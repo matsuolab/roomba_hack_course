@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Chapter 1 | ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack/course/chap1/</link><atom:link href="https://matsuolab.github.io/roomba_hack/course/chap1/index.xml" rel="self" type="application/rss+xml"/><description>Chapter 1</description><generator>Wowchemy (https://wowchemy.com)</generator><language>ja</language><copyright>© 2022 Tokyo Robot And Intelligence Lab (TRAIL)</copyright><lastBuildDate>Sun, 09 Sep 2018 00:00:00 +0000</lastBuildDate><image><url>https://matsuolab.github.io/roomba_hack/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png</url><title>Chapter 1</title><link>https://matsuolab.github.io/roomba_hack/course/chap1/</link></image><item><title>開発環境</title><link>https://matsuolab.github.io/roomba_hack/course/chap1/%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83/</link><pubDate>Fri, 01 Jan 2021 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack/course/chap1/%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83/</guid><description>&lt;p>ロボットシステムの開発環境に使われている要素の概要を理解する&lt;/p>
+&lt;h2 id="スライド">スライド&lt;/h2>
+&lt;p>&lt;a href="https://docs.google.com/presentation/d/1-q6zq3vV91GTj7mw9uqwT4B8LyHDpFHBNVi4lEyCa5A/edit?usp=sharing">https://docs.google.com/presentation/d/1-q6zq3vV91GTj7mw9uqwT4B8LyHDpFHBNVi4lEyCa5A/edit?usp=sharing&lt;/a>&lt;/p>
+&lt;h2 id="learn">Learn&lt;/h2>
+&lt;h3 id="linuxコマンド">Linuxコマンド&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>command&lt;/th>
+&lt;th>　説明&lt;/th>
+&lt;th>option&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>ls&lt;/td>
+&lt;td>ディレクトリ内のファイル・ディレクトリの表示&lt;/td>
+&lt;td>-l: 詳細を表示 -a: 全て表示&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>mkdir&lt;/td>
+&lt;td>ディレクトリ作成&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>cd&lt;/td>
+&lt;td>ディレクトリ移動&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>mv&lt;/td>
+&lt;td>ファイル移動&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>rm&lt;/td>
+&lt;td>ファイル削除&lt;/td>
+&lt;td>-r:ディレクトリ内を再起的に削除 -f:強制削除&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>cat&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="ssh">ssh&lt;/h3>
+&lt;pre>&lt;code>ssh &amp;lt;username&amp;gt;@&amp;lt;hostname&amp;gt; -p &amp;lt;port&amp;gt; -i &amp;lt;identity_file&amp;gt;
+&lt;/code>&lt;/pre>
+&lt;h3 id="エディタ">エディタ&lt;/h3>
+&lt;ul>
+&lt;li>vim
+&lt;ul>
+&lt;li>チュートリアル： &lt;code>vimtuter&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>emacs&lt;/li>
+&lt;/ul>
+&lt;h3 id="gitgithub">git/GitHub&lt;/h3>
+&lt;ul>
+&lt;li>gitとは
+&lt;ul>
+&lt;li>add&lt;/li>
+&lt;li>push&lt;/li>
+&lt;li>pull&lt;/li>
+&lt;li>fetch&lt;/li>
+&lt;li>clone&lt;/li>
+&lt;li>merge&lt;/li>
+&lt;li>reset&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;h2 id="githubとは">GitHubとは&lt;/h2>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="docker">docker&lt;/h3>
+&lt;ul>
+&lt;li>
+&lt;p>Dockerとは&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>DockerFileのビルド&lt;/p>
+&lt;pre>&lt;code>docker build -t &amp;lt;image_name&amp;gt;:&amp;lt;tag_name&amp;gt; -f &amp;lt;Dockerfile&amp;gt; &amp;lt;relative_dir&amp;gt;
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;li>
+&lt;p>Docker Image&lt;/p>
+&lt;pre>&lt;code># Docker image一覧
+docker images
+# Docker Imageのダウンロード
+docker pull &amp;lt;image_name&amp;gt;:&amp;lt;tag_name&amp;gt;
+# 削除
+docker rmi &amp;lt;image_id&amp;gt;
+# 不要なDocker imageを消す
+docker image prune
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;li>
+&lt;p>Docker Container&lt;/p>
+&lt;pre>&lt;code># Docker containerの起動
+docker run &amp;lt;image_name&amp;gt; &amp;lt;command&amp;gt;
+# Docker container一覧
+docker ps -a
+# Docker containerに接続
+docker exec -it &amp;lt;container_name&amp;gt; bash
+&lt;/code>&lt;/pre>
+&lt;p>※&lt;code>docker run&lt;/code>でよく使うオプション&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>-it&lt;/code>
+&lt;ul>
+&lt;li>標準入出力有効になる&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>--name &amp;lt;container_name&amp;gt;&lt;/code>
+&lt;ul>
+&lt;li>コンテナの名前の指定&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>--rm&lt;/code>
+&lt;ul>
+&lt;li>コンテナを抜けた際に自動的にコンテナを削除する&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>--gpus all&lt;/code>
+&lt;ul>
+&lt;li>コンテナに全gpuを渡す&lt;/li>
+&lt;li>gpuの個数を指定する場合は all の代わりに数字(0, 1,&amp;hellip;)&lt;/li>
+&lt;li>gpuを指定する場合は &lt;code>--gpus '&amp;quot;device=0,1&amp;quot;'&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>-v &amp;lt;host/path/to/dir:container/path/to/dir&amp;gt;&lt;/code>
+&lt;ul>
+&lt;li>コンテナ内にホストのディレクトリをマウントする&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>-p &amp;lt;host_port&amp;gt;:&amp;lt;container_port&amp;gt;&lt;/code>
+&lt;ul>
+&lt;li>ホストのポートをコンテナのポートにマップする&lt;/li>
+&lt;li>コンテナ内でwebサーバを動かす場合などに使う&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>--net=host&lt;/code>
+&lt;ul>
+&lt;li>コンテナとホストでネットワークを共有する(IPアドレスなどが同じになる)&lt;/li>
+&lt;li>ROSノードをコンテナ内で動かす場合などはこれを使うと楽&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>--privileged&lt;/code>
+&lt;ul>
+&lt;li>コンテナからのデバイスへのアクセスを許可&lt;/li>
+&lt;li>コンテナからWEBカメラにアクセスしたいときなど&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="演習">演習&lt;/h2>
+&lt;p>演習には個人PC, 開発PC, ルンバに搭載されているjetsonの3種類のコンピュータを用います。&lt;/p>
+&lt;p>開発PC : robot_dev系, hsr_dev系&lt;/p>
+&lt;p>jetson : roomba_dev系&lt;/p>
+&lt;details class="spoiler " id="spoiler-0">
+&lt;summary>【ssh】開発用PCにsshする&lt;/summary>
+&lt;p>&lt;p>個人PCから開発PCにsshする&lt;/p>
+&lt;pre>&lt;code class="language-shell">(個人PC):~$ vim ~/.ssh/config
+(個人PC):~$ ssh robot_dev2
+&lt;/code>&lt;/pre>
+&lt;p>sshに成功すると&lt;/p>
+&lt;pre>&lt;code>robot_dev2@robot-dev2:~$
+&lt;/code>&lt;/pre>
+&lt;p>などと表記が変わり、開発PCに接続できたことが確認できます。&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-1">
+&lt;summary>【Linuxコマンド】グループのディレクトリを作成し移動する&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-shell">(開発PC):~$ mkdir group_a
+(開発PC):~$ cd group_a
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-2">
+&lt;summary>【git】roomba_hackリポジトリをcloneし移動する&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-shell">(開発PC):~/group_a$ git clone https://github.com/matsuolab/roomba_hack.git
+(開発PC):~/group_a$ cd roomba_hack
+(開発PC):~/group_a$ ls
+&lt;/code>&lt;/pre>
+&lt;p>&lt;a href="https://github.com/matsuolab/roomba_hack">https://github.com/matsuolab/roomba_hack&lt;/a> をそのままダウンロードできたことが確認できると思います。&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-3">
+&lt;summary>【git】ブランチを確認する&lt;/summary>
+&lt;p>&lt;p>git branchコマンドを使ってみましょう。&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC):~/group_a/roomba_hack$ git branch
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-4">
+&lt;summary>【docker】roomba_hackの開発環境のdocker imageをビルドする&lt;/summary>
+&lt;p>&lt;p>shellファイルを実行してビルドを行います。&lt;/p>
+&lt;pre>&lt;code>(開発PC):~/group_a/roomba_hack$ ./BUILD-DOCKER-IMAGE.sh
+&lt;/code>&lt;/pre>
+&lt;p>shellファイルの中身をcatコマンドで確認してみましょう。&lt;/p>
+&lt;pre>&lt;code>(開発PC)2:~/group_a/roomba_hack$ cat BUILD-DOCKER-IMAGE.sh
+&lt;/code>&lt;/pre>
+&lt;p>細かいところは気にしなくていいですが、ファイルの最後の&lt;/p>
+&lt;pre>&lt;code>docker build . -f docker/${DOCKERFILE_NAME} -t ${IMAGE_NAME}:${TAG_NAME} --build-arg BASE_IMAGE=${BASE_IMAGE}
+&lt;/code>&lt;/pre>
+&lt;p>でビルドが行われていることが確認できると思います。&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-5">
+&lt;summary>【ssh】jetsonにsshする&lt;/summary>
+&lt;p>&lt;p>開発用PCからルンバに載っているjetson nanoへsshします。&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC):~/group_a/roomba_hack$ ssh roomba_dev2
+roomba_dev2@roomba-dev-jetson2:~$
+&lt;/code>&lt;/pre>
+&lt;p>先頭の表記が&lt;code>roomba_dev2@roomba-dev-jetson2&lt;/code>と変わり、jetsonへ接続されたことがわかります。&lt;/p>
+&lt;p>jetsonでも同様にグループのディレクトリを作成し、移動し、roomba_hackリポジトリをcloneしてみましょう。&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-6">
+&lt;summary>【ssh】VNCを使う&lt;/summary>
+&lt;p>&lt;p>個人PCから開発PCにsshで接続&lt;/p>
+&lt;pre>&lt;code class="language-shell">(個人PC):~$ ssh robot_dev2 -L 5900:localhost:5900
+&lt;/code>&lt;/pre>
+&lt;p>手元のVNC viewerでlocalhost:5900を開く&lt;/p>
+&lt;/p>
+&lt;/details></description></item><item><title>ROSとは</title><link>https://matsuolab.github.io/roomba_hack/course/chap1/ros/</link><pubDate>Sat, 22 Jan 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack/course/chap1/ros/</guid><description>&lt;p>ロボット開発によく用いられるROSの概要を理解する&lt;/p>
+&lt;h2 id="learn">Learn&lt;/h2>
+&lt;h3 id="rosの概要">ROSの概要&lt;/h3>
+&lt;p>ROS(Robot Operating System)は、ロボット・アプリケーション作成を支援するライブラリとツールを提供するミドルウェアです。
+具体的には以下にあげるものをROSは提供しています。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>メッセージ通信&lt;/p>
+&lt;p>プロセス間、コンピュータ間の通信ライブラリが提供されています。用途に応じて、多対多や一対多、非同期、同期などの通信形態を選択することができます。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>デバイスドライバ&lt;/p>
+&lt;p>ロボットに搭載される多くのセンサやアクチュエータがROSのAPIで標準化された形で提供されています。&lt;/p>
+&lt;p>&lt;a href="https://github.com/ros-drivers">https://github.com/ros-drivers&lt;/a>
+&lt;a href="http://wiki.ros.org/Sensors">http://wiki.ros.org/Sensors&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>ライブラリ&lt;/p>
+&lt;p>ロボットを動作させるソフトウェア(ナビゲーション、マニピュレーション)の基本機能の大半が提供されています。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>視覚化ツール&lt;/p>
+&lt;p>ロボットの内部状態やセンサ出力を2次元、3次元で視覚化するRvizや3次元動力学シミュレータのGazeboなどが提供されています。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>パッケージ管理&lt;/p>
+&lt;p>多種多様なプログラミング言語(python, C++, &amp;hellip;)、依存関係で記述されたプログラム(パッケージ)同士を統合的にセットアップ、ビルド、テスト、リリースすることが可能です。&lt;/p>
+&lt;p>たとえば、経路計画など処理が重いプロセスはC++で、画像認識など機械学習系のプロセスはpythonで実装し、それらプロセス間の通信を容易に実装できる。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="rosのメッセージ通信">ROSのメッセージ通信&lt;/h3>
+&lt;p>ロボットシステムでは、多数のプログラムを並列に実行し、それぞれがデータをやりとりします。
+それらのプログラム間の通信ライブラリをROSは提供します。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>ノード(node)&lt;/p>
+&lt;p>ROSでは、一つのプログラム単位を「ノード(node)」と呼びます。
+ノードは、ROSクライアントライブラリを用いて、他のノードとデータをやりとりします。
+ROSクライアントライブラリは異なるプログラミング言語で記述されたノードがやりとりできるようにしています。
+ノードは、次に述べるトピックの配信・購読、またはサービスの提供・使用が可能です。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>トピック(topic)&lt;/p>
+&lt;p>ROSでの、標準的なデータ通信の経路を「トピック(topic)」と呼びます。
+ノードはメッセージをトピックへ向けて配信(Publish)し、同様に購読する(Subscribe)ことでトピックからメッセージを受け取ることができます。&lt;/p>
+&lt;p>トピックには名前が付けられ、同じトピックに複数のノードがデータを送り、複数のノードがデータを受け取ることができます。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>メッセージ(message)&lt;/p>
+&lt;p>トピックへ配信したり、購読したりするときのROSのデータ型のことを「メッセージ(message)」と呼びます。
+メッセージの型はmsgファイルに記述されており、使用言語に依存しないデータ形式になっています。&lt;/p>
+&lt;p>以下に、物体やロボットの位置を表す時によく用いる&lt;code>geomemtry_msgs/PoseStamped&lt;/code>型のmsgファイルを示します。
+位置情報の時間や座標フレームの情報が含まれるheaderと座標位置を表すposeで定義されています。&lt;/p>
+&lt;pre>&lt;code>std_msgs/Header header
+uint32 seq
+time stamp
+string frame_id
+geometry_msgs/Pose pose
+geometry_msgs/Point position
+float64 x
+float64 y
+float64 z
+geometry_msgs/Quaternion orientation
+float64 x
+float64 y
+float64 z
+float64 w
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;li>
+&lt;p>サービス(service)&lt;/p>
+&lt;p>「サービス(service)」はノードが他のノードとお互いに通信するための一つの手段です。
+サービスを提供しているノードに引数を渡して、関数の実行結果を戻り値として受け取ることができます。&lt;/p>
+&lt;p>呼び出される側のノードは、サービス名とデータ形式の宣言を「アドバタイズ(advertise)」し、呼び出す側のノードは、サービスを「コール(call)」します。&lt;/p>
+&lt;p>サービスにおいて送受信されるデータの型はsrvファイルに記述されています。
+メッセージと同様使用言語に依存しないデータ形式ですが、メッセージと異なるのは、引数と戻り値の二つの形式を定義する必要があるところです。&lt;/p>
+&lt;p>以下に、srvの例として&lt;code>std_srvs/SetBool&lt;/code>を示します。
+このように引数と戻り値の間に&lt;code>---&lt;/code>を入れて定義します。&lt;/p>
+&lt;pre>&lt;code>bool data
+---
+bool success
+string message
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;li>
+&lt;p>ROSマスタ(ROS master)&lt;/p>
+&lt;p>「ROSマスタ(ROS master)」は、ノード、トピックおよびサービスの名前登録を行い、それぞれのノードが他のノードから見えるようにする役割を担っています。
+通信するノード名とトピック名およびサービス名の対応が決定した後、ノード同士が「peer-to-peer」で通信します。&lt;/p>
+&lt;p>ROSマスタとノード間の通信はXML-RPCを用いて行われます。
+ROSマスタを起動するには「roscore」というコマンドを実行します。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>パラメータサーバ(parameter server)&lt;/p>
+&lt;p>「パラメータサーバ(parameter server)」は、設定データを複数のノードで共有するための軽量なサーバです。
+各ノードのパラメータを、パラメータサーバで一括して管理できます。
+パラメータサーバもROSマスタ同様に「roscore」コマンドで起動します。&lt;/p>
+&lt;p>パラメータサーバで扱える型は、整数・小数・真偽値・辞書・リストになります。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>ROSのデータ通信のまとめ&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;figure id="figure-ros通信">
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../ros_communication.png" alt="ROS通信" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;figcaption>
+ROS通信
+&lt;/figcaption>&lt;/figure>
+&lt;!-- ### デバイスドライバ
+- カメラ
+- LiDAR
+- IMU -->
+&lt;h3 id="rosと連動するソフトウェア">ROSと連動するソフトウェア&lt;/h3>
+&lt;p>ROSは以下のソフトウェアと連動して使うためのパッケージが提供されています。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>OpenCV&lt;/p>
+&lt;p>コンピュータビジョンの標準的なライブラリ。&lt;/p>
+&lt;p>OpenCVのデータ形式である、MatクラスとROSのメッセージ形式を変換するcv_bridgeや３次元座標上の物体を２次元画像上に投影する機能であるimage_geometryといったパッケージ(vision_opencv)が提供されています。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>PCL(Point Cloud Library)&lt;/p>
+&lt;p>3次元点群処理のライブラリ。&lt;/p>
+&lt;p>OpenCV同様PCLのデータ形式とROSのメッセージ形式を変換するパッケージが提供されています。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>OpenSLAM, Navigation Stack&lt;/p>
+&lt;p>移動ロボットの自己位置推定と地図生成を同時に行うSLAM(Simultaneous Localization and Mapping)のソースコードを公開するためのプラットフォームと、。&lt;/p>
+&lt;p>ROSではOpenSLAMで実装されているgmappingパッケージのラッパーやそれと連携して自律走行を実現するnavigationメタパッケージが提供されています。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Move it&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="視覚化ツール">視覚化ツール&lt;/h3>
+&lt;ul>
+&lt;li>rqt&lt;/li>
+&lt;/ul>
+&lt;figure id="figure-rqt-window">
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../ros_gui.png" alt="rqt window" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;figcaption>
+rqt window
+&lt;/figcaption>&lt;/figure>
+&lt;!-- http://wiki.ros.org/rqt -->
+&lt;ul>
+&lt;li>rviz&lt;/li>
+&lt;/ul>
+&lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+&lt;iframe src="https://www.youtube.com/embed/i--Sd4xH9ZE" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video">&lt;/iframe>
+&lt;/div>
+&lt;!-- http://wiki.ros.org/ja/rviz -->
+&lt;ul>
+&lt;li>gazebo&lt;/li>
+&lt;/ul>
+&lt;!-- ### パッケージ管理
+- プログラミング言語
+- rosdep
+- -->
+&lt;h2 id="演習">演習&lt;/h2>
+&lt;details class="spoiler " id="spoiler-3">
+&lt;summary>roomba driverを起動し、動作していることを確認する&lt;/summary>
+&lt;p>&lt;ul>
+&lt;li>
+&lt;p>jetsonにアクセスする&lt;/p>
+&lt;pre>&lt;code class="language-sh">(開発PC):~$ ssh roomba_dev1
+(jetson):~$
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;li>
+&lt;p>docker containerを起動する
+余裕があれば&lt;code>RUN-DOCKER-CONTAINER.sh&lt;/code>ファイルの中身を確認してみましょう。&lt;/p>
+&lt;pre>&lt;code class="language-sh">(jetson):~$ cd ~/team_a/roomba_hack
+(jetson):~/team_a/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
+root@roomba-dev-jetson:~/roomba_hack#
+&lt;/code>&lt;/pre>
+&lt;p>&lt;code>root@roomba-dev-jetson:~/roomba_hack#&lt;/code>などと表示されればdocker内部に入れています。&lt;/p>
+&lt;p>今後docker内部であることは(docker)と表記します。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>roomba driverなどを起動するlaunchファイルを起動する
+このタイミングでルンバの電源が入っているかを確認しておきましょう。&lt;/p>
+&lt;pre>&lt;code class="language-sh">(jetson)(docker):~/roomba_hack# roslaunch roomba_bringup bringup.launch
+&lt;/code>&lt;/pre>
+&lt;p>起動に成功すればルンバからピッと短い音が鳴り、ターミナルには赤い文字が出続けるはずです。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-4">
+&lt;summary>コントローラーを使って、ロボットを動かす&lt;/summary>
+&lt;p>&lt;ul>
+&lt;li>
+&lt;p>開発PCでdocker containerを起動する
+　　xにはroomba_devの後につく数字を入れてください。&lt;/p>
+&lt;pre>&lt;code class="language-sh">(開発PC):~$ cd ~/team_a/roomba_hack
+(開発PC):~/team_a/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;li>
+&lt;p>コントローラーを起動
+コントローラーが開発PCに刺さってることを確認してください。&lt;/p>
+&lt;pre>&lt;code class="language-sh">(開発PC)(docker):~/roomba_hack# cd catkin_ws
+(開発PC)(docker):~/roomba_hack/catkin_ws# catkin_make
+(開発PC)(docker):~/roomba_hack/catkin_ws# source devel/setup.bash
+(開発PC)(docker):~/roomba_hack/catkin_ws#roslaunch roomba_teleop teleop.launch
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;li>
+&lt;p>コントローラのモード&lt;/p>
+&lt;ul>
+&lt;li>移動・停止&lt;/li>
+&lt;li>自動・マニュアル&lt;/li>
+&lt;li>ドッキング・アンドッキング&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>コントローラによる操縦&lt;/p>
+&lt;ul>
+&lt;li>移動ロック解除
+L1を押している時のみ移動コマンドが動作します。&lt;/li>
+&lt;li>左ジョイスティック
+縦方向で前進速度(手前に倒すとバック)、横方向は回転速度に対応しています。&lt;/li>
+&lt;li>左矢印
+それぞれ、一定に低速度で前進・後退・回転します。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>正常に起動できているかを確認
+開発PCで新しくターミナルを開いてdockerの中に入ります。&lt;/p>
+&lt;p>すでに開発PCで起動されているdockerコンテナに入る場合は、&lt;/p>
+&lt;pre>&lt;code class="language-sh">(開発PC):~/group_a/roomba_hack$ docker exec -it roomba_hack bash
+&lt;/code>&lt;/pre>
+&lt;p>または&lt;/p>
+&lt;pre>&lt;code class="language-sh">(開発PC):~/group_a/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
+&lt;/code>&lt;/pre>
+&lt;p>のいずれかの方法で入ることができます。&lt;/p>
+&lt;p>さまざまなコマンドを使ってroombaの情報を取得してみましょう。&lt;/p>
+&lt;pre>&lt;code class="language-sh">(開発PC)(docker):~/roomba_hack# rosnode list
+(開発PC)(docker):~/roomba_hack# rostopic list
+(開発PC)(docker):~/roomba_hack# rostopic echo /cmd_vel
+(開発PC)(docker):~/roomba_hack# rqt_graph
+(開発PC)(docker):~/roomba_hack# rviz
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;/ul>
+&lt;/p>
+&lt;/details></description></item></channel></rss>

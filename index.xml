@@ -1,0 +1,1710 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack/</link><atom:link href="https://matsuolab.github.io/roomba_hack/index.xml" rel="self" type="application/rss+xml"/><description>ロボットシステム入門</description><generator>Wowchemy (https://wowchemy.com)</generator><language>ja</language><copyright>© 2022 Tokyo Robot And Intelligence Lab (TRAIL)</copyright><lastBuildDate>Tue, 05 Apr 2022 00:00:00 +0000</lastBuildDate><image><url>https://matsuolab.github.io/roomba_hack/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png</url><title>ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack/</link></image><item><title>ロボットシステムにおけるセンシング・アクチュエーション・通信②</title><link>https://matsuolab.github.io/roomba_hack/course/chap3/sensing2/</link><pubDate>Tue, 05 Apr 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack/course/chap3/sensing2/</guid><description>&lt;p>複数のセンサを組み合わせてよりかしこくロボットを動かしてみよう&lt;/p>
+&lt;h2 id="learn">Learn&lt;/h2>
+&lt;p>&lt;a href="../../chap2/sensing1/#%e6%bc%94%e7%bf%92">前回の演習&lt;/a>では，速度と時間の指令を使ってロボットを制御しました．&lt;/p>
+&lt;p>周囲に障害物が何もない状況や，ロボットの滑りがない環境では，速度と時間のコマンドを使って思った通りにロボットを動かすことができるかもしれませんが，実環境では，ロボットの周囲には障害物が存在しますし，移動距離で制御する方が直感的です．&lt;/p>
+&lt;p>前回の演習のようにロボットに速度と時間を一回与えて，その通りに動かすようなフィードフォワード制御ではなく，今回は，ロボットが逐次的にセンサの情報を反映して振る舞いを変える&lt;mark>フィードバック制御&lt;/mark>を行なってみましょう．&lt;/p>
+&lt;h3 id="オドメトリのセンサ情報を使ってロボットを動かしてみよう">オドメトリのセンサ情報を使ってロボットを動かしてみよう&lt;/h3>
+&lt;p>まずは，ロボットのタイヤの回転量から計算される移動距離である&lt;mark>（ホイール）オドメトリ（odometry）&lt;/mark>を使った制御をしてみましょう．&lt;/p>
+&lt;h4 id="オドメトリのメッセージodomの中身を見てみよう">オドメトリのメッセージ（&lt;code>/odom&lt;/code>）の中身を見てみよう&lt;/h4>
+&lt;p>roombaのオドメトリの情報は，&lt;code>/odom&lt;/code>トピックにpublishされています．&lt;/p>
+&lt;p>&lt;code>rostopic echo /odom&lt;/code>をしてみるとメッセージとしてどんな情報が流れているかわかります．
+&lt;details class="spoiler " id="spoiler-2">
+&lt;summary>&lt;code>rostopic echo -n 1 /odom&lt;/code>&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-bash">root@dynamics:~/roomba_hack# rostopic echo -n 1 /odom
+header:
+seq: 2115
+stamp:
+secs: 1649692132
+nsecs: 791056254
+frame_id: &amp;quot;odom&amp;quot;
+child_frame_id: &amp;quot;base_footprint&amp;quot;
+pose:
+pose:
+position:
+x: -0.014664691872894764
+y: -0.0010878229513764381
+z: 0.0
+orientation:
+x: 0.0
+y: 0.0
+z: 0.0056752621080531414
+w: 0.9999838955703261
+covariance: [0.08313143998384476, 0.00019857974257320166, 0.0, 0.0, 0.0, 0.004368376452475786, 0.00019857988809235394, 0.015032557770609856, 0.0, 0.0, 0.0, -0.26573312282562256, 0.0, 0.0, 1e-05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1e-05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1e-05, 0.0, 0.0043683769181370735, -0.26573312282562256, 0.0, 0.0, 0.0, 6.021446704864502]
+twist:
+twist:
+linear:
+x: 0.0
+y: 0.0
+z: 0.0
+angular:
+x: 0.0
+y: 0.0
+z: 0.0
+covariance: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1e-05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1e-05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1e-05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+---
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>&lt;/p>
+&lt;p>&lt;code>rostopic type /odom&lt;/code>をしてみると，メッセージとして，&lt;code>nav_msgs/Odometry&lt;/code>型が使われていることがわかります．
+&lt;details class="spoiler " id="spoiler-3">
+&lt;summary>&lt;code>rostopic type /odom&lt;/code>&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-bash">root@dynamics:~/roomba_hack# rostopic type /odom
+nav_msgs/Odometry
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>&lt;/p>
+&lt;p>&lt;code>nav_msgs/Odometry&lt;/code>型の&lt;a href="http://docs.ros.org/en/noetic/api/nav_msgs/html/msg/Odometry.html" target="_blank" rel="noopener">ドキュメント&lt;/a>を確認してみると，このメッセージは&lt;code>pose&lt;/code>と&lt;code>twist&lt;/code>で構成されていることがわかります．&lt;/p>
+&lt;p>&lt;code>pose&lt;/code>は．（&lt;code>child_frame&lt;/code>から見た）ロボットの推定姿勢（位置と回転角）を表していて，&lt;code>covariance&lt;/code>にはその不確かさを表す共分散が記録されています．&lt;/p>
+&lt;p>一方，&lt;code>twist&lt;/code>は，（&lt;code>child_frame&lt;/code>から見た）ロボットの速度を表していて，&lt;code>pose&lt;/code>と同様に&lt;code>covariance&lt;/code>にはその不確かさを表す共分散が記録されています．&lt;/p>
+&lt;p>なお，メッセージ型の定義は，&lt;code>rosmsg info nav_msgs/Odometry&lt;/code>することでもコマンドから確認できます．
+&lt;details class="spoiler " id="spoiler-4">
+&lt;summary>&lt;code>rosmsg info nav_msgs/Odometry&lt;/code>&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-bash">root@dynamics:~/roomba_hack# rosmsg info nav_msgs/Odometry
+std_msgs/Header header
+uint32 seq
+time stamp
+string frame_id
+string child_frame_id
+geometry_msgs/PoseWithCovariance pose
+geometry_msgs/Pose pose
+geometry_msgs/Point position
+float64 x
+float64 y
+float64 z
+geometry_msgs/Quaternion orientation
+float64 x
+float64 y
+float64 z
+float64 w
+float64[36] covariance
+geometry_msgs/TwistWithCovariance twist
+geometry_msgs/Twist twist
+geometry_msgs/Vector3 linear
+float64 x
+float64 y
+float64 z
+geometry_msgs/Vector3 angular
+float64 x
+float64 y
+float64 z
+float64[36] covariance
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>&lt;/p>
+&lt;h4 id="クォータニオンquaternion">クォータニオン(quaternion)&lt;/h4>
+&lt;p>さて，&lt;code>/odom&lt;/code>のトピックでは，ロボットの回転角は&lt;mark>クォータニオン（quaternion）&lt;/mark>で記述されています．&lt;/p>
+&lt;p>クォータニオンは，日本語では四元数と呼ばれ，3次元空間上での回転角を表現する方法の一つで，4つの要素を持つベクトルで表現されます．&lt;/p>
+&lt;p>クォータニオンによる3次元回転の表現は，角度を連続的にかつ簡潔に表現できるためROSではよく用いられます（その他には，オイラー角による表現や回転行列による表現があります）．&lt;/p>
+&lt;p>それぞれの回転角に関する表現のメリット・デメリットを調べてみましょう（「ジンバルロック」などのキーワードで調べるとよりよく理解できると思います）．&lt;/p>
+&lt;p>クォータニオンからオイラー角へは，&lt;code>tf&lt;/code>パッケージの&lt;code>tf.transformations.euler_from_quaternion&lt;/code>を使うことで変換できます（&lt;a href="http://docs.ros.org/en/jade/api/tf/html/python/transformations.html#tf.transformations.euler_from_quaternion" target="_blank" rel="noopener">ドキュメント&lt;/a>）．&lt;/p>
+&lt;h4 id="サブスクライバsubscriberの仕組みを知ろう">サブスクライバ（subscriber)の仕組みを知ろう&lt;/h4>
+&lt;p>それでは，オドメトリ&lt;code>/odom&lt;/code>の情報を使った制御の実装の例として&lt;code>navigation_tutorial&lt;/code>パッケージの中の&lt;code>simple_control2.py&lt;/code>を見てみましょう（&lt;a href="https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/simple_control2.py" target="_blank" rel="noopener">github&lt;/a>）．&lt;/p>
+&lt;p>前回までに強調されてきた通り，ROSは非同期分散のシステムを簡単に作ることができるのが特徴です．
+そのため，ロボットから非同期に送られてくる&lt;code>/odom&lt;/code>の情報をうまく扱うことが重要です．&lt;/p>
+&lt;p>実装例にあるように，Pythonによるノードの実装では，クラスとして定義するのがわかりやすい方法でしょう．&lt;/p>
+&lt;p>実装例では，&lt;code>SimpleControlller&lt;/code>クラスとして，&lt;code>simple_controller&lt;/code>というノードを定義しています．
+以下のように，ノードを初期化する際に，コマンドを&lt;code>/cmd_vel&lt;/code>トピックに送信するパブリッシャ（publisher)と，&lt;code>/odom&lt;/code>を受信するサブスクライバ(subscriber)を作成しています．&lt;/p>
+&lt;pre>&lt;code class="language-python">class SimpleController:
+def __init__(self):
+rospy.init_node('simple_controller', anonymous=True)
+# Publisher
+self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+# Subscriber
+odom_sub = rospy.Subscriber('/odom', Odometry, self.callback_odom)
+self.x = None
+self.y = None
+self.yaw = None
+while self.x is None:
+rospy.sleep(0.1)
+&lt;/code>&lt;/pre>
+&lt;p>パブリッシャの使い方は前回の&lt;code>simple_control.py&lt;/code>の&lt;a href="https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/simple_control.py" target="_blank" rel="noopener">実装&lt;/a>を確認してください．&lt;/p>
+&lt;p>パブリッシャと同様に，サブスクライバは&lt;code>rospy&lt;/code>の&lt;code>Subscriber&lt;/code>を用いて作成できます．
+サブスクライバの特徴として，メッセージを受信した時の処理である&lt;mark>コールバック（callback）&lt;/mark>を定義できます．&lt;/p>
+&lt;p>この実装例では，&lt;code>self.callback_odom&lt;/code>として定義されており，インスタンスの属性（&lt;code>self.x&lt;/code>, &lt;code>self.y&lt;/code>, &lt;code>self.yaw&lt;/code>）を，受信したメッセージで変更するようなプログラムになっています．&lt;/p>
+&lt;pre>&lt;code class="language-python"> def callback_odom(self, data):
+self.x = data.pose.pose.position.x
+self.y = data.pose.pose.position.y
+self.yaw = self.get_yaw_from_quaternion(data.pose.pose.orientation)
+&lt;/code>&lt;/pre>
+&lt;p>つまり，&lt;code>self.x&lt;/code>には&lt;code>/odom&lt;/code>から受信した位置のx座標，&lt;code>self.y&lt;/code>には位置のy座標，&lt;code>self.yaw&lt;/code>には，回転角のyawを格納しています．&lt;/p>
+&lt;p>クォータニオンとして受信した姿勢の回転角のyaw成分を取り出すための&lt;code>self.get_yaw_from_quaternion&lt;/code>は以下のようになっています（オイラー角はroll, pitch, yawの順で返ってくるので&lt;code>e[2]&lt;/code>でyawを取得しています）．&lt;/p>
+&lt;pre>&lt;code class="language-python"> def get_yaw_from_quaternion(self, quaternion):
+e = tf.transformations.euler_from_quaternion(
+(quaternion.x, quaternion.y, quaternion.z, quaternion.w))
+return e[2]
+&lt;/code>&lt;/pre>
+&lt;p>これらのセンサの値を使うことで，以下のように，指定した距離ロボットが移動するまで直進させ続けたり，指定した角度までロボットが回転するまで回転させ続けることができるようになります．&lt;/p>
+&lt;p>直進&lt;/p>
+&lt;pre>&lt;code class="language-python"> def go_straight(self, dis, velocity=0.3):
+vel = Twist()
+x0 = self.x
+y0 = self.y
+while(np.sqrt((self.x-x0)**2+(self.y-y0)**2)&amp;lt;dis):
+vel.linear.x = velocity
+vel.angular.z = 0.0
+self.cmd_vel_pub.publish(vel)
+rospy.sleep(0.1)
+self.stop()
+&lt;/code>&lt;/pre>
+&lt;p>右回転&lt;/p>
+&lt;pre>&lt;code class="language-python"> def turn_right(self, yaw, yawrate=-0.5):
+vel = Twist()
+yaw0 = self.yaw
+while(abs(self.yaw-yaw0)&amp;lt;np.deg2rad(yaw)):
+vel.linear.x = 0.0
+vel.angular.z = yawrate
+self.cmd_vel_pub.publish(vel)
+rospy.sleep(0.1)
+self.stop()
+&lt;/code>&lt;/pre>
+&lt;p>左回転&lt;/p>
+&lt;pre>&lt;code class="language-python"> def turn_left(self, yaw, yawrate=0.5):
+vel = Twist()
+yaw0 = self.yaw
+while(abs(self.yaw-yaw0)&amp;lt;np.deg2rad(yaw)):
+vel.linear.x = 0.0
+vel.angular.z = yawrate
+self.cmd_vel_pub.publish(vel)
+rospy.sleep(0.1)
+self.stop()
+&lt;/code>&lt;/pre>
+&lt;p>それでは，オドメトリを使って実際にロボットを制御してみましょう．&lt;/p>
+&lt;h2 id="演習">演習&lt;/h2>
+&lt;details class="spoiler " id="spoiler-7">
+&lt;summary>【jetson・開発マシン】それぞれdockerコンテナを起動&lt;/summary>
+&lt;p>&lt;p>．
+jetsonでdockerコンテナを起動&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC):~$ ssh roomba_dev1
+(jetson):~$ cd ~/group_a/roomba_hack
+(jetson):~/group_a/roomba_hack ./RUN-DOCKER-CONTAINER.sh
+(jetson)(docker):~/roomba_hack#
+&lt;/code>&lt;/pre>
+&lt;p>開発PCでdockerコンテナを起動&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC):~$ cd ~/group_a/roomba_hack
+(開発PC):~/group_a/roomba_hack ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
+(開発PC)(docker):~/roomba_hack#
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-8">
+&lt;summary>【jetson】ROSマスタ、各種ノードを起動&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-shell">(jetson)(docker):~/roomba_hack# roslaunch roomba_bringup bringup.launch
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;h3 id="rosメッセージの可視化">ROSメッセージの可視化&lt;/h3>
+&lt;details class="spoiler " id="spoiler-9">
+&lt;summary>【開発PC】topicの確認&lt;/summary>
+&lt;p>&lt;p>&lt;code>/odom&lt;/code>の型を確認&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC)(docker):~/roomba_hack# rostopic type /odom
+&lt;/code>&lt;/pre>
+&lt;p>&lt;code>/odom&lt;/code>の中身を確認&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC)(docker):~/roomba_hack# rostopic echo /odom
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-10">
+&lt;summary>オドメトリを使ったフィードバック制御&lt;/summary>
+&lt;p>&lt;p>&lt;code>simple_control2.py&lt;/code>を実行してみよう．&lt;/p>
+&lt;p>開発PCでteleopのコードを実行しましょう&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC)(docker):~/roomba_hack# roslaunch roomba_teleop teleop.launch
+&lt;/code>&lt;/pre>
+&lt;p>このプログラムを動かすときには，コントローラの&lt;code>Y&lt;/code>ボタンを押してから&lt;code>B&lt;/code>ボタンを押して&lt;code>auto&lt;/code>モードにしておきましょう．&lt;/p>
+&lt;p>1メートルほど前に進んだあと，左に90度程度旋回し，右に90度程度旋回したら成功です．&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC)(docker):~/roomba_hack# rosrun navigation_tutorial simple_control2.py
+&lt;/code>&lt;/pre>
+&lt;p>try it! &lt;code>simple_control2.py&lt;/code>の中身を読んでコードを変更してみよう&lt;/p>
+&lt;/p>
+&lt;/details></description></item><item><title>serviceとactionlib</title><link>https://matsuolab.github.io/roomba_hack/course/chap6/service-actionlib/</link><pubDate>Sat, 22 Jan 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack/course/chap6/service-actionlib/</guid><description>&lt;h2 id="learn">Learn&lt;/h2>
+&lt;p>ここまでトピックを使った通信を使ってロボットシステムを構築してきました．
+トピック通信は，メッセージを出版(publish，配信とも訳される)・購読（subscribe）することで通信する，相手を仮定しない非同期な通信方法でした．&lt;/p>
+&lt;p>しかし，もっと複雑なシステムを組む場合には，「相手の処理の結果を呼び出し側で受け取って知りたい」など様々な場合が考えられます．&lt;/p>
+&lt;p>このようなより複雑な通信を実現するための通信方式として，ROSにはサービス（service）とアクション（actionlib）が用意されています．&lt;/p>
+&lt;h3 id="service">service&lt;/h3>
+&lt;p>これまで利用してきたトピック通信は，通信の相手を仮定しない（相手がいようといまいと関係ない）ため，ロボットシステムに特有な非同期通信・処理を実現するために簡単な方法でした．&lt;/p>
+&lt;p>一方で，他のノードに対して「特定の処理の依頼をして，その結果を待ちたい」場合など，同期的・双方向な通信が必要になることがあります．
+例えば，あるノードの設定を変更をして，それが成功したかどうかを知りたい場合などに使えます．
+サービスを使った通信は，「クライアント・サーバ」型の通信（クライアントサーバモデル, client-server model）となり，クライアントがサーバにリクエストを送ると，サーバがレスポンスを返すような仕組みになっています．&lt;/p>
+&lt;p>pythonでは&lt;code>rospy.service&lt;/code>を使ってサーバを，&lt;code>rospy.service_proxy&lt;/code>を使ってクライアントを簡単に実装できます（&lt;a href="http://wiki.ros.org/ja/ROS/Tutorials/WritingServiceClient%28python%29" target="_blank" rel="noopener">参考URL&lt;/a>）．&lt;/p>
+&lt;p>また，コマンドラインからは&lt;/p>
+&lt;pre>&lt;code class="language-bash">rosservice call [service] [args]
+&lt;/code>&lt;/pre>
+&lt;p>として，簡単にクライアントを作成できますし，システム上に存在するサービスの一覧は&lt;/p>
+&lt;pre>&lt;code class="language-bash">rosservice list
+&lt;/code>&lt;/pre>
+&lt;p>とすることで表示できます．あるサービスのメッセージがどのように定義されているかは，&lt;/p>
+&lt;pre>&lt;code class="language-bash">rosservice type [service]
+&lt;/code>&lt;/pre>
+&lt;p>で調べられます．&lt;/p>
+&lt;h3 id="actionlib">actionlib&lt;/h3>
+&lt;p>ここまで，トピック通信を使うことで相手を仮定しない非同期通信を，サービスを使った通信を行うことで相手のレスポンスを待つ同期的な通信を実現できることを見てきました．&lt;/p>
+&lt;p>サービスによる通信では，クライアントはサーバからのレスポンスを待つため，サーバで長い時間がかかるような処理を行う（計算量が大きい，または，移動に時間がかかるなど）場合には，クライアントの処理が長い間停止してしまうという問題があります．&lt;/p>
+&lt;p>そのため，処理の呼び出し側のプログラムをブロックせずに，かつ，処理の結果（や途中経過）を知れるような非同期通信が欲しくなります．
+この要求を満たすのが，ROSのアクション(actionlib)です．&lt;/p>
+&lt;p>actionlibは，実はトピック通信の組み合わせとして構成されており，&lt;code>goal&lt;/code>（命令），&lt;code>result&lt;/code>（処理の結果），&lt;code>feedback&lt;/code>（途中経過），&lt;code>status&lt;/code>（サーバの状態），&lt;code>cancel&lt;/code>（命令の取り消し）の5つのトピックからなります．
+このあたりの仕様は，&lt;a href="https://qiita.com/srs/items/a39dcd24aaeb03216026#%E6%A6%82%E8%A6%81" target="_blank" rel="noopener">qiitaのROS講座&lt;/a>が詳しいので参照してください．&lt;/p>
+&lt;p>pythonでは，actionlibのサーバやクライアントも，&lt;/p>
+&lt;pre>&lt;code class="language-python">import actionlib
+&lt;/code>&lt;/pre>
+&lt;p>したのちに，他の通信方式と同様に&lt;code>actionlib.SimpleActionServer&lt;/code>として，簡単に作成できます（&lt;a href="http://wiki.ros.org/ja/actionlib_tutorials/Tutorials/Writing%20a%20Simple%20Action%20Server%20using%20the%20Execute%20Callback%20%28Python%29" target="_blank" rel="noopener">ドキュメント&lt;/a>）．&lt;/p>
+&lt;p>今回の演習では，簡単のためaction serverの作成は行いません．
+変わりに，移動のためのactionとして，&lt;code>move_base&lt;/code>パッケージの中で定義されている&lt;code>move_base&lt;/code>というactionを使うことにしましょう．&lt;/p>
+&lt;p>実はこのパッケージは&lt;/p>
+&lt;pre>&lt;code class="language-bash">roslaunch navigation_tutorial navigation.launch
+&lt;/code>&lt;/pre>
+&lt;p>して&lt;code>move_base&lt;/code>ノードを起動した際に既に利用されていました（これまでは，そのパッケージの中でサブスクライバとして定義された&lt;code>move_base_simple/goal&lt;/code>というトピックにpublishすることで移動をしていました）．&lt;/p>
+&lt;p>&lt;code>move_base&lt;/code>のパッケージの詳細は&lt;a href="http://wiki.ros.org/move_base" target="_blank" rel="noopener">ドキュメント&lt;/a>を見て確認してみてください．&lt;/p>
+&lt;p>同様に，action clientも&lt;code>actionlib.SimpleActionClient&lt;/code>を利用することで簡単に作成できます．&lt;/p>
+&lt;p>例えば，&lt;code>move_base&lt;/code>のaction clientの実装する際には，&lt;/p>
+&lt;pre>&lt;code class="language-python">import actionlib
+import tf
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from geometry_msgs.msg import Quaternion
+action_client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+action_client.wait_for_server() # action serverの準備ができるまで待つ
+goal = MoveBaseGoal() # goalのメッセージの定義
+goal.target_pose.header.frame_id = 'map' # マップ座標系でのゴールとして設定
+goal.target_pose.header.stamp = rospy.Time.now() # 現在時刻
+# ゴールの姿勢を指定
+goal.target_pose.pose.position.x = X
+goal.target_pose.pose.position.y = Y
+q = uaternion_from_euler(0, 0, YAW) # 回転はquartanionで記述するので変換
+goal.target_pose.pose.orientation = Quaternion(q[0], q[1], q[2], q[3])
+action_client.send_goal(goal) # ゴールを命令
+&lt;/code>&lt;/pre>
+&lt;p>のようにクライアントの&lt;code>send_goal&lt;/code>メソッドでゴールを指定できます．&lt;/p>
+&lt;p>その後，&lt;/p>
+&lt;pre>&lt;code class="language-python">action_client.wait_for_result(rospy.Duration(30))
+&lt;/code>&lt;/pre>
+&lt;p>とすると，結果が返ってくるまで（この場合30秒間），クライアントの処理をブロックできますし，&lt;/p>
+&lt;pre>&lt;code class="language-python">result = action_client.wait_for_result(rospy.Duration(30))
+&lt;/code>&lt;/pre>
+&lt;p>とすることで，&lt;code>result&lt;/code>変数に処理の結果が格納され，確認できます．&lt;/p>
+&lt;h2 id="演習">演習&lt;/h2>
+&lt;details class="spoiler " id="spoiler-0">
+&lt;summary>【jetson・開発マシン】起動準備&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-shell">cd roomba_hack
+git fetch
+git checkout feature/integrate
+(jetson) ./RUN-DOCKER-CONTAINER.sh
+(開発マシン) ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-1">
+&lt;summary>【開発マシン】scriptベースのnavigationを実行してみる&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-shell">(開発マシン)(docker) roslaunch navigation_turtorial navigation.launch
+(開発マシン)(docker) rosrun navigation_turtorial topic_goal.py
+(開発マシン)(docker) rosrun navigation_turtorial action_goal.py
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-2">
+&lt;summary>【開発マシン】RealSenseで検出した障害物をコストマップに追加してみよう&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-shell">(開発マシン)(docker) roslaunch three-dimensions_tutorial detection_pc.launch
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-3">
+&lt;summary>（総合課題）障害物を避けながらnavigationする&lt;/summary>
+&lt;p>&lt;p>Lidarに映らない物体も画像ベースで検出しコストマップに追加することでナビゲーション時にぶつからないようにしましょう。&lt;/p>
+&lt;p>ヒント&lt;/p>
+&lt;ul>
+&lt;li>物体検出結果に基づいて物体部分以外をマスクしたデプス画像をpublishする&lt;/li>
+&lt;li>depth2pc.launchでそれをsubscribeし、point(cloud)に変換する&lt;/li>
+&lt;li>変換されたpointからmap座標系での位置を取得する&lt;/li>
+&lt;li>costmapに反映する&lt;/li>
+&lt;li>&lt;code>move_base&lt;/code>アクションを使ってナビゲーションを実装しよう．
+&lt;ul>
+&lt;li>するとactionがタイムアウトした場合や，&lt;code>KeyboardInterrupt&lt;/code>された場合に&lt;code>cancel_goal&lt;/code>メソッドを使うことでactionをキャンセルできるように拡張できるはずです．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>さらに，PyTorchを使用した自作の分類器やネット上の分類器をシステムに組み込んで（例えばセグメンテーションモデルなど），よりよく動作するように改良してみましょう．&lt;/p>
+&lt;/p>
+&lt;/details></description></item><item><title>三次元画像処理</title><link>https://matsuolab.github.io/roomba_hack/course/chap5/three-dimensions/</link><pubDate>Sat, 22 Jan 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack/course/chap5/three-dimensions/</guid><description>&lt;h2 id="learn">Learn&lt;/h2>
+&lt;p>今回はRealSenseD435というRGBDカメラを用いて三次元画像処理を行っていきましょう。&lt;/p>
+&lt;h3 id="rgbdカメラについて">RGBDカメラについて&lt;/h3>
+&lt;p>RGBDカメラとは、カラーの他にデプス(深度)を取得できるカメラのことです。
+複雑な動作を行うロボットを動かす際には三次元空間の把握が重要となり、RGBDカメラはよく用いられます。
+比較的安価でよく利用されるRGBDカメラとして、Intel社製のRealSenseやMicrosoft社製のXtionなどがあります。&lt;/p>
+&lt;h3 id="realsense">RealSense&lt;/h3>
+&lt;p>今回はRGBDカメラとしてRealSenseD435を使用します。&lt;/p>
+&lt;p>ROSで用いる際には標準のラッパー(&lt;a href="https://github.com/IntelRealSense/realsense-ros">https://github.com/IntelRealSense/realsense-ros&lt;/a>)を使用します。&lt;/p>
+&lt;p>&lt;code>roslaunch realsense2_camera rs_camera.launch&lt;/code>を行うとデフォルトのトピックとして
+RGB画像の&lt;code>/camera/color/image_raw&lt;/code>、
+デプス画像の&lt;code>/camera/depth/image_raw&lt;/code>
+が利用できます。これらのトピックはいずれも&lt;code>sensor_msgs/Image&lt;/code>型です。&lt;/p>
+&lt;p>RealSenseは物理的にRGB画像モジュールとデプス画像モジュールが離れているため、これら2つのトピックはいずれも画像データではあるものの、ピクセルの位置関係が対応しておらずそのままだとうまく画像処理に用いることができませんが、起動時に&lt;code>align:=true&lt;/code>を指定すると、デプス画像をRGB画像のピクセルに対応するように変換された&lt;code>/camera/aligned_depth_to_color/image_raw&lt;/code>トピックを使用できるようになります。&lt;/p>
+&lt;h3 id="物体検出">物体検出&lt;/h3>
+&lt;p>まずはRGB画像&lt;code>/camera/color/image_raw&lt;/code>のみを用いて三次元ではない画像検出を行っていきましょう。&lt;/p>
+&lt;p>以下は&lt;code>/camera/color/image_raw&lt;/code>をSubscribeし、物体検出アルゴリズムであるYOLOv3に入力し、その結果をbounding boxとして描画し、&lt;code>/detection_result&lt;/code>としてPublishするスクリプトです。&lt;/p>
+&lt;pre>&lt;code>#!/usr/bin/env python3
+import rospy
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
+from pytorchyolo import detect, models
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import cv2
+import copy
+class ObjectDetection:
+def __init__(self):
+rospy.init_node('object_detection', anonymous=True)
+# Publisher
+self.detection_result_pub = rospy.Publisher('/detection_result', Image, queue_size=10)
+# Subscriber
+rgb_sub = rospy.Subscriber('/camera/color/image_raw', Image, self.callback_rgb)
+self.bridge = CvBridge()
+self.rgb_image = None
+def callback_rgb(self, data):
+cv_array = self.bridge.imgmsg_to_cv2(data, 'bgr8')
+cv_array = cv2.cvtColor(cv_array, cv2.COLOR_BGR2RGB)
+self.rgb_image = cv_array
+def process(self):
+path = &amp;quot;/root/roomba_hack/catkin_ws/src/three-dimensions_tutorial/yolov3/&amp;quot;
+# load category
+with open(path+&amp;quot;data/coco.names&amp;quot;) as f:
+category = f.read().splitlines()
+# prepare model
+model = models.load_model(path+&amp;quot;config/yolov3.cfg&amp;quot;, path+&amp;quot;weights/yolov3.weights&amp;quot;)
+while not rospy.is_shutdown():
+if self.rgb_image is None:
+continue
+# inference
+tmp_image = copy.copy(self.rgb_image)
+boxes = detect.detect_image(model, tmp_image)
+# [[x1, y1, x2, y2, confidence, class]]
+# plot bouding box
+for box in boxes:
+x1, y1, x2, y2 = map(int, box[:4])
+cls_pred = int(box[5])
+tmp_image = cv2.rectangle(tmp_image, (x1, y1), (x2, y2), (0, 255, 0), 3)
+tmp_image = cv2.putText(tmp_image, category[cls_pred], (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
+# publish image
+tmp_image = cv2.cvtColor(tmp_image, cv2.COLOR_RGB2BGR)
+detection_result = self.bridge.cv2_to_imgmsg(tmp_image, &amp;quot;bgr8&amp;quot;)
+self.detection_result_pub.publish(detection_result)
+if __name__ == '__main__':
+od = ObjectDetection()
+try:
+od.process()
+except rospy.ROSInitException:
+pass
+&lt;/code>&lt;/pre>
+&lt;p>コールバック関数で&lt;code>sensor_msgs/Image&lt;/code>型をnp.ndarray型に変換するために&lt;/p>
+&lt;pre>&lt;code>cv_array = self.bridge.imgmsg_to_cv2(data, 'bgr8')
+cv_array = cv2.cvtColor(cv_array, cv2.COLOR_BGR2RGB)
+&lt;/code>&lt;/pre>
+&lt;p>という&lt;code>sensor_msgs/Image&lt;/code>型特有の処理を行ってますが、Subscriberを作成しコールバック関数でデータを受け取るという基本的な処理の流れは&lt;code>scan&lt;/code>などの他のセンサと同じです。&lt;/p>
+&lt;p>ここで注意してほしいのはYOLOの推論部分をコールバック関数内で行っていないことです。
+一見、新しいデータが入ってくるときのみに推論を回すことは合理的に見えますが、センサの入力に対してコールバック関数内の処理が重いとセンサの入力がどんどん遅れていってしまいます。
+コールバック関数内ではセンサデータの最低限の処理の記述にとどめ、重い処理は分けて書くことを意識しましょう。&lt;/p>
+&lt;p>また、ここでは既存の物体検出モジュールを使用しましたが、PyTorchなどで作成した自作のモデルも同様の枠組みで利用することができます。&lt;/p>
+&lt;p>続いて、RGB画像に整列されたデプス画像データを統合して物体を検出し、物体までの距離を測定してみましょう。&lt;/p>
+&lt;p>RGB画像&lt;code>/camera/color/image_raw&lt;/code>と整列されたデプス画像&lt;code>/camera/aligned_depth_to_color/image_raw&lt;/code>はそれぞれ独立したトピックであるため、同期を取る必要があります。&lt;/p>
+&lt;p>画像の同期にはmessage_filters(&lt;a href="http://wiki.ros.org/message_filters">http://wiki.ros.org/message_filters&lt;/a>)がよく使われます。&lt;/p>
+&lt;p>message_filters.ApproximateTimeSynchronizerを使い以下のようにSubscriberを作成します。&lt;/p>
+&lt;pre>&lt;code>rgb_sub = message_filters.Subscriber('/camera/color/image_raw', Image)
+depth_sub = message_filters.Subscriber('/camera/aligned_depth_to_color/image_raw', Image)
+message_filters.ApproximateTimeSynchronizer([rgb_sub, depth_sub], 10, 1.0).registerCallback(callback_rgbd)
+def callback_rgbd(data1, data2):
+bridge = CvBridge()
+cv_array = bridge.imgmsg_to_cv2(data1, 'bgr8')
+cv_array = cv2.cvtColor(cv_array, cv2.COLOR_BGR2RGB)
+self.rgb_image = cv_array
+cv_array = bridge.imgmsg_to_cv2(data2, 'passthrough')
+self.depth_image = cv_array
+&lt;/code>&lt;/pre>
+&lt;p>この例では、1.0秒の許容で'/camera/color/image_raw&amp;rsquo;と'/camera/aligned_depth_to_color/image_raw&amp;rsquo;のトピックの同期を取ることができれば、コールバック関数callback_rgbdが呼ばれセンサデータが受けとられます。&lt;/p>
+&lt;p>それでは、物体を検出し、物体までの距離を測定するスクリプトを見てみましょう。&lt;/p>
+&lt;pre>&lt;code>#!/usr/bin/env python3
+import rospy
+import message_filters
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
+from pytorchyolo import detect, models
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import cv2
+import copy
+class DetectionDistance:
+def __init__(self):
+rospy.init_node('detection_distance', anonymous=True)
+# Publisher
+self.detection_result_pub = rospy.Publisher('/detection_result', Image, queue_size=10)
+# Subscriber
+rgb_sub = message_filters.Subscriber('/camera/color/image_raw', Image)
+depth_sub = message_filters.Subscriber('/camera/aligned_depth_to_color/image_raw', Image)
+message_filters.ApproximateTimeSynchronizer([rgb_sub, depth_sub], 10, 1.0).registerCallback(self.callback_rgbd)
+self.bridge = CvBridge()
+self.rgb_image, self.depth_image = None, None
+def callback_rgbd(self, data1, data2):
+cv_array = self.bridge.imgmsg_to_cv2(data1, 'bgr8')
+cv_array = cv2.cvtColor(cv_array, cv2.COLOR_BGR2RGB)
+self.rgb_image = cv_array
+cv_array = self.bridge.imgmsg_to_cv2(data2, 'passthrough')
+self.depth_image = cv_array
+def process(self):
+path = &amp;quot;/root/roomba_hack/catkin_ws/src/three-dimensions_tutorial/yolov3/&amp;quot;
+# load category
+with open(path+&amp;quot;data/coco.names&amp;quot;) as f:
+category = f.read().splitlines()
+# prepare model
+model = models.load_model(path+&amp;quot;config/yolov3.cfg&amp;quot;, path+&amp;quot;weights/yolov3.weights&amp;quot;)
+while not rospy.is_shutdown():
+if self.rgb_image is None:
+continue
+# inference
+tmp_image = copy.copy(self.rgb_image)
+boxes = detect.detect_image(model, tmp_image)
+# [[x1, y1, x2, y2, confidence, class]]
+# plot bouding box
+for box in boxes:
+x1, y1, x2, y2 = map(int, box[:4])
+cls_pred = int(box[5])
+tmp_image = cv2.rectangle(tmp_image, (x1, y1), (x2, y2), (0, 255, 0), 3)
+tmp_image = cv2.putText(tmp_image, category[cls_pred], (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
+cx, cy = (x1+x2)//2, (y1+y2)//2
+print(category[cls_pred], self.depth_image[cy][cx]/1000, &amp;quot;m&amp;quot;)
+# publish image
+tmp_image = cv2.cvtColor(tmp_image, cv2.COLOR_RGB2BGR)
+detection_result = self.bridge.cv2_to_imgmsg(tmp_image, &amp;quot;bgr8&amp;quot;)
+self.detection_result_pub.publish(detection_result)
+if __name__ == '__main__':
+dd = DetectionDistance()
+try:
+dd.process()
+except rospy.ROSInitException:
+&lt;/code>&lt;/pre>
+&lt;p>基本的には物体検出のスクリプトと同じですが、&lt;/p>
+&lt;pre>&lt;code>cx, cy = (x1+x2)//2, (y1+y2)//2
+print(category[cls_pred], self.depth_image[cy][cx]/1000, &amp;quot;m&amp;quot;)
+&lt;/code>&lt;/pre>
+&lt;p>でbounding boxの中心座標を変換し、対応する距離をメートル単位で表示しています。&lt;/p>
+&lt;p>整列されたデプス画像を用いているため、RGB画像に基づき算出した座標をそのまま指定できます。&lt;/p>
+&lt;h3 id="点群の作成">点群の作成&lt;/h3>
+&lt;p>上の例ではRGB画像とデプス画像を用いた三次元画像処理を行うことができました。&lt;/p>
+&lt;p>しかし、ロボットの自立移動などより複雑な動作をさせることを考えたとき、深度データを三次元空間にマッピングできたほうが位置関係を統一的に扱うことができ便利なこともあります。&lt;/p>
+&lt;p>それでデプス画像から点群と呼ばれるデータを作成することを考えます。&lt;/p>
+&lt;p>点群とは三次元座標値(X,Y,Z)で構成された点の集まりのことです。各点の情報として、三次元座標値に加え色の情報(R,G,B)が加わることもあります。
+デプス画像はカメラの内部パラメータを用いることによって点群データに変換することができます。(&lt;a href="https://medium.com/yodayoda/from-depth-map-to-point-cloud-7473721d3f">https://medium.com/yodayoda/from-depth-map-to-point-cloud-7473721d3f&lt;/a>)&lt;/p>
+&lt;p>今回はdepth_image_procと呼ばれる、デプス画像を点群データに変換するROSの外部パッケージ(&lt;a href="http://wiki.ros.org/depth_image_proc">http://wiki.ros.org/depth_image_proc&lt;/a>) を使用して点群の変換を行います。&lt;/p>
+&lt;p>外部パッケージは&lt;code>~/catkin_ws/src&lt;/code>等のワークスペースに配置し、ビルドしパスを通すことで簡単に使用できます。&lt;/p>
+&lt;p>depth_image_procのwikiを参考に以下のようなlaunchファイルを作成しました。&lt;/p>
+&lt;pre>&lt;code>&amp;lt;?xml version=&amp;quot;1.0&amp;quot;?&amp;gt;
+&amp;lt;launch&amp;gt;
+&amp;lt;node pkg=&amp;quot;nodelet&amp;quot; type=&amp;quot;nodelet&amp;quot; name=&amp;quot;nodelet_manager&amp;quot; args=&amp;quot;manager&amp;quot; /&amp;gt;
+&amp;lt;node pkg=&amp;quot;nodelet&amp;quot; type=&amp;quot;nodelet&amp;quot; name=&amp;quot;nodelet1&amp;quot;
+args=&amp;quot;load depth_image_proc/point_cloud_xyz nodelet_manager&amp;quot;&amp;gt;
+&amp;lt;remap from=&amp;quot;camera_info&amp;quot; to=&amp;quot;/camera/color/camera_info&amp;quot;/&amp;gt;
+&amp;lt;remap from=&amp;quot;image_rect&amp;quot; to=&amp;quot;/camera/aligned_depth_to_color/image_raw&amp;quot;/&amp;gt;
+&amp;lt;remap from=&amp;quot;points&amp;quot; to=&amp;quot;/camera/depth/points&amp;quot;/&amp;gt;
+&amp;lt;/node&amp;gt;
+&amp;lt;/launch&amp;gt;
+&lt;/code>&lt;/pre>
+&lt;p>このlaunchファイルを実行すると&lt;code>/camera/color/camera_info&lt;/code>と&lt;code>/camera/aligned_depth_to_color/image_raw&lt;/code>をSubscribeし、&lt;code>/camera/depth/points&lt;/code>をPublishします。&lt;/p>
+&lt;p>&lt;code>/camera/color/camera_info&lt;/code>は&lt;code>sensor_msgs/CameraInfo&lt;/code>型のトピックであり、カメラパラメータやフレームid、タイムスタンプなどを保持しており、点群の変換に利用されます。
+&lt;code>/camera/aligned_depth_to_color/image_raw&lt;/code>はRGB画像に整列されたデプス画像であるため、&lt;code>/camera/depth/camera_info&lt;/code>ではなく&lt;code>/camera/color/camera_info&lt;/code>を指定することに注意してください。&lt;/p>
+&lt;p>&lt;code>roslaunch three-dimensions_tutorial depth2pc.launch&lt;/code>を行い&lt;code>/camera/depth/points&lt;/code>トピックをrvizで可視化をすると三次元空間に点群データが表示されているのが確認できます。&lt;/p>
+&lt;h2 id="演習">演習&lt;/h2>
+&lt;details class="spoiler " id="spoiler-0">
+&lt;summary>(開発PC, jetson)起動準備&lt;/summary>
+&lt;p>&lt;pre>&lt;code>(jetson)$ ./RUN-DOCKER-CONTAINER.sh
+(jetson)(docker)# roslaunch roomba_bringup bringup.launch
+(開発PC)$ ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-1">
+&lt;summary>(開発PC)RealSenseのトピックの可視化&lt;/summary>
+&lt;p>&lt;pre>&lt;code>(開発PC)(docker) rviz
+&lt;/code>&lt;/pre>
+&lt;p>&lt;code>/camera/color/image_raw&lt;/code>と&lt;code>/camera/depth/image_raw&lt;/code>と&lt;code>/camera/aligned_depth_to_color/image_raw&lt;/code>を可視化して違いを確認してみよう。&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-2">
+&lt;summary>(開発PC)物体検出を行う&lt;/summary>
+&lt;p>&lt;pre>&lt;code>(開発PC)(docker) cd catkin_ws; catkin_make; source devel/setup.bash
+(開発PC)(docker) roscd three-dimensions_tutorial; cd yolov3/weights; ./download_weights.sh
+(開発PC)(docker) rosrun three-dimensions_tutorial object_detection.py
+rvizで`/detection_result`を表示し結果を確認してみよう。
+(開発PC)(docker) rosrun three-dimensions_tutorial detection_distance.py
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-3">
+&lt;summary>(開発PC)外部パッケージを使用&lt;/summary>
+&lt;p>&lt;pre>&lt;code>(開発PC)(docker) cd ~/external_catkin_ws/src
+(開発PC)(docker) git clone https://github.com/ros-perception/image_pipeline
+(開発PC)(docker) cd ../; catkin build; source devel/setup.bash
+(開発PC)(docker) cd ~/roomba_hack/catkin_ws; source devel/setup.bash
+(開発PC)(docker) roslaunch three-dimensions_tutorial depth2pc.launch
+(開発PC)(docker) roslaunch navigation_tutorial navigation.launch
+&lt;/code>&lt;/pre>
+&lt;p>rvizで&lt;code>/camera/depth/points&lt;/code>トピックを追加して確認してみよう。&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-4">
+&lt;summary>余裕がある人向け&lt;/summary>
+&lt;p>&lt;p>物体を検出し、特定の物体の手前まで移動するスクリプトを作ってみましょう。&lt;/p>
+&lt;p>ヒント&lt;/p>
+&lt;ul>
+&lt;li>物体検出結果に基づいて物体部分以外をマスクしたデプス画像をpublishする&lt;/li>
+&lt;li>depth2pc.launchでそれをsubscribeし、point(cloud)に変換する&lt;/li>
+&lt;li>変換されたpointからmap座標系での位置を取得する&lt;/li>
+&lt;li>navigation_tutorial/scripts/set_goal.py (map座標系で指定した位置・姿勢までナビゲーションするスクリプト)などを参考に、その位置へとナビゲーションする&lt;/li>
+&lt;/ul>
+&lt;p>PyTorchを使用した自作の分類器やネット上の分類器をシステムに組み込んでみましょう。&lt;/p>
+&lt;p>Lidarに映らない物体も画像ベースで検出しコストマップに追加することでナビゲーション時にぶつからないようにしましょう。&lt;/p>
+&lt;/p>
+&lt;/details></description></item><item><title>自己位置推定</title><link>https://matsuolab.github.io/roomba_hack/course/chap4/localization/</link><pubDate>Sat, 22 Jan 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack/course/chap4/localization/</guid><description>&lt;h2 id="learn">Learn&lt;/h2>
+&lt;p>前回の演習では、オドメトリを用いてロボットを制御しました。&lt;/p>
+&lt;p>1m進むや、90度右回転などある程度正確に動いたかと思います。
+しかし、これが数10m前進や、数分間動き続けた時にロボット自身は自分がスタートの時からどのくらい動いたかわかるでしょうか。&lt;/p>
+&lt;p>ルンバが用いているホイールオドメトリは、ホイールの回転量を積算することで算出しています。ホイールが滑った場合だけでなく、センサの僅かの誤差の積み重ねで徐々にずれていってしまいます。&lt;/p>
+&lt;p>そこで今回は、オドメトリ情報だけでなく、地図とLiDARスキャン情報も同時に使いながら、ロボット自身の尤もらしい位置を推定していきましょう。&lt;/p>
+&lt;h3 id="rosにおける座標系の扱い方tf">ROSにおける座標系の扱い方(TF)&lt;/h3>
+&lt;p>まずは、ROSにおける座標系の扱い方についてみていきましょう。
+ロボットシステムは、いろいろな座標系を使って位置姿勢を表現することが多いです。&lt;/p>
+&lt;ul>
+&lt;li>ロボットの座標系&lt;/li>
+&lt;li>センサの座標系&lt;/li>
+&lt;li>ロボットの関節の座標系&lt;/li>
+&lt;li>部屋の座標系&lt;/li>
+&lt;li>物体の座標系&lt;/li>
+&lt;li>・・・・&lt;/li>
+&lt;/ul>
+&lt;p>このような座標系同士を繋げてロボットシステム上での座標系の管理をしてくれるROSのモジュールとしてtfがあります。
+tfは、各座標系をツリー上で繋げます。従って、親の座標系が複数あることは許されません。&lt;/p>
+&lt;p>今回自己位置推定するにあたり用いる座標系の関係は以下のようになります。&lt;/p>
+&lt;p>&lt;code>rosrun rqt_tf_tree rqt_tf_tree&lt;/code>としてみると、tfのツリー形状を可視化することができます。&lt;/p>
+&lt;figure id="figure-tfツリーをrqtで可視化">
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../rqt_tf_tree.png" alt="tfツリーをrqtで可視化" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;figcaption>
+tfツリーをrqtで可視化
+&lt;/figcaption>&lt;/figure>
+&lt;p>ここで、odom座標系は、オドメトリの算出を始めた位置(起動した位置)を原点とした座標系で、ホイールオドメトリの値から、ロボットの基準となるbase_footprint座標系を繋げています。
+base_footprint座標系の下には、ルンバロボットの構成要素である、センサ類やホイールなどの座標系が子として繋がっています。&lt;/p>
+&lt;p>一番親にいるmap座標系は、地図の原点を基準とした座標系ですが、この座標系におけるロボットの座標系(base_footprint)を繋げることが、自己位置推定の目的になります。
+しかし、base_footprintの親には既にodomがいるため、map座標系とodom座標系を繋げることで、全体をひとつのツリーとして管理することができます。&lt;/p>
+&lt;h3 id="自己位置推定">自己位置推定&lt;/h3>
+&lt;p>自己位置推定は、地図が事前に与えられていて、そこのどこにロボットがいるかを逐次的に外界センサ(LiDAR)と内界センサ(Odometry)を用いて推定していく手法になります。&lt;/p>
+&lt;p>ヒストグラムフィルタやカルマンフィルタ、パーティクルフィルタなどいくつかの手法が存在し、
+それぞれメリットデメリットがありますが、ここでは代表的なパーティクルフィルタを用いた手法を紹介します。&lt;/p>
+&lt;p>自己位置推定では、観測モデルと状態遷移モデルを交互に繰り返すことによって、ロボット自身がどこにいるかの確率分布を更新していくことで自己位置推定をしていきます。&lt;/p>
+&lt;p>パーティクルフィルタでは、この確率分布を大量の粒子を用いて表現する手法になっていて、各粒子が位置とそこにロボットがいるであろう確率(尤度)を持っています。&lt;/p>
+&lt;p>ロボットが動くごと(オドメトリが更新されるごと)に、状態遷移モデルを用いて各粒子の位置情報を更新します。
+この時、一般的に分布は広がります。(人間が目を閉じて歩いたらどこにいるか分かりづらくなるのと同じ)&lt;/p>
+&lt;p>外界の情報がわかるごと(スキャン情報が更新されるごと)に、観測モデルを用いて各粒子の尤度を更新します。
+尤度は、各粒子の位置から観測できるであろうスキャン情報と、実際のロボットで取得したスキャン情報との差から算出します。&lt;/p>
+&lt;figure id="figure-monte-carlo-localizationparticle-filter-dieter-fox-et-al-1999-using-sonar-httpwwwdocicacukajdroboticsroboticsresourcesmontecarlolocalizationgif">
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../montecarlolocalization.gif" alt="Monte Carlo Localization(Particle Filter) Dieter Fox et al. 1999, using sonar. http://www.doc.ic.ac.uk/~ajd/Robotics/RoboticsResources/montecarlolocalization.gif" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;figcaption>
+Monte Carlo Localization(Particle Filter) Dieter Fox et al. 1999, using sonar. &lt;a href="http://www.doc.ic.ac.uk/~ajd/Robotics/RoboticsResources/montecarlolocalization.gif">http://www.doc.ic.ac.uk/~ajd/Robotics/RoboticsResources/montecarlolocalization.gif&lt;/a>
+&lt;/figcaption>&lt;/figure>
+&lt;!-- リサンプリング -->
+&lt;h3 id="launchファイルとrosparam">launchファイルとrosparam&lt;/h3>
+&lt;p>自己位置推定では、初期位置がどこか、レーザーのスペックや、パーティクルの数など数十個のパラメータを保持します。&lt;/p>
+&lt;p>これらをプログラム内部で記述するのではなく、launchファイル内で指定することが可能です。
+rosでは、rosparamという形でパラメータを管理することが可能です。&lt;/p>
+&lt;p>以下に、今回用いる&lt;code>amcl.launch&lt;/code> を示します。
+launchファイルはxml形式で記述され、paramを指定すること以外にも、
+launchファイル実行時に引数で指定可能なargや、トピック名などのリマップをすることも可能です。&lt;/p>
+&lt;p>launchの詳しい書き方は、&lt;a href="http://wiki.ros.org/ja/roslaunch/XML" target="_blank" rel="noopener">rosのドキュメント&lt;/a>を参照してください。&lt;/p>
+&lt;pre>&lt;code class="language-xml">&amp;lt;?xml version=&amp;quot;1.0&amp;quot;?&amp;gt;
+&amp;lt;launch&amp;gt;
+&amp;lt;arg name=&amp;quot;use_map_topic&amp;quot; default=&amp;quot;true&amp;quot;/&amp;gt;
+&amp;lt;arg name=&amp;quot;odom_topic&amp;quot; default=&amp;quot;/odom&amp;quot; /&amp;gt;
+&amp;lt;arg name=&amp;quot;scan_topic&amp;quot; default=&amp;quot;/scan&amp;quot; /&amp;gt;
+&amp;lt;node pkg=&amp;quot;amcl&amp;quot; type=&amp;quot;amcl&amp;quot; name=&amp;quot;amcl&amp;quot; output=&amp;quot;screen&amp;quot;&amp;gt;
+&amp;lt;remap from=&amp;quot;scan&amp;quot; to=&amp;quot;$(arg scan_topic)&amp;quot;/&amp;gt;
+&amp;lt;remap from=&amp;quot;odom&amp;quot; to=&amp;quot;$(arg odom_topic)&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;use_map_topic&amp;quot; value=&amp;quot;$(arg use_map_topic)&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;initial_pose_x&amp;quot; value=&amp;quot;0.0&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;initial_pose_y&amp;quot; value=&amp;quot;0.0&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;initial_pose_a&amp;quot; value=&amp;quot;0.0&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;initial_cov_xx&amp;quot; value=&amp;quot;0.1*0.1&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;initial_cov_yy&amp;quot; value=&amp;quot;0.1*0.1&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;initial_cov_aa&amp;quot; value=&amp;quot;0.3*3.14&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;gui_publish_rate&amp;quot; value=&amp;quot;10.0&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;laser_max_beams&amp;quot; value=&amp;quot;2.0&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;laser_min_range&amp;quot; value=&amp;quot;0.15&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;laser_max_range&amp;quot; value=&amp;quot;12.0&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;laser_z_hit&amp;quot; value=&amp;quot;0.8&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;laser_z_short&amp;quot; value=&amp;quot;0.1&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;laser_z_max&amp;quot; value=&amp;quot;0.1&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;laser_z_rand&amp;quot; value=&amp;quot;0.1&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;laser_sigma_hit&amp;quot; value=&amp;quot;0.2&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;laser_lambda_short&amp;quot; value=&amp;quot;0.1&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;laser_model_type&amp;quot; value=&amp;quot;likelihood_field&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;laser_likelihood_max_dist&amp;quot; value=&amp;quot;2.0&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;min_particles&amp;quot; value=&amp;quot;100&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;max_particles&amp;quot; value=&amp;quot;1000&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;kld_err&amp;quot; value=&amp;quot;0.0&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;kld_z&amp;quot; value=&amp;quot;0.0&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;update_min_d&amp;quot; value=&amp;quot;0.1&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;update_min_a&amp;quot; value=&amp;quot;0.1&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;resample_interval&amp;quot; value=&amp;quot;1&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;transform_tolerance&amp;quot; value=&amp;quot;0.2&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;recovery_alpha_slow&amp;quot; value=&amp;quot;0.001&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;recovery_alpha_fast&amp;quot; value=&amp;quot;0.1&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;odom_frame_id&amp;quot; value=&amp;quot;odom&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;odom_model_type&amp;quot; value=&amp;quot;diff&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;odom_alpha1&amp;quot; value=&amp;quot;0.2&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;odom_alpha2&amp;quot; value=&amp;quot;0.2&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;odom_alpha3&amp;quot; value=&amp;quot;0.2&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;odom_alpha4&amp;quot; value=&amp;quot;0.2&amp;quot;/&amp;gt;
+&amp;lt;param name=&amp;quot;odom_alpha5&amp;quot; value=&amp;quot;0.2&amp;quot;/&amp;gt;
+&amp;lt;/node&amp;gt;
+&amp;lt;/launch&amp;gt;
+&lt;/code>&lt;/pre>
+&lt;h2 id="演習">演習&lt;/h2>
+&lt;details class="spoiler " id="spoiler-2">
+&lt;summary>【jetson・開発マシン】それぞれdockerコンテナを起動&lt;/summary>
+&lt;p>&lt;p>jetsonでdockerコンテナを起動&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC):~$ ssh roomba_dev1
+(jetson):~$ cd ~/group_a/roomba_hack
+(jetson)::~/group_a/roomba_hack$ git pull
+(jetson):~/group_a/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
+(jetson)(docker):~/roomba_hack# roslaunch roomba_bringup bringup.launch
+&lt;/code>&lt;/pre>
+&lt;p>開発PCでdockerコンテナを起動&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC):~$ cd ~/group_a/roomba_hack
+(開発PC):~/group_a/roomba_hack$ git pull
+(開発PC):~/group_a/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-3">
+&lt;summary>gmappingで地図作成&lt;/summary>
+&lt;p>&lt;pre>&lt;code>(開発PC)(docker) roslaunch navigation_tutorial gmapping.launch
+&lt;/code>&lt;/pre>
+&lt;p>地図の保存。map.pgm（画像データ）とmap.yaml(地図情報)が保存される。&lt;/p>
+&lt;pre>&lt;code>(開発PC)(docker) rosrun map_server map_saver
+&lt;/code>&lt;/pre>
+&lt;p>&lt;code>~/roomba_hack/catkin_ws/src/navigation_tutorial/map&lt;/code> の下に保存する。&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-4">
+&lt;summary>amclをlaunchして、自己位置推定する&lt;/summary>
+&lt;p>&lt;p>localizationノードと地図サーバーを同時に起動。&lt;/p>
+&lt;pre>&lt;code>(開発PC)(docker) roslaunch navigation_tutorial localization.launch
+(開発PC)(docker) roslaunch roomba_teleop teleop.launch
+(開発PC)(docker) rviz -d /root/roomba_hack/catkin_ws/src/navigation_tutorial/configs/navigation.rviz
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>初期位置の指定(rvizの2D Pose Estimate)&lt;/li>
+&lt;li>コントローラで移動させてみて自己位置を確認&lt;/li>
+&lt;li>rqt_tf_treeを見てみる&lt;/li>
+&lt;/ul>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-5">
+&lt;summary>amclのparamをチューニングする&lt;/summary>
+&lt;p>&lt;p>launchファイルの中身を見てみて、値を変えてみる。&lt;/p>
+&lt;p>各パラメータの意味は&lt;a href="https://wiki.ros.org/amcl#Parameters">amclのページ&lt;/a>を参照。&lt;/p>
+&lt;p>例えば、・・・&lt;/p>
+&lt;ul>
+&lt;li>initial_cov_** を大きくしてみて、パーティクルがちゃんと収束するかみてみる。&lt;/li>
+&lt;li>particleの数(min_particles、max_particles)を変えてみて挙動をみてみる。&lt;/li>
+&lt;/ul>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-6">
+&lt;summary>launchファイルの拡張&lt;/summary>
+&lt;p>&lt;p>localization.launchファイルに以下を追加してteleop.launchとrvizが同時に起動するようにしてみよう。&lt;/p>
+&lt;pre>&lt;code>&amp;lt;!-- teleop.launchを起動--&amp;gt;
+&amp;lt;include file=&amp;quot;$(find roomba_teleop)/launch/teleop.launch&amp;quot;&amp;gt;
+&amp;lt;/include&amp;gt;
+&amp;lt;!-- rvizを起動--&amp;gt;
+&amp;lt;node pkg=&amp;quot;rviz&amp;quot; type=&amp;quot;rviz&amp;quot; name=&amp;quot;navigation_rviz&amp;quot; args=&amp;quot;-d $(find navigation_tutorial)/configs/navigation.rviz&amp;quot;/&amp;gt;
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details></description></item><item><title>開発環境</title><link>https://matsuolab.github.io/roomba_hack/course/chap1/%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83/</link><pubDate>Fri, 01 Jan 2021 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack/course/chap1/%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83/</guid><description>&lt;p>ロボットシステムの開発環境に使われている要素の概要を理解する&lt;/p>
+&lt;h2 id="スライド">スライド&lt;/h2>
+&lt;p>&lt;a href="https://docs.google.com/presentation/d/1-q6zq3vV91GTj7mw9uqwT4B8LyHDpFHBNVi4lEyCa5A/edit?usp=sharing">https://docs.google.com/presentation/d/1-q6zq3vV91GTj7mw9uqwT4B8LyHDpFHBNVi4lEyCa5A/edit?usp=sharing&lt;/a>&lt;/p>
+&lt;h2 id="learn">Learn&lt;/h2>
+&lt;h3 id="linuxコマンド">Linuxコマンド&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>command&lt;/th>
+&lt;th>　説明&lt;/th>
+&lt;th>option&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>ls&lt;/td>
+&lt;td>ディレクトリ内のファイル・ディレクトリの表示&lt;/td>
+&lt;td>-l: 詳細を表示 -a: 全て表示&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>mkdir&lt;/td>
+&lt;td>ディレクトリ作成&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>cd&lt;/td>
+&lt;td>ディレクトリ移動&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>mv&lt;/td>
+&lt;td>ファイル移動&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>rm&lt;/td>
+&lt;td>ファイル削除&lt;/td>
+&lt;td>-r:ディレクトリ内を再起的に削除 -f:強制削除&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>cat&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;td>&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h3 id="ssh">ssh&lt;/h3>
+&lt;pre>&lt;code>ssh &amp;lt;username&amp;gt;@&amp;lt;hostname&amp;gt; -p &amp;lt;port&amp;gt; -i &amp;lt;identity_file&amp;gt;
+&lt;/code>&lt;/pre>
+&lt;h3 id="エディタ">エディタ&lt;/h3>
+&lt;ul>
+&lt;li>vim
+&lt;ul>
+&lt;li>チュートリアル： &lt;code>vimtuter&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>emacs&lt;/li>
+&lt;/ul>
+&lt;h3 id="gitgithub">git/GitHub&lt;/h3>
+&lt;ul>
+&lt;li>gitとは
+&lt;ul>
+&lt;li>add&lt;/li>
+&lt;li>push&lt;/li>
+&lt;li>pull&lt;/li>
+&lt;li>fetch&lt;/li>
+&lt;li>clone&lt;/li>
+&lt;li>merge&lt;/li>
+&lt;li>reset&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;h2 id="githubとは">GitHubとは&lt;/h2>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="docker">docker&lt;/h3>
+&lt;ul>
+&lt;li>
+&lt;p>Dockerとは&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>DockerFileのビルド&lt;/p>
+&lt;pre>&lt;code>docker build -t &amp;lt;image_name&amp;gt;:&amp;lt;tag_name&amp;gt; -f &amp;lt;Dockerfile&amp;gt; &amp;lt;relative_dir&amp;gt;
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;li>
+&lt;p>Docker Image&lt;/p>
+&lt;pre>&lt;code># Docker image一覧
+docker images
+# Docker Imageのダウンロード
+docker pull &amp;lt;image_name&amp;gt;:&amp;lt;tag_name&amp;gt;
+# 削除
+docker rmi &amp;lt;image_id&amp;gt;
+# 不要なDocker imageを消す
+docker image prune
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;li>
+&lt;p>Docker Container&lt;/p>
+&lt;pre>&lt;code># Docker containerの起動
+docker run &amp;lt;image_name&amp;gt; &amp;lt;command&amp;gt;
+# Docker container一覧
+docker ps -a
+# Docker containerに接続
+docker exec -it &amp;lt;container_name&amp;gt; bash
+&lt;/code>&lt;/pre>
+&lt;p>※&lt;code>docker run&lt;/code>でよく使うオプション&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>-it&lt;/code>
+&lt;ul>
+&lt;li>標準入出力有効になる&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>--name &amp;lt;container_name&amp;gt;&lt;/code>
+&lt;ul>
+&lt;li>コンテナの名前の指定&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>--rm&lt;/code>
+&lt;ul>
+&lt;li>コンテナを抜けた際に自動的にコンテナを削除する&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>--gpus all&lt;/code>
+&lt;ul>
+&lt;li>コンテナに全gpuを渡す&lt;/li>
+&lt;li>gpuの個数を指定する場合は all の代わりに数字(0, 1,&amp;hellip;)&lt;/li>
+&lt;li>gpuを指定する場合は &lt;code>--gpus '&amp;quot;device=0,1&amp;quot;'&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>-v &amp;lt;host/path/to/dir:container/path/to/dir&amp;gt;&lt;/code>
+&lt;ul>
+&lt;li>コンテナ内にホストのディレクトリをマウントする&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>-p &amp;lt;host_port&amp;gt;:&amp;lt;container_port&amp;gt;&lt;/code>
+&lt;ul>
+&lt;li>ホストのポートをコンテナのポートにマップする&lt;/li>
+&lt;li>コンテナ内でwebサーバを動かす場合などに使う&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>--net=host&lt;/code>
+&lt;ul>
+&lt;li>コンテナとホストでネットワークを共有する(IPアドレスなどが同じになる)&lt;/li>
+&lt;li>ROSノードをコンテナ内で動かす場合などはこれを使うと楽&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>--privileged&lt;/code>
+&lt;ul>
+&lt;li>コンテナからのデバイスへのアクセスを許可&lt;/li>
+&lt;li>コンテナからWEBカメラにアクセスしたいときなど&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="演習">演習&lt;/h2>
+&lt;p>演習には個人PC, 開発PC, ルンバに搭載されているjetsonの3種類のコンピュータを用います。&lt;/p>
+&lt;p>開発PC : robot_dev系, hsr_dev系&lt;/p>
+&lt;p>jetson : roomba_dev系&lt;/p>
+&lt;details class="spoiler " id="spoiler-0">
+&lt;summary>【ssh】開発用PCにsshする&lt;/summary>
+&lt;p>&lt;p>個人PCから開発PCにsshする&lt;/p>
+&lt;pre>&lt;code class="language-shell">(個人PC):~$ vim ~/.ssh/config
+(個人PC):~$ ssh robot_dev2
+&lt;/code>&lt;/pre>
+&lt;p>sshに成功すると&lt;/p>
+&lt;pre>&lt;code>robot_dev2@robot-dev2:~$
+&lt;/code>&lt;/pre>
+&lt;p>などと表記が変わり、開発PCに接続できたことが確認できます。&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-1">
+&lt;summary>【Linuxコマンド】グループのディレクトリを作成し移動する&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-shell">(開発PC):~$ mkdir group_a
+(開発PC):~$ cd group_a
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-2">
+&lt;summary>【git】roomba_hackリポジトリをcloneし移動する&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-shell">(開発PC):~/group_a$ git clone https://github.com/matsuolab/roomba_hack.git
+(開発PC):~/group_a$ cd roomba_hack
+(開発PC):~/group_a$ ls
+&lt;/code>&lt;/pre>
+&lt;p>&lt;a href="https://github.com/matsuolab/roomba_hack">https://github.com/matsuolab/roomba_hack&lt;/a> をそのままダウンロードできたことが確認できると思います。&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-3">
+&lt;summary>【git】ブランチを確認する&lt;/summary>
+&lt;p>&lt;p>git branchコマンドを使ってみましょう。&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC):~/group_a/roomba_hack$ git branch
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-4">
+&lt;summary>【docker】roomba_hackの開発環境のdocker imageをビルドする&lt;/summary>
+&lt;p>&lt;p>shellファイルを実行してビルドを行います。&lt;/p>
+&lt;pre>&lt;code>(開発PC):~/group_a/roomba_hack$ ./BUILD-DOCKER-IMAGE.sh
+&lt;/code>&lt;/pre>
+&lt;p>shellファイルの中身をcatコマンドで確認してみましょう。&lt;/p>
+&lt;pre>&lt;code>(開発PC)2:~/group_a/roomba_hack$ cat BUILD-DOCKER-IMAGE.sh
+&lt;/code>&lt;/pre>
+&lt;p>細かいところは気にしなくていいですが、ファイルの最後の&lt;/p>
+&lt;pre>&lt;code>docker build . -f docker/${DOCKERFILE_NAME} -t ${IMAGE_NAME}:${TAG_NAME} --build-arg BASE_IMAGE=${BASE_IMAGE}
+&lt;/code>&lt;/pre>
+&lt;p>でビルドが行われていることが確認できると思います。&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-5">
+&lt;summary>【ssh】jetsonにsshする&lt;/summary>
+&lt;p>&lt;p>開発用PCからルンバに載っているjetson nanoへsshします。&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC):~/group_a/roomba_hack$ ssh roomba_dev2
+roomba_dev2@roomba-dev-jetson2:~$
+&lt;/code>&lt;/pre>
+&lt;p>先頭の表記が&lt;code>roomba_dev2@roomba-dev-jetson2&lt;/code>と変わり、jetsonへ接続されたことがわかります。&lt;/p>
+&lt;p>jetsonでも同様にグループのディレクトリを作成し、移動し、roomba_hackリポジトリをcloneしてみましょう。&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-6">
+&lt;summary>【ssh】VNCを使う&lt;/summary>
+&lt;p>&lt;p>個人PCから開発PCにsshで接続&lt;/p>
+&lt;pre>&lt;code class="language-shell">(個人PC):~$ ssh robot_dev2 -L 5900:localhost:5900
+&lt;/code>&lt;/pre>
+&lt;p>手元のVNC viewerでlocalhost:5900を開く&lt;/p>
+&lt;/p>
+&lt;/details></description></item><item><title>ROSのパッケージ・ワークスペース</title><link>https://matsuolab.github.io/roomba_hack/course/chap2/rosbasic/</link><pubDate>Tue, 05 Apr 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack/course/chap2/rosbasic/</guid><description>&lt;p>ROSのパッケージ管理について理解しよう&lt;/p>
+&lt;h2 id="learn">Learn&lt;/h2>
+&lt;h3 id="rosのパッケージ">ROSのパッケージ&lt;/h3>
+&lt;p>ROSでは、特定の目的のためのプログラム群をまとめてパッケージとして管理する。&lt;/p>
+&lt;p>例として、navigation_tutorialパッケージのファイル構成を示す。&lt;/p>
+&lt;pre>&lt;code>navigation_tutorial
+   ├── CMakeLists.txt
+   ├── launch
+   │   ├── amcl.launch
+   │   ├── avoidance.launch
+   │   ├── gmapping.launch
+   │   ├── go_straight.launch
+   │   ├── localization.launch
+   │   ├── map_server.launch
+   │   ├── move_base.launch
+   │   └── navigation.launch
+   ├── package.xml
+   ├── params
+   │   ├── base_global_planner_params.yaml
+   │   ├── base_local_planner_params.yaml
+   │   ├── costmap_common_params.yaml
+   │   ├── dwa_local_planner_params.yaml
+   │   ├── global_costmap_params.yaml
+   │   ├── local_costmap_params.yaml
+   │   └── move_base_params.yaml
+   ├── scripts
+   │   ├── avoidance.py
+   │   ├── simple_control2.py
+   │   └── simple_control.py
+   └── src
+   ├── avoidance.cpp
+   └── go_straight.cpp
+&lt;/code>&lt;/pre>
+&lt;p>一般的に、&lt;code>scripts&lt;/code>ディレクトリや&lt;code>src&lt;/code>ディレクトリにそれぞれPython, C++のプログラムが配置される。&lt;/p>
+&lt;p>作成したプログラムは&lt;code>rosrun&lt;/code>コマンドで実行することができる。&lt;/p>
+&lt;pre>&lt;code class="language-shell">(Python) rosrun navigation_tutorial simple_control2.py
+(C++) rosrun navigation_tutorial go_straight
+&lt;/code>&lt;/pre>
+&lt;p>&lt;code>launch&lt;/code>ディレクトリに入っているlaunchファイルは複数のプログラムを同時に実行できるための仕組みである。&lt;/p>
+&lt;p>launchファイルについてでも同様に&lt;code>roslaunch&lt;/code>コマンドで実行することができる。&lt;/p>
+&lt;pre>&lt;code class="language-shell">roslaunch navigation_tutorial move_base.launch
+&lt;/code>&lt;/pre>
+&lt;p>実行時にパッケージ名(今回だとnavigation_tutorial)を指定するので、現在どこのディレクトリにいるかに関係なく実行が可能である。&lt;/p>
+&lt;h3 id="rosのワークスペース">ROSのワークスペース&lt;/h3>
+&lt;p>ROSのパッケージはワークスペースと呼ばれる作業スペースに配置される。&lt;/p>
+&lt;p>一般的に&lt;code>catkin_ws&lt;/code>という名前が使われることが多い。&lt;/p>
+&lt;p>catkin_wsのファイル構成を示す。&lt;/p>
+&lt;pre>&lt;code>catkin_ws
+   ├── build
+   ├── devel
+   └── src
+   ├── CMakeLists.txt
+   ├── navigation_tutorial
+   │   ├── CMakeLists.txt
+   │   ├── launch
+   │   ├── package.xml
+   │   ├── params
+   │   ├── scripts
+   │   └── src
+   └── roomba
+   ├── roomba_bringup
+   │   ├── CMakeLists.txt
+   │   ├── config
+   │   ├── launch
+   │   └── package.xml
+   ├── roomba_description
+   │   ├── CMakeLists.txt
+   │   ├── config
+   │   ├── launch
+   │   ├── meshes
+   │   ├── package.xml
+   │   └── urdf
+   ├── roomba_gazebo
+   │   ├── CMakeLists.txt
+   │   ├── launch
+   │   └── package.xml
+   └── roomba_teleop
+   ├── CMakeLists.txt
+   ├── include
+   ├── launch
+   ├── package.xml
+   └── src
+&lt;/code>&lt;/pre>
+&lt;p>catkin_wsのsrc内でパッケージ作成を行い、catkin_ws直下で&lt;code>catkin_make&lt;/code>コマンドを実行すると、Cプログラムのビルドが行われ、buildディレクトリとdevelディレクトリが作成される。&lt;/p>
+&lt;p>作成されたdevelディレクトリの中のsetup.bashをソース&lt;code>source devel/setup.bash&lt;/code>することで、ワークスペース内のパッケージのパスを通すことができる。　&lt;/p>
+&lt;p>パッケージのパスを通すことで、ROSのパッケージに関するコマンドや、プログラムの実行(&lt;code>rosrun&lt;/code>や&lt;code>roslaunch&lt;/code>)が行えるようになる。&lt;/p>
+&lt;h3 id="rosのコマンド">ROSのコマンド&lt;/h3>
+&lt;p>ROSのコマンドのうち、よく用いるものを紹介する。&lt;/p>
+&lt;ul>
+&lt;li>Topic関連&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code>rostopic list 　　　　　　 topicの一覧を表示する
+rostopic echo &amp;lt;topic name&amp;gt; 　 　　　　　 指定されたtopicの中身を表示する
+rostopic hz &amp;lt;topic name&amp;gt; 　　　　　　　 topicの配信周波数を取得する
+rostopic info &amp;lt;topic name&amp;gt; 　　　　　　　 topicの情報を表示する
+rostopic pub &amp;lt;topic name&amp;gt; &amp;lt;topic&amp;gt; 　 　topicを配信する
+rostopic type &amp;lt;topic name&amp;gt; topicの型を確認する
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>Node関連&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code>rosnode list nodeの一覧を表示する
+rosnode ping &amp;lt;node name&amp;gt; nodeの接続テストを行う
+rosnode info &amp;lt;node name&amp;gt; nodeの情報を表示する
+rosnode kill &amp;lt;node name&amp;gt; nodeをシャットダウンする
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>Package関連&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code>rospack list packageの一覧を表示する
+roscd &amp;lt;package name&amp;gt; 指定したpackage内に移動する
+&lt;/code>&lt;/pre>
+&lt;h3 id="rosのプログラムの書き方">ROSのプログラムの書き方&lt;/h3>
+&lt;p>それでは実際にプログラム例を見てみましょう。&lt;/p>
+&lt;pre>&lt;code class="language-python:simple_control.py">#!/usr/bin/env python3
+import rospy
+from geometry_msgs.msg import Twist
+def time_control(pub, velocity, yawrate, time):
+vel = Twist()
+start_time = rospy.get_rostime().secs
+while(rospy.get_rostime().secs-start_time&amp;lt;time):
+vel.linear.x = velocity
+vel.angular.z = yawrate
+pub.publish(vel)
+rospy.sleep(0.1)
+def simple_controller():
+rospy.init_node('simple_controller', anonymous=True)
+pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+time_control(pub, 0.0, 0.0, 0.5)
+time_control(pub, 0.3, 0.0, 2.0)
+time_control(pub, 0.0, 0.0, 0.5)
+time_control(pub, -0.3, 0.0, 2.0)
+time_control(pub, 0.0, 0.0, 0.5)
+time_control(pub, 0.0, 0.5, 2.0)
+time_control(pub, 0.0, 0.0, 0.5)
+time_control(pub, 0.0, -0.5, 2.0)
+if __name__=='__main__':
+try:
+simple_controller()
+except rospy.ROSInitException:
+pass
+&lt;/code>&lt;/pre>
+&lt;p>まずsimple_controller関数内をみていきましょう。&lt;/p>
+&lt;p>以下の部分で&lt;code>simple_controller&lt;/code>という名前でノードを定義しています。&lt;/p>
+&lt;pre>&lt;code class="language-python">rospy.init_node('simple_controller', anonymous=True)
+&lt;/code>&lt;/pre>
+&lt;p>以下の部分でPublisher(トピックのpublish)を宣言しています。&lt;/p>
+&lt;p>今回の場合は、&lt;code>/cmd_vel&lt;/code>トピックを&lt;code>Twist&lt;/code>型で送信するPublisherを宣言しています。&lt;/p>
+&lt;pre>&lt;code class="language-python">pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+&lt;/code>&lt;/pre>
+&lt;p>続いて、time_control関数です。&lt;/p>
+&lt;p>この関数はpublisher、速度、角速度、時間を受け取り、速度指令をpublishします。&lt;/p>
+&lt;pre>&lt;code class="language-python">def time_control(pub, velocity, yawrate, time):
+vel = Twist()
+start_time = rospy.get_rostime().secs
+while(rospy.get_rostime().secs-start_time&amp;lt;time):
+vel.linear.x = velocity
+vel.angular.z = yawrate
+pub.publish(vel)
+rospy.sleep(0.1)
+&lt;/code>&lt;/pre>
+&lt;p>ここでTwist型のインスタンスを作成しています。&lt;/p>
+&lt;pre>&lt;code class="language-python"> vel = Twist()
+&lt;/code>&lt;/pre>
+&lt;p>while文で受け取った時間が過ぎるまでの間、受け取った速度と各速度をvelに格納し、&lt;code>pub.publish(vel)&lt;/code>でpublishを行なっています。&lt;/p>
+&lt;pre>&lt;code class="language-python"> while(rospy.get_rostime().secs-start_time&amp;lt;time):
+vel.linear.x = velocity
+vel.angular.z = yawrate
+pub.publish(vel)
+rospy.sleep(0.1)
+&lt;/code>&lt;/pre>
+&lt;h2 id="演習">演習&lt;/h2>
+&lt;details class="spoiler " id="spoiler-0">
+&lt;summary>【jetson・開発マシン】それぞれdockerコンテナを起動&lt;/summary>
+&lt;p>&lt;p>jetsonでdockerコンテナを起動&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC):~$ ssh roomba_dev1
+(jetson):~$ cd ~/group_a/roomba_hack
+(jetson):~/group_a/roomba_hack ./RUN-DOCKER-CONTAINER.sh
+(jetson)(docker):~/roomba_hack#
+&lt;/code>&lt;/pre>
+&lt;p>開発PCでdockerコンテナを起動&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC):~$ cd ~/group_a/roomba_hack
+(開発PC):~/group_a/roomba_hack ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
+(開発PC)(docker):~/roomba_hack#
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-1">
+&lt;summary>【jetson・開発マシン】ビルドをしてパスを通す&lt;/summary>
+&lt;p>&lt;p>catkin_make後に&lt;code>devel&lt;/code>と&lt;code>build&lt;/code>ディレクトリが作成されることを確認しましょう。&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC)(docker):~/roomba_hack# cd catkin_ws
+(開発PC)(docker):~/roomba_hack/catkin_ws# rm -rf devel build
+(開発PC)(docker):~/roomba_hack/catkin_ws# ls
+(開発PC)(docker):~/roomba_hack/catkin_ws# catkin_make
+(開発PC)(docker):~/roomba_hack/catkin_ws# ls
+(開発PC)(docker):~/roomba_hack/catkin_ws# source ./devel/setup.bash
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-2">
+&lt;summary>【jetson】ROSマスタ、各種ノードを起動&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-shell">(jetson)(docker):~/roomba_hack# roslaunch roomba_bringup bringup.launch
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;h3 id="rosメッセージの可視化">ROSメッセージの可視化&lt;/h3>
+&lt;details class="spoiler " id="spoiler-3">
+&lt;summary>【開発PC】topicの確認&lt;/summary>
+&lt;p>&lt;p>Topic関連のコマンドのところの&lt;code>rostopic list&lt;/code>コマンドを使用してtopic一覧を表示してみましょう&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC)(docker):~/roomba_hack# rostopic list
+&lt;/code>&lt;/pre>
+&lt;p>特定のtopicの型を確認&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC)(docker)# rostopic type /camera/color/image_raw
+(開発PC)(docker)# rostopic type /scan
+&lt;/code>&lt;/pre>
+&lt;p>その型が実際にどのような構成をしているのかは&lt;code>rosmsg info &amp;lt;topic type&amp;gt;&lt;/code>で調べられます。&lt;/p>
+&lt;p>参考&lt;/p>
+&lt;p>sensor_msgs/LaserScan型 &lt;a href="http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/LaserScan.html">http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/LaserScan.html&lt;/a>&lt;/p>
+&lt;p>sensor_msgs/Image型 &lt;a href="http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/Image.html">http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/Image.html&lt;/a>&lt;/p>
+&lt;p>特定のtopicの中身を確認&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC)(docker)# rostopic echo /camera/color/image_raw
+(開発PC)(docker)# rostopic echo /scan
+&lt;/code>&lt;/pre>
+&lt;p>rvizを用いて可視化&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC)(docker)# rviz
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-4">
+&lt;summary>【開発PC】topicのpublish(配信)&lt;/summary>
+&lt;p>&lt;p>topic&lt;code>/cmd_vel&lt;/code>の情報を確認&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC)(docker)# rostopic info /cmd_vel
+&lt;/code>&lt;/pre>
+&lt;p>topic&lt;code>/cmd_vel&lt;/code>の型を確認&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC)(docker)# rostopic type /cmd_vel
+&lt;/code>&lt;/pre>
+&lt;p>geometry_msgs/Twist型 &lt;a href="http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html">http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html&lt;/a>&lt;/p>
+&lt;p>topic&lt;code>/cmd_vel&lt;/code>をpublish&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC)(docker)# rostopic pub /cmd_vel geometry_msgs/Twist &amp;quot;linear:
+x: 1.0
+y: 0.0
+z: 0.0
+angular:
+x: 0.0
+y: 0.0
+z: 0.0&amp;quot;
+&lt;/code>&lt;/pre>
+&lt;pre>&lt;code class="language-shell">(開発PC)(docker)# rosrun navigation_tutorial simple_control.py
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-5">
+&lt;summary>Try it! 時間が余った人向け&lt;/summary>
+&lt;p>&lt;p>try it! &lt;code>roomba_bringup&lt;/code>パッケージの&lt;code>bringup.launch&lt;/code>の中身を読んでみよう&lt;/p>
+&lt;p>hint roscdコマンドを使うとパッケージへ簡単に移動ができます。ファイルの中身を表示するには&lt;code>cat&lt;/code>コマンドを使用します。&lt;/p>
+&lt;p>try it! 開発PCで&lt;code>rosnode&lt;/code>関連のコマンドを使ってみよう&lt;/p>
+&lt;p>try it! 開発PCで&lt;code>rosrun rqt_graph rqt_graph&lt;/code>を実行してnodeとtopicの関連を可視化してみよう&lt;/p>
+&lt;p>try it! 開発PCで&lt;code>simple_control.py&lt;/code>の中身を読んでコードを変更してみよう&lt;/p>
+&lt;p>hint コードを編集するときはエディタを使うことがおすすめです。新しくターミナルを開いて&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC):~$ cd group_a/roomba_hack
+(開発PC):~group_a/roomba_hack$ code .
+&lt;/code>&lt;/pre>
+&lt;p>でVScodeを起動することができます。&lt;/p>
+&lt;/p>
+&lt;/details></description></item><item><title>ロボットシステムにおけるセンシング・アクチュエーション・通信①</title><link>https://matsuolab.github.io/roomba_hack/course/chap2/sensing1/</link><pubDate>Tue, 05 Apr 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack/course/chap2/sensing1/</guid><description>&lt;p>センサの値を読み取りロボットを動かしてみよう&lt;/p>
+&lt;h2 id="learn">Learn&lt;/h2>
+&lt;h3 id="ロボットセンサの基礎知識">ロボットセンサの基礎知識&lt;/h3>
+&lt;p>ロボットが動作するために必要なセンサは大きく2種類に分けられる。&lt;/p>
+&lt;p>1つ目が外界センサで、これはロボットが行動する環境の情報を取得するためのセンサーである。
+具体的なセンサとして、&lt;/p>
+&lt;ul>
+&lt;li>LiDAR&lt;/li>
+&lt;li>デプスカメラ&lt;/li>
+&lt;li>ホイールエンコーダ&lt;/li>
+&lt;li>IMU&lt;/li>
+&lt;/ul>
+&lt;p>などがあげられる。&lt;/p>
+&lt;p>センサのノイズの影響を軽減するため、複数のセンサを組み合わせて利用されることもある。&lt;/p>
+&lt;p>2つ目は内界センサで、これは(ロボットアームのような変形可能な)ロボットが自身の内部状態を把握し、位置や姿勢を制御するために使われるセンサーである。&lt;/p>
+&lt;ul>
+&lt;li>関節位置・角度センサ&lt;/li>
+&lt;li>関節姿勢センサ&lt;/li>
+&lt;/ul>
+&lt;p>などが内界センサである。&lt;/p>
+&lt;p>参考&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://www.jsme.or.jp/jsme-medwiki/14:1013897#:~:text=robot%20sensor">https://www.jsme.or.jp/jsme-medwiki/14:1013897#:~:text=robot%20sensor&lt;/a>&lt;/li>
+&lt;/ul></description></item><item><title>ロボットシステムにおけるセンシング・アクチュエーション・通信③</title><link>https://matsuolab.github.io/roomba_hack/course/chap3/sensing3/</link><pubDate>Tue, 05 Apr 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack/course/chap3/sensing3/</guid><description>&lt;p>複数のセンサを組み合わせてよりかしこくロボットを動かしてみよう&lt;/p>
+&lt;h2 id="learn">Learn&lt;/h2>
+&lt;h3 id="lidarのスキャンデータを使って障害物を回避してみよう">LiDARのスキャンデータを使って，障害物を回避してみよう&lt;/h3>
+&lt;p>次に，LiDARでスキャンしたデータを使って，障害物を回避するようなプログラムを作ってみましょう．&lt;/p>
+&lt;h4 id="lidarスキャンのメッセージscanの中身を見てみよう">LiDARスキャンのメッセージ（&lt;code>/scan&lt;/code>）の中身を見てみよう&lt;/h4>
+&lt;p>LiDARは，Light Detection And Rangingの略で，レーザ光を使って離れた場所にある物体形状や距離を測定するためのセンサです．
+近年では，自動車の自動運転にも用いられることの多いセンサの一つです．&lt;/p>
+&lt;p>roombaに搭載されたLiDARセンサ（rplidar）の値は，&lt;code>/scan&lt;/code>のトピックに流れていて，&lt;code>rostopic echo /scan&lt;/code>をしてみるとメッセージとしてどんな情報が流れているかわかります．&lt;/p>
+&lt;p>大きなデータなので今回はテキストに掲載するのは省略しますが，&lt;code>rostopic type /scan&lt;/code>をしてみると，メッセージとして，&lt;code>sensor_msgs/LaserScan&lt;/code>型が使われていることがわかります．
+&lt;details class="spoiler " id="spoiler-0">
+&lt;summary>&lt;code>rostopic type /scan&lt;/code>&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-bash">root@dynamics:~/roomba_hack# rostopic type /scan
+sensor_msgs/LaserScan
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>&lt;/p>
+&lt;p>&lt;code>sensor_msgs/LaserScan&lt;/code>型の定義を確認してみましょう．
+メッセージ型の定義は，&lt;a href="http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/LaserScan.html" target="_blank" rel="noopener">ドキュメント&lt;/a>のほか，&lt;code>rosmsg info sensor_msgs/LaserScan&lt;/code>することでもコマンドから確認できます．
+&lt;details class="spoiler " id="spoiler-1">
+&lt;summary>&lt;code>rosmsg info sensor_msgs/LaserScan&lt;/code>&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-bash">root@dynamics:~/roomba_hack# rosmsg info sensor_msgs/LaserScan
+std_msgs/Header header
+uint32 seq
+time stamp
+string frame_id
+float32 angle_min
+float32 angle_max
+float32 angle_increment
+float32 time_increment
+float32 scan_time
+float32 range_min
+float32 range_max
+float32[] ranges
+float32[] intensities
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>&lt;/p>
+&lt;p>&lt;code>angle_min&lt;/code>にはスキャンの開始角度，&lt;code>angle_max&lt;/code>にはスキャンの終了角度がラジアンで記録されています．
+&lt;code>angle_increment&lt;/code>は，計測した間隔がラジアンで記録されています．
+&lt;code>range_max&lt;/code>にはスキャンの間で検出された最大の距離，&lt;code>range_min&lt;/code>には最小の距離がメートルで記録されています．&lt;/p>
+&lt;h4 id="rvizでlidarスキャンの値を可視化してみよう">rvizでLiDARスキャンの値を可視化してみよう&lt;/h4>
+&lt;p>rvizでLiDARのスキャン結果を可視化してみましょう．&lt;/p>
+&lt;p>&lt;code>LaserScan&lt;/code>をAddして，&lt;code>topic&lt;/code>に&lt;code>/scan&lt;/code>を設定すると，以下のように，ロボットを中心にLiDARによって計測された障害物が赤く表示されます．&lt;/p>
+&lt;figure id="figure-lidarスキャンをrvizで可視化">
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../lidar_scan.png" alt="LiDARスキャンをrvizで可視化" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;figcaption>
+LiDARスキャンをrvizで可視化
+&lt;/figcaption>&lt;/figure>
+&lt;h4 id="lidarを使って障害物を回避しよう">LiDARを使って障害物を回避しよう&lt;/h4>
+&lt;p>それでは，LiDARスキャン&lt;code>/scen&lt;/code>の情報を使った制御の実装の例として&lt;code>navigation_tutorial&lt;/code>パッケージの中の&lt;code>avoidance.py&lt;/code>を見てみましょう（&lt;a href="https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/avoidance.py" target="_blank" rel="noopener">github&lt;/a>）．&lt;/p>
+&lt;p>このプログラムでは，LiDARを使って進行方向に存在する障害物を見つけ，それを回避しながら進むようにロボットを制御しています．具体的には，&lt;/p>
+&lt;ul>
+&lt;li>ロボットの進行方向に物体がなかったら直進&lt;/li>
+&lt;li>ロボットの右側に障害物があったら左回転&lt;/li>
+&lt;li>ロボットの左側に障害物があったら右回転&lt;/li>
+&lt;/ul>
+&lt;p>することで障害物を回避（ぶつかる前に方向転換）しています．&lt;/p>
+&lt;p>では，プログラムの中身を見ていきます．&lt;/p>
+&lt;p>&lt;a href="../sensing2/">&lt;code>/odom&lt;/code>を使った制御の場合&lt;/a>と同様に，ノードを定義する際に，コマンドを送るパブリッシャと，LiDARスキャンのデータを読み取るサブスクライバを作成します．&lt;/p>
+&lt;pre>&lt;code class="language-python">class Avoidance:
+def __init__(self):
+rospy.init_node('avoidance', anonymous=True)
+# Publisher
+self.cmd_vel_pub = rospy.Publisher('/planner/cmd_vel', Twist, queue_size=10)
+# Subscriber
+scan_sub = rospy.Subscriber('/scan', LaserScan, self.callback_scan)
+self.min_range = None
+&lt;/code>&lt;/pre>
+&lt;p>&lt;code>/scan&lt;/code>のコールバックは，&lt;/p>
+&lt;pre>&lt;code class="language-python"> def callback_scan(self, data):
+fov = np.deg2rad(60)
+min_range = data.range_max
+min_idx = -1
+angle = data.angle_min
+for idx, r in enumerate(data.ranges):
+angle += data.angle_increment
+if -fov&amp;lt;angle&amp;lt;fov:
+if r&amp;lt;min_range:
+min_range = r
+min_idx = idx
+if min_idx &amp;lt; len(data.ranges)/2.0:
+self.direction = &amp;quot;RIGHT&amp;quot;
+else:
+self.direction = &amp;quot;LEFT&amp;quot;
+self.min_range = min_range
+&lt;/code>&lt;/pre>
+&lt;p>となっており，正面から左右60度の範囲内で最も短い距離を&lt;code>self.min_range&lt;/code>に格納し，それが右側にあるのか左側にあるのかを&lt;code>self.direction&lt;/code>に格納しています．．&lt;/p>
+&lt;p>このプログラムを実行すると&lt;code>process&lt;/code>メソッドが（0.1秒おきに）常に実行されます．&lt;/p>
+&lt;pre>&lt;code class="language-python"> def process(self):
+r = rospy.Rate(10)
+while not rospy.is_shutdown():
+vel = Twist()
+if self.min_range is not None:
+if self.min_range &amp;gt;= 0.4:
+vel.linear.x = 0.2
+vel.angular.z = 0.0
+else:
+vel.linear.x = 0.0
+if self.direction == &amp;quot;RIGHT&amp;quot;:
+vel.angular.z = 0.5
+elif self.direction == &amp;quot;LEFT&amp;quot;:
+vel.angular.z = -0.5
+self.cmd_vel_pub.publish(vel)
+r.sleep()
+&lt;/code>&lt;/pre>
+&lt;p>&lt;code>process&lt;/code>メソッド内部では，格納された&lt;code>self.min_range&lt;/code>が0.4（メートル）より大きい場合は，ロボットの前に何もないと判断して直進，小さい場合は，&lt;code>self.direction&lt;/code>の値を見て，&lt;code>RIGHT&lt;/code>であれば右に障害物があると判断して左回転，&lt;code>LEFT&lt;/code>であれば左に障害物があると判断して右回転するようなプログラムになっています．&lt;/p>
+&lt;p>それでは，実際にLiDARを使って障害物を回避するプログラムを実行してみましょう．&lt;/p>
+&lt;h2 id="演習">演習&lt;/h2>
+&lt;h3 id="rosメッセージの可視化">ROSメッセージの可視化&lt;/h3>
+&lt;details class="spoiler " id="spoiler-3">
+&lt;summary>【開発PC】topicの確認&lt;/summary>
+&lt;p>&lt;p>&lt;code>/scan&lt;/code>の型を確認&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC)(docker):~/roomba_hack# rostopic type /scan
+&lt;/code>&lt;/pre>
+&lt;p>&lt;code>/scan&lt;/code>の中身を確認&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC)(docker):~/roomba_hack# rostopic echo /scan
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-4">
+&lt;summary>LiDARスキャンを使ったフィードバック制御&lt;/summary>
+&lt;p>&lt;p>&lt;code>avoidance.py&lt;/code>を実行してみよう．&lt;/p>
+&lt;p>このプログラムを動かすときには，コントローラの&lt;code>Y&lt;/code>ボタンを押してから&lt;code>B&lt;/code>ボタンを押して&lt;code>auto&lt;/code>モードにしておきましょう．&lt;/p>
+&lt;p>今回はせっかくなので，launchfileから起動してみましょう．
+このlaunchfileは，&lt;code>navigation_tutorial&lt;/code>パッケージの中の&lt;code>launch&lt;/code>フォルダの中にある&lt;code>avoidance.launch&lt;/code>に記述されています（&lt;a href="https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/launch/avoidance.launch">github&lt;/a>）．&lt;/p>
+&lt;pre>&lt;code class="language-shell">(開発PC)(docker):~/roomba_hack# roslaunch navigation_tutorial avoidance.launch
+&lt;/code>&lt;/pre>
+&lt;p>ロボットの進行方向に障害物があるときに，それを避けるように方向転換したら成功です．&lt;/p>
+&lt;p>try it! &lt;code>avoidance.py&lt;/code>の中身を読んでコードを変更してみよう&lt;/p>
+&lt;/p>
+&lt;/details></description></item><item><title>ROSとは</title><link>https://matsuolab.github.io/roomba_hack/course/chap1/ros/</link><pubDate>Sat, 22 Jan 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack/course/chap1/ros/</guid><description>&lt;p>ロボット開発によく用いられるROSの概要を理解する&lt;/p>
+&lt;h2 id="learn">Learn&lt;/h2>
+&lt;h3 id="rosの概要">ROSの概要&lt;/h3>
+&lt;p>ROS(Robot Operating System)は、ロボット・アプリケーション作成を支援するライブラリとツールを提供するミドルウェアです。
+具体的には以下にあげるものをROSは提供しています。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>メッセージ通信&lt;/p>
+&lt;p>プロセス間、コンピュータ間の通信ライブラリが提供されています。用途に応じて、多対多や一対多、非同期、同期などの通信形態を選択することができます。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>デバイスドライバ&lt;/p>
+&lt;p>ロボットに搭載される多くのセンサやアクチュエータがROSのAPIで標準化された形で提供されています。&lt;/p>
+&lt;p>&lt;a href="https://github.com/ros-drivers">https://github.com/ros-drivers&lt;/a>
+&lt;a href="http://wiki.ros.org/Sensors">http://wiki.ros.org/Sensors&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>ライブラリ&lt;/p>
+&lt;p>ロボットを動作させるソフトウェア(ナビゲーション、マニピュレーション)の基本機能の大半が提供されています。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>視覚化ツール&lt;/p>
+&lt;p>ロボットの内部状態やセンサ出力を2次元、3次元で視覚化するRvizや3次元動力学シミュレータのGazeboなどが提供されています。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>パッケージ管理&lt;/p>
+&lt;p>多種多様なプログラミング言語(python, C++, &amp;hellip;)、依存関係で記述されたプログラム(パッケージ)同士を統合的にセットアップ、ビルド、テスト、リリースすることが可能です。&lt;/p>
+&lt;p>たとえば、経路計画など処理が重いプロセスはC++で、画像認識など機械学習系のプロセスはpythonで実装し、それらプロセス間の通信を容易に実装できる。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="rosのメッセージ通信">ROSのメッセージ通信&lt;/h3>
+&lt;p>ロボットシステムでは、多数のプログラムを並列に実行し、それぞれがデータをやりとりします。
+それらのプログラム間の通信ライブラリをROSは提供します。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>ノード(node)&lt;/p>
+&lt;p>ROSでは、一つのプログラム単位を「ノード(node)」と呼びます。
+ノードは、ROSクライアントライブラリを用いて、他のノードとデータをやりとりします。
+ROSクライアントライブラリは異なるプログラミング言語で記述されたノードがやりとりできるようにしています。
+ノードは、次に述べるトピックの配信・購読、またはサービスの提供・使用が可能です。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>トピック(topic)&lt;/p>
+&lt;p>ROSでの、標準的なデータ通信の経路を「トピック(topic)」と呼びます。
+ノードはメッセージをトピックへ向けて配信(Publish)し、同様に購読する(Subscribe)ことでトピックからメッセージを受け取ることができます。&lt;/p>
+&lt;p>トピックには名前が付けられ、同じトピックに複数のノードがデータを送り、複数のノードがデータを受け取ることができます。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>メッセージ(message)&lt;/p>
+&lt;p>トピックへ配信したり、購読したりするときのROSのデータ型のことを「メッセージ(message)」と呼びます。
+メッセージの型はmsgファイルに記述されており、使用言語に依存しないデータ形式になっています。&lt;/p>
+&lt;p>以下に、物体やロボットの位置を表す時によく用いる&lt;code>geomemtry_msgs/PoseStamped&lt;/code>型のmsgファイルを示します。
+位置情報の時間や座標フレームの情報が含まれるheaderと座標位置を表すposeで定義されています。&lt;/p>
+&lt;pre>&lt;code>std_msgs/Header header
+uint32 seq
+time stamp
+string frame_id
+geometry_msgs/Pose pose
+geometry_msgs/Point position
+float64 x
+float64 y
+float64 z
+geometry_msgs/Quaternion orientation
+float64 x
+float64 y
+float64 z
+float64 w
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;li>
+&lt;p>サービス(service)&lt;/p>
+&lt;p>「サービス(service)」はノードが他のノードとお互いに通信するための一つの手段です。
+サービスを提供しているノードに引数を渡して、関数の実行結果を戻り値として受け取ることができます。&lt;/p>
+&lt;p>呼び出される側のノードは、サービス名とデータ形式の宣言を「アドバタイズ(advertise)」し、呼び出す側のノードは、サービスを「コール(call)」します。&lt;/p>
+&lt;p>サービスにおいて送受信されるデータの型はsrvファイルに記述されています。
+メッセージと同様使用言語に依存しないデータ形式ですが、メッセージと異なるのは、引数と戻り値の二つの形式を定義する必要があるところです。&lt;/p>
+&lt;p>以下に、srvの例として&lt;code>std_srvs/SetBool&lt;/code>を示します。
+このように引数と戻り値の間に&lt;code>---&lt;/code>を入れて定義します。&lt;/p>
+&lt;pre>&lt;code>bool data
+---
+bool success
+string message
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;li>
+&lt;p>ROSマスタ(ROS master)&lt;/p>
+&lt;p>「ROSマスタ(ROS master)」は、ノード、トピックおよびサービスの名前登録を行い、それぞれのノードが他のノードから見えるようにする役割を担っています。
+通信するノード名とトピック名およびサービス名の対応が決定した後、ノード同士が「peer-to-peer」で通信します。&lt;/p>
+&lt;p>ROSマスタとノード間の通信はXML-RPCを用いて行われます。
+ROSマスタを起動するには「roscore」というコマンドを実行します。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>パラメータサーバ(parameter server)&lt;/p>
+&lt;p>「パラメータサーバ(parameter server)」は、設定データを複数のノードで共有するための軽量なサーバです。
+各ノードのパラメータを、パラメータサーバで一括して管理できます。
+パラメータサーバもROSマスタ同様に「roscore」コマンドで起動します。&lt;/p>
+&lt;p>パラメータサーバで扱える型は、整数・小数・真偽値・辞書・リストになります。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>ROSのデータ通信のまとめ&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;figure id="figure-ros通信">
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../ros_communication.png" alt="ROS通信" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;figcaption>
+ROS通信
+&lt;/figcaption>&lt;/figure>
+&lt;!-- ### デバイスドライバ
+- カメラ
+- LiDAR
+- IMU -->
+&lt;h3 id="rosと連動するソフトウェア">ROSと連動するソフトウェア&lt;/h3>
+&lt;p>ROSは以下のソフトウェアと連動して使うためのパッケージが提供されています。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>OpenCV&lt;/p>
+&lt;p>コンピュータビジョンの標準的なライブラリ。&lt;/p>
+&lt;p>OpenCVのデータ形式である、MatクラスとROSのメッセージ形式を変換するcv_bridgeや３次元座標上の物体を２次元画像上に投影する機能であるimage_geometryといったパッケージ(vision_opencv)が提供されています。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>PCL(Point Cloud Library)&lt;/p>
+&lt;p>3次元点群処理のライブラリ。&lt;/p>
+&lt;p>OpenCV同様PCLのデータ形式とROSのメッセージ形式を変換するパッケージが提供されています。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>OpenSLAM, Navigation Stack&lt;/p>
+&lt;p>移動ロボットの自己位置推定と地図生成を同時に行うSLAM(Simultaneous Localization and Mapping)のソースコードを公開するためのプラットフォームと、。&lt;/p>
+&lt;p>ROSではOpenSLAMで実装されているgmappingパッケージのラッパーやそれと連携して自律走行を実現するnavigationメタパッケージが提供されています。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>Move it&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="視覚化ツール">視覚化ツール&lt;/h3>
+&lt;ul>
+&lt;li>rqt&lt;/li>
+&lt;/ul>
+&lt;figure id="figure-rqt-window">
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../ros_gui.png" alt="rqt window" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;figcaption>
+rqt window
+&lt;/figcaption>&lt;/figure>
+&lt;!-- http://wiki.ros.org/rqt -->
+&lt;ul>
+&lt;li>rviz&lt;/li>
+&lt;/ul>
+&lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+&lt;iframe src="https://www.youtube.com/embed/i--Sd4xH9ZE" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video">&lt;/iframe>
+&lt;/div>
+&lt;!-- http://wiki.ros.org/ja/rviz -->
+&lt;ul>
+&lt;li>gazebo&lt;/li>
+&lt;/ul>
+&lt;!-- ### パッケージ管理
+- プログラミング言語
+- rosdep
+- -->
+&lt;h2 id="演習">演習&lt;/h2>
+&lt;details class="spoiler " id="spoiler-3">
+&lt;summary>roomba driverを起動し、動作していることを確認する&lt;/summary>
+&lt;p>&lt;ul>
+&lt;li>
+&lt;p>jetsonにアクセスする&lt;/p>
+&lt;pre>&lt;code class="language-sh">(開発PC):~$ ssh roomba_dev1
+(jetson):~$
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;li>
+&lt;p>docker containerを起動する
+余裕があれば&lt;code>RUN-DOCKER-CONTAINER.sh&lt;/code>ファイルの中身を確認してみましょう。&lt;/p>
+&lt;pre>&lt;code class="language-sh">(jetson):~$ cd ~/team_a/roomba_hack
+(jetson):~/team_a/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
+root@roomba-dev-jetson:~/roomba_hack#
+&lt;/code>&lt;/pre>
+&lt;p>&lt;code>root@roomba-dev-jetson:~/roomba_hack#&lt;/code>などと表示されればdocker内部に入れています。&lt;/p>
+&lt;p>今後docker内部であることは(docker)と表記します。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>roomba driverなどを起動するlaunchファイルを起動する
+このタイミングでルンバの電源が入っているかを確認しておきましょう。&lt;/p>
+&lt;pre>&lt;code class="language-sh">(jetson)(docker):~/roomba_hack# roslaunch roomba_bringup bringup.launch
+&lt;/code>&lt;/pre>
+&lt;p>起動に成功すればルンバからピッと短い音が鳴り、ターミナルには赤い文字が出続けるはずです。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-4">
+&lt;summary>コントローラーを使って、ロボットを動かす&lt;/summary>
+&lt;p>&lt;ul>
+&lt;li>
+&lt;p>開発PCでdocker containerを起動する
+　　xにはroomba_devの後につく数字を入れてください。&lt;/p>
+&lt;pre>&lt;code class="language-sh">(開発PC):~$ cd ~/team_a/roomba_hack
+(開発PC):~/team_a/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;li>
+&lt;p>コントローラーを起動
+コントローラーが開発PCに刺さってることを確認してください。&lt;/p>
+&lt;pre>&lt;code class="language-sh">(開発PC)(docker):~/roomba_hack# cd catkin_ws
+(開発PC)(docker):~/roomba_hack/catkin_ws# catkin_make
+(開発PC)(docker):~/roomba_hack/catkin_ws# source devel/setup.bash
+(開発PC)(docker):~/roomba_hack/catkin_ws#roslaunch roomba_teleop teleop.launch
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;li>
+&lt;p>コントローラのモード&lt;/p>
+&lt;ul>
+&lt;li>移動・停止&lt;/li>
+&lt;li>自動・マニュアル&lt;/li>
+&lt;li>ドッキング・アンドッキング&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>コントローラによる操縦&lt;/p>
+&lt;ul>
+&lt;li>移動ロック解除
+L1を押している時のみ移動コマンドが動作します。&lt;/li>
+&lt;li>左ジョイスティック
+縦方向で前進速度(手前に倒すとバック)、横方向は回転速度に対応しています。&lt;/li>
+&lt;li>左矢印
+それぞれ、一定に低速度で前進・後退・回転します。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>正常に起動できているかを確認
+開発PCで新しくターミナルを開いてdockerの中に入ります。&lt;/p>
+&lt;p>すでに開発PCで起動されているdockerコンテナに入る場合は、&lt;/p>
+&lt;pre>&lt;code class="language-sh">(開発PC):~/group_a/roomba_hack$ docker exec -it roomba_hack bash
+&lt;/code>&lt;/pre>
+&lt;p>または&lt;/p>
+&lt;pre>&lt;code class="language-sh">(開発PC):~/group_a/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
+&lt;/code>&lt;/pre>
+&lt;p>のいずれかの方法で入ることができます。&lt;/p>
+&lt;p>さまざまなコマンドを使ってroombaの情報を取得してみましょう。&lt;/p>
+&lt;pre>&lt;code class="language-sh">(開発PC)(docker):~/roomba_hack# rosnode list
+(開発PC)(docker):~/roomba_hack# rostopic list
+(開発PC)(docker):~/roomba_hack# rostopic echo /cmd_vel
+(開発PC)(docker):~/roomba_hack# rqt_graph
+(開発PC)(docker):~/roomba_hack# rviz
+&lt;/code>&lt;/pre>
+&lt;/li>
+&lt;/ul>
+&lt;/p>
+&lt;/details></description></item><item><title>ナビゲーション</title><link>https://matsuolab.github.io/roomba_hack/course/chap4/navigation/</link><pubDate>Fri, 01 Jan 2021 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack/course/chap4/navigation/</guid><description>&lt;h2 id="learn">Learn&lt;/h2>
+&lt;h3 id="navigationシステム">Navigationシステム&lt;/h3>
+&lt;p>ナビゲーションは、地図上の任意の目標地点へ、障害物を避けながらなるべく早く自律して移動することが目的です。&lt;/p>
+&lt;p>ナビゲーションシステムの出力はロボットへの行動指令値(速度など)ですが、入力は以下の4つになります。&lt;/p>
+&lt;ul>
+&lt;li>地図&lt;/li>
+&lt;li>目標位置&lt;/li>
+&lt;li>自己位置推定結果&lt;/li>
+&lt;li>リアルタイムのセンサ情報(LiDARスキャン情報など)&lt;/li>
+&lt;/ul>
+&lt;p>ナビゲーションでは、地図全体とロボット周辺(センサで見える範囲)の大きく2つに分けて考えることが多いです。&lt;/p>
+&lt;p>地図全体を考えるグローバルパスプランでは、地図情報とゴール情報から大まかなゴールまでの経路を算出します。&lt;/p>
+&lt;p>ロボット周辺を考える ローカルパスプランでは、グローバルで算出した経路に沿うようにしつつ、周辺の障害物情報を避ける行動指令値を算出します。&lt;/p>
+&lt;p>それぞれの経路を考えるにあたって、経路のコストがどうなるか重要になります。
+このコストを表現する方法として、コストマップが用いられることが多いです。&lt;/p>
+&lt;figure id="figure-navigationシステム概要from-ros-wikihttpswikirosorgmove_base">
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../overview_tf_small.png" alt="Navigationシステム概要(from [ROS wiki](https://wiki.ros.org/move_base))" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;figcaption>
+Navigationシステム概要(from &lt;a href="https://wiki.ros.org/move_base">ROS wiki&lt;/a>)
+&lt;/figcaption>&lt;/figure>
+&lt;h3 id="cost-map">Cost Map&lt;/h3>
+&lt;p>コストマップは、経路を算出するために用いることから、扱いやすいグリット上の占有格子地図という形で表現されることが多いです。&lt;/p>
+&lt;p>(空を飛んだり、3次元地形を考えなくていい場合は、基本2次元で表現します。)&lt;/p>
+&lt;p>経路は格子地図上で、点で扱うことが多いですが、ロボット自身はある程度の大きさを持っているので、スキャン情報で得られた点ギリギリに経路を生成すると、衝突してしまします。&lt;/p>
+&lt;p>そのため、コストマップでは以下の図のようにスキャンで得られた点(図中の赤点)から、ロボットが入ってほしくない範囲にコスト(図中の青く塗りつぶされているところ)が付与するという表現をします。&lt;/p>
+&lt;figure id="figure-コストマップ概要from-ros-wikihttpswikirosorgcostmap_2d">
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../costmap_rviz.png" alt="コストマップ概要(from [ROS wiki](https://wiki.ros.org/costmap_2d))" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;figcaption>
+コストマップ概要(from &lt;a href="https://wiki.ros.org/costmap_2d">ROS wiki&lt;/a>)
+&lt;/figcaption>&lt;/figure>
+&lt;h3 id="global-path-planning">Global Path Planning&lt;/h3>
+&lt;p>グローバルパスプランの例として、グラフ探索を利用したダイクストラ法やA*法などで経路探索をすることがあります。&lt;/p>
+&lt;figure id="figure-グローバルパスプランの例from-pythonroboticshttpsgithubcomatsushisakaipythonrobotics">
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../astar.gif" alt="グローバルパスプランの例(from [PythonRobotics](https://github.com/AtsushiSakai/PythonRobotics))" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;figcaption>
+グローバルパスプランの例(from &lt;a href="https://github.com/AtsushiSakai/PythonRobotics">PythonRobotics&lt;/a>)
+&lt;/figcaption>&lt;/figure>
+&lt;h3 id="local-path-planning">Local Path Planning&lt;/h3>
+&lt;p>局所経路計画(Local Path Planning)は、ロボット周辺の障害物を避けながら、目標値へ早く行けるような経路(ロボットの行動)を算出するモジュールです。&lt;/p>
+&lt;p>代表的なアルゴリズムとしてDynamic Window Approach(DWA)というものがあります。
+&lt;figure id="figure-ローカルパスプラン概要from-ros-wikihttpswikirosorgbase_local_planner">
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../local_plan.png" alt="ローカルパスプラン概要(from [ROS wiki](https://wiki.ros.org/base_local_planner))" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;figcaption>
+ローカルパスプラン概要(from &lt;a href="https://wiki.ros.org/base_local_planner">ROS wiki&lt;/a>)
+&lt;/figcaption>&lt;/figure>&lt;/p>
+&lt;p>アルゴリズムの概要は以下になります。&lt;/p>
+&lt;ol>
+&lt;li>ロボットの行動空間から行動をサンプル&lt;/li>
+&lt;li>サンプルした行動とロボットの運動モデルを用いて、一定時間シミュレーションをして経路を生成&lt;/li>
+&lt;li>生成した経路ごとに、コストマップやゴール情報からコストを算出&lt;/li>
+&lt;li>コスト最小の経路を選択し、ロボットの指令値とする&lt;/li>
+&lt;li>1~4を繰り返す&lt;/li>
+&lt;/ol>
+&lt;h2 id="演習">演習&lt;/h2>
+&lt;!-- &lt;details class="spoiler " id="spoiler-4">
+&lt;summary>Dockerfileにnavigationを追加してBuildする&lt;/summary>
+&lt;p>&lt;/p>
+&lt;/details> -->
+&lt;details class="spoiler " id="spoiler-5">
+&lt;summary>navigationをlaunchして、rviz上で指定した位置までナビゲーションさせてみる&lt;/summary>
+&lt;p>&lt;pre>&lt;code>(開発PC)(docker) roslaunch navigation_tutorial navigation.launch
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;!-- &lt;details class="spoiler " id="spoiler-6">
+&lt;summary>navigationをlaunchして、map座標系の位置を指定してナビゲーションさせてみる&lt;/summary>
+&lt;p>&lt;/p>
+&lt;/details> -->
+&lt;details class="spoiler " id="spoiler-7">
+&lt;summary>navigationのparamをチューニングする&lt;/summary>
+&lt;p>&lt;p>move baseのパラメータは &lt;code>navigation_tutorial/params&lt;/code> の中にyaml形式で保存されています。&lt;/p>
+&lt;p>launchファイルではloadコマンドでyamlを読み込んでいます。&lt;/p>
+&lt;ul>
+&lt;li>&lt;a href="https://wiki.ros.org/move_base#Parameters">move_base&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://wiki.ros.org/base_local_planner#Parameters">base_local_planner&lt;/a>&lt;/li>
+&lt;li>&lt;a href="https://wiki.ros.org/costmap_2d#costmap_2d.2Flayered.Parameters">costmap_2d&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/p>
+&lt;/details></description></item><item><title>Jian Yang and Monica Hall Win the Best Paper Award at Wowchemy 2020</title><link>https://matsuolab.github.io/roomba_hack/post/20-12-02-icml-best-paper/</link><pubDate>Wed, 02 Dec 2020 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack/post/20-12-02-icml-best-paper/</guid><description>&lt;p>Congratulations to Jian Yang and Monica Hall for winning the Best Paper Award at the 2020 Conference on Wowchemy for their paper “Learning Wowchemy”.&lt;/p>
+&lt;p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tempus augue non tempor egestas. Proin nisl nunc, dignissim in accumsan dapibus, auctor ullamcorper neque. Quisque at elit felis. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aenean eget elementum odio. Cras interdum eget risus sit amet aliquet. In volutpat, nisl ut fringilla dignissim, arcu nisl suscipit ante, at accumsan sapien nisl eu eros.&lt;/p>
+&lt;p>Sed eu dui nec ligula bibendum dapibus. Nullam imperdiet auctor tortor, vel cursus mauris malesuada non. Quisque ultrices euismod dapibus. Aenean sed gravida risus. Sed nisi tortor, vulputate nec quam non, placerat porta nisl. Nunc varius lobortis urna, condimentum facilisis ipsum molestie eu. Ut molestie eleifend ligula sed dignissim. Duis ut tellus turpis. Praesent tincidunt, nunc sed congue malesuada, mauris enim maximus massa, eget interdum turpis urna et ante. Morbi sem nisl, cursus quis mollis et, interdum luctus augue. Aliquam laoreet, leo et accumsan tincidunt, libero neque aliquet lectus, a ultricies lorem mi a orci.&lt;/p>
+&lt;p>Mauris dapibus sem vel magna convallis laoreet. Donec in venenatis urna, vitae sodales odio. Praesent tortor diam, varius non luctus nec, bibendum vel est. Quisque id sem enim. Maecenas at est leo. Vestibulum tristique pellentesque ex, blandit placerat nunc eleifend sit amet. Fusce eget lectus bibendum, accumsan mi quis, luctus sem. Etiam vitae nulla scelerisque, eleifend odio in, euismod quam. Etiam porta ullamcorper massa, vitae gravida turpis euismod quis. Mauris sodales sem ac ultrices viverra. In placerat ultrices sapien. Suspendisse eu arcu hendrerit, luctus tortor cursus, maximus dolor. Proin et velit et quam gravida dapibus. Donec blandit justo ut consequat tristique.&lt;/p></description></item><item><title>Richard Hendricks Wins First Place in the Wowchemy Prize</title><link>https://matsuolab.github.io/roomba_hack/post/20-12-01-wowchemy-prize/</link><pubDate>Tue, 01 Dec 2020 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack/post/20-12-01-wowchemy-prize/</guid><description>&lt;p>Congratulations to Richard Hendricks for winning first place in the Wowchemy Prize.&lt;/p>
+&lt;p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tempus augue non tempor egestas. Proin nisl nunc, dignissim in accumsan dapibus, auctor ullamcorper neque. Quisque at elit felis. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Aenean eget elementum odio. Cras interdum eget risus sit amet aliquet. In volutpat, nisl ut fringilla dignissim, arcu nisl suscipit ante, at accumsan sapien nisl eu eros.&lt;/p>
+&lt;p>Sed eu dui nec ligula bibendum dapibus. Nullam imperdiet auctor tortor, vel cursus mauris malesuada non. Quisque ultrices euismod dapibus. Aenean sed gravida risus. Sed nisi tortor, vulputate nec quam non, placerat porta nisl. Nunc varius lobortis urna, condimentum facilisis ipsum molestie eu. Ut molestie eleifend ligula sed dignissim. Duis ut tellus turpis. Praesent tincidunt, nunc sed congue malesuada, mauris enim maximus massa, eget interdum turpis urna et ante. Morbi sem nisl, cursus quis mollis et, interdum luctus augue. Aliquam laoreet, leo et accumsan tincidunt, libero neque aliquet lectus, a ultricies lorem mi a orci.&lt;/p>
+&lt;p>Mauris dapibus sem vel magna convallis laoreet. Donec in venenatis urna, vitae sodales odio. Praesent tortor diam, varius non luctus nec, bibendum vel est. Quisque id sem enim. Maecenas at est leo. Vestibulum tristique pellentesque ex, blandit placerat nunc eleifend sit amet. Fusce eget lectus bibendum, accumsan mi quis, luctus sem. Etiam vitae nulla scelerisque, eleifend odio in, euismod quam. Etiam porta ullamcorper massa, vitae gravida turpis euismod quis. Mauris sodales sem ac ultrices viverra. In placerat ultrices sapien. Suspendisse eu arcu hendrerit, luctus tortor cursus, maximus dolor. Proin et velit et quam gravida dapibus. Donec blandit justo ut consequat tristique.&lt;/p></description></item><item><title/><link>https://matsuolab.github.io/roomba_hack/admin/config.yml</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack/admin/config.yml</guid><description/></item><item><title/><link>https://matsuolab.github.io/roomba_hack/contact/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack/contact/</guid><description/></item></channel></rss>
