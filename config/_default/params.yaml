@@ -54,7 +54,7 @@ diagram: true
 privacy_pack: false
 edit_page:
   repo_url: 'https://github.com/matsuolab/roomba_hack'
-  content_dir: 'textbook/content'
+  content_dir: 'content'
   repo_branch: 'master'
   editable:
     page: true
