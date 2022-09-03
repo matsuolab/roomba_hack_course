@@ -118,10 +118,10 @@ git checkout feature/integrate
 
 {{< spoiler text="【開発マシン】scriptベースのnavigationを実行してみる" >}}
 ```shell
-(開発マシン)(docker) roslaunch navigation_turtorial navigation.launch
+(開発マシン)(docker) roslaunch navigation_tutorial navigation.launch
 
-(開発マシン)(docker) rosrun navigation_turtorial topic_goal.py
-(開発マシン)(docker) rosrun navigation_turtorial action_goal.py
+(開発マシン)(docker) rosrun navigation_tutorial topic_goal.py
+(開発マシン)(docker) rosrun navigation_tutorial action_goal.py
 ```
 {{< /spoiler >}}
 
