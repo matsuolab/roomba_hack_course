@@ -76,9 +76,9 @@ git checkout feature/integrate
 &lt;/details>
 &lt;details class="spoiler " id="spoiler-1">
 &lt;summary>【開発マシン】scriptベースのnavigationを実行してみる&lt;/summary>
-&lt;p>&lt;pre>&lt;code class="language-shell">(開発マシン)(docker) roslaunch navigation_turtorial navigation.launch
-(開発マシン)(docker) rosrun navigation_turtorial topic_goal.py
-(開発マシン)(docker) rosrun navigation_turtorial action_goal.py
+&lt;p>&lt;pre>&lt;code class="language-shell">(開発マシン)(docker) roslaunch navigation_tutorial navigation.launch
+(開発マシン)(docker) rosrun navigation_tutorial topic_goal.py
+(開発マシン)(docker) rosrun navigation_tutorial action_goal.py
 &lt;/code>&lt;/pre>
 &lt;/p>
 &lt;/details>
