@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Chapter 8 | ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap8/</link><atom:link href="https://matsuolab.github.io/roomba_hack_course/course/chap8/index.xml" rel="self" type="application/rss+xml"/><description>Chapter 8</description><generator>Wowchemy (https://wowchemy.com)</generator><language>ja</language><copyright>© 2022 Tokyo Robot And Intelligence Lab (TRAIL)</copyright><lastBuildDate>Sun, 09 Sep 2018 00:00:00 +0000</lastBuildDate><image><url>https://matsuolab.github.io/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png</url><title>Chapter 8</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap8/</link></image><item><title>最終プロジェクト</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap8/final_project/</link><pubDate>Wed, 07 Sep 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap8/final_project/</guid><description>&lt;h2 id="最終課題について">最終課題について&lt;/h2>
-&lt;p>最終課題発表会は9/21(水)(暫定)&lt;/p>
+&lt;p>最終課題発表会は9/21(水)15:00〜&lt;/p>
 &lt;h3 id="ルール">ルール&lt;/h3>
 &lt;p>Task1とTask2の2つのタスクを行い、その合計点を競います。&lt;/p>
 &lt;p>それぞれのタスクは図の環境で行われます。&lt;/p>
@@ -16,8 +16,27 @@
 &lt;p>&lt;p>Task1では、3分の制限時間の間で、Room1のStarting Pointからルンバを自律移動させ、Area1内に落ちている物体を避けながらRoom2へと移動することが目標になります。&lt;/p>
 &lt;p>途中でロボットが停止した場合などは再びStarting Pointからリスタートすることができます。&lt;/p>
 &lt;p>また、Area1内に落ちている5つの物体を検出し、正しく分類することで追加ポイントを獲得することができます。&lt;/p>
-&lt;p>5つの物体は以下の10個の物体からランダムに選択されます。&lt;/p>
-&lt;p>物体検出結果は、bboxと分類結果を追記した画像として任意のフォルダに保存してください。&lt;/p>
+&lt;p>検出結果は、物体ごとに物体検出結果(bboxやセグメンテーションなど)と分類結果(物体の名前)を追記した画像として任意のフォルダに保存してください。&lt;/p>
+&lt;p>5つの物体は8個の物体からランダムに選択されます。&lt;/p>
+&lt;figure id="figure-task1で出現する物体">
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../objects.jpeg" alt="Task1で出現する物体" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;figcaption>
+Task1で出現する物体
+&lt;/figcaption>&lt;/figure>
+&lt;p>物体の名前は左から順に&lt;/p>
+&lt;ul>
+&lt;li>chips can&lt;/li>
+&lt;li>mini soccor ball&lt;/li>
+&lt;li>rubic cube&lt;/li>
+&lt;li>banana&lt;/li>
+&lt;li>apple&lt;/li>
+&lt;li>strawberry&lt;/li>
+&lt;li>toy plane&lt;/li>
+&lt;li>wood block
+です。&lt;/li>
+&lt;/ul>
+&lt;p>実際に使用する物体は角川に置いてあり、あらかじめ学習データを作成することができます。&lt;/p>
 &lt;/p>
 &lt;/details>
 &lt;details class="spoiler " id="spoiler-2">
@@ -31,19 +50,67 @@
 &lt;p>フォルダに保存された写真が5枚を超える場合、保存時刻が新しい5枚を採点に用います&lt;/p>
 &lt;/p>
 &lt;/details>
-&lt;h4 id="task2">Task2&lt;/h4>
 &lt;details class="spoiler " id="spoiler-3">
+&lt;summary>ヒント&lt;/summary>
+&lt;p>&lt;p>何からしたらいいかわからない人&lt;/p>
+&lt;ul>
+&lt;li>Task1はまず、ゴールへ移動するコードを作成することを目標にしましょう (スクリプトでナビゲーションを行うためのヒント参照)&lt;/li>
+&lt;li>余裕があれば、他のヒントを参照して高得点を目指していきましょう&lt;/li>
+&lt;/ul>
+&lt;p>スクリプトでナビゲーションを行うためのヒント&lt;/p>
+&lt;ul>
+&lt;li>スクリプトでナビゲーションを行うコード(&lt;a href="https://matsuolab.github.io/roomba_hack_course/course/chap6/service-actionlib/">https://matsuolab.github.io/roomba_hack_course/course/chap6/service-actionlib/&lt;/a> の演習)を参考に、指定した位置へ移動するコードを書いてみましょう&lt;/li>
+&lt;/ul>
+&lt;p>障害物を避けながらnavigationするためのヒント&lt;/p>
+&lt;ul>
+&lt;li>物体検出器を改善するためのヒントおよび &lt;a href="https://matsuolab.github.io/roomba_hack_course/course/chap6/service-actionlib/">https://matsuolab.github.io/roomba_hack_course/course/chap6/service-actionlib/&lt;/a> の総合課題を参照し、課題物体を検出し、それをコストマップに追加することで障害物を避けるコードを書いてみましょう&lt;/li>
+&lt;/ul>
+&lt;p>より正確な自己位置推定を行うためのヒント&lt;/p>
+&lt;ul>
+&lt;li>amclのパラメータ調整 (参考: &lt;a href="https://matsuolab.github.io/roomba_hack_course/course/chap4/localization/">https://matsuolab.github.io/roomba_hack_course/course/chap4/localization/&lt;/a> の演習)をしてみましょう&lt;/li>
+&lt;li>gmappingを用いてより正確な地図を作成 (参考: &lt;a href="https://matsuolab.github.io/roomba_hack_course/course/chap4/localization/">https://matsuolab.github.io/roomba_hack_course/course/chap4/localization/&lt;/a> の演習)してみましょう&lt;/li>
+&lt;li>emcl(&lt;a href="https://github.com/ryuichiueda/emcl">https://github.com/ryuichiueda/emcl&lt;/a>)等の異なる自己位置推定アルゴリズムを使ってみましょう&lt;/li>
+&lt;li>Lidarの位置を合わせをより正確に(&lt;a href="https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/roomba/roomba_description/urdf/roomba.urdf.xacro">https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/roomba/roomba_description/urdf/roomba.urdf.xacro&lt;/a> を編集)合わせてみましょう&lt;/li>
+&lt;/ul>
+&lt;p>物体検出器を改善するためのヒント&lt;/p>
+&lt;ul>
+&lt;li>自作データを用いて既存モデルの学習 (参考: &lt;a href="https://eng-memo.info/blog/yolo-original-dataset/">https://eng-memo.info/blog/yolo-original-dataset/&lt;/a>) を行ってみましょう&lt;/li>
+&lt;/ul>
+&lt;/p>
+&lt;/details>
+&lt;h4 id="task2">Task2&lt;/h4>
+&lt;details class="spoiler " id="spoiler-4">
 &lt;summary>ルール&lt;/summary>
 &lt;p>&lt;p>Task2では、3分の制限時間の間で、Room2のStarting Pointからルンバを自律移動させ、Area2にいる2人の人のうち、手を振っている人の前で停止することが目標になります。&lt;/p>
 &lt;p>2人の人がArea2にある2つの椅子に座っており、そのうち一方のみが手を振っていることが保証されています。&lt;/p>
 &lt;p>途中でロボットが停止した場合などは再びStarting Pointからリスタートすることができます。&lt;/p>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-4">
+&lt;details class="spoiler " id="spoiler-5">
 &lt;summary>採点基準&lt;/summary>
 &lt;p>&lt;p>Task2全体で150点満点です、また、Task2の得点が負になることはありません。&lt;/p>
-&lt;p>いずれかの人の前に移動が成功する(人の50cm以内に到達する)+50点&lt;/p>
-&lt;p>上に加え、正しい人の前に移動が成功する+100点&lt;/p>
+&lt;p>いずれかの人の前に移動が成功する(人の50cm以内に到達する)+70点&lt;/p>
+&lt;p>上に加え、正しい人の前に移動が成功する+80点&lt;/p>
 &lt;p>ロボットをStarting Pointからリスタートする度に-10点&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-6">
+&lt;summary>ヒント&lt;/summary>
+&lt;p>&lt;p>何からしたらいいかわからない人&lt;/p>
+&lt;ul>
+&lt;li>Task2はまず、人を検出して移動するコードを作成することを目標にしましょう (人を検出して移動するためのヒント参照)&lt;/li>
+&lt;li>余裕があれば手を振っている人の検出にチャレンジしてみましょう&lt;/li>
+&lt;/ul>
+&lt;p>人を検出して移動するためのヒント&lt;/p>
+&lt;ul>
+&lt;li>人を検出する部分については三次元画像処理で扱ったYOLOv3で検出することができます&lt;/li>
+&lt;li>検出した結果に対応する深度画像から距離を取得することで、人の近くへ移動するコードを書くことができます&lt;/li>
+&lt;li>(参考: &lt;a href="https://matsuolab.github.io/roomba_hack_course/course/chap5/three-dimensions/">https://matsuolab.github.io/roomba_hack_course/course/chap5/three-dimensions/&lt;/a> のdetection_distance.py)&lt;/li>
+&lt;li>さらに余裕があれば、深度画像を点群等に変換するとより正確な移動が可能になります&lt;/li>
+&lt;/ul>
+&lt;p>手を振っている人の検出&lt;/p>
+&lt;ul>
+&lt;li>学習済みのKeypoint R-CNNを用いることで人間の手や腕の位置などのキーポイントを推定することができます。&lt;/li>
+&lt;/ul>
 &lt;/p>
 &lt;/details></description></item></channel></rss>
