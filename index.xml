@@ -1,4 +1,52 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack_course/</link><atom:link href="https://matsuolab.github.io/roomba_hack_course/index.xml" rel="self" type="application/rss+xml"/><description>ロボットシステム入門</description><generator>Wowchemy (https://wowchemy.com)</generator><language>ja</language><copyright>© 2022 Tokyo Robot And Intelligence Lab (TRAIL)</copyright><lastBuildDate>Tue, 05 Apr 2022 00:00:00 +0000</lastBuildDate><image><url>https://matsuolab.github.io/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png</url><title>ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack_course/</link></image><item><title>ロボットシステムにおけるセンシング・アクチュエーション・通信②</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/</link><pubDate>Tue, 05 Apr 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/</guid><description>&lt;p>複数のセンサを組み合わせてよりかしこくロボットを動かしてみよう&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack_course/</link><atom:link href="https://matsuolab.github.io/roomba_hack_course/index.xml" rel="self" type="application/rss+xml"/><description>ロボットシステム入門</description><generator>Wowchemy (https://wowchemy.com)</generator><language>ja</language><copyright>© 2022 Tokyo Robot And Intelligence Lab (TRAIL)</copyright><lastBuildDate>Wed, 07 Sep 2022 00:00:00 +0000</lastBuildDate><image><url>https://matsuolab.github.io/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png</url><title>ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack_course/</link></image><item><title>最終プロジェクト</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap8/final_project/</link><pubDate>Wed, 07 Sep 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap8/final_project/</guid><description>&lt;h2 id="最終課題について">最終課題について&lt;/h2>
+&lt;p>最終課題発表会は9/21(水)(暫定)&lt;/p>
+&lt;h3 id="ルール">ルール&lt;/h3>
+&lt;p>Task1とTask2の2つのタスクを行い、その合計点を競います。&lt;/p>
+&lt;p>それぞれのタスクは図の環境で行われます。&lt;/p>
+&lt;figure id="figure-タスクがおこなわれるフィールド図">
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../feild.png" alt="タスクがおこなわれるフィールド図" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;figcaption>
+タスクがおこなわれるフィールド図
+&lt;/figcaption>&lt;/figure>
+&lt;p>それぞれのTaskのStaring Pointではルンバの自己位置を合わせることはできますが、一度ルンバが動き始めたら自律移動のみで制御させることに注意してください。(リスタートを除く)&lt;/p>
+&lt;h4 id="task1">Task1&lt;/h4>
+&lt;details class="spoiler " id="spoiler-1">
+&lt;summary>ルール&lt;/summary>
+&lt;p>&lt;p>Task1では、3分の制限時間の間で、Room1のStarting Pointからルンバを自律移動させ、Area1内に落ちている物体を避けながらRoom2へと移動することが目標になります。&lt;/p>
+&lt;p>途中でロボットが停止した場合などは再びStarting Pointからリスタートすることができます。&lt;/p>
+&lt;p>また、Area1内に落ちている5つの物体を検出し、正しく分類することで追加ポイントを獲得することができます。&lt;/p>
+&lt;p>5つの物体は以下の10個の物体からランダムに選択されます。&lt;/p>
+&lt;p>物体検出結果は、bboxと分類結果を追記した画像として任意のフォルダに保存してください。&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-2">
+&lt;summary>採点基準&lt;/summary>
+&lt;p>&lt;p>ゴール得点と物体検出得点それぞれ100点満点です。また、ゴール得点と物体検出得点それぞれの得点が負になることはありません。&lt;/p>
+&lt;p>ゴール得点内訳(100点満点)&lt;/p>
+&lt;p>制限時間以内にゴールに辿り着けたら100点、物体に衝突するたびに物体ごとに-20点&lt;/p>
+&lt;p>ロボットをStarting Pointからリスタートする度に-10点&lt;/p>
+&lt;p>物体検出得点内訳(各物体20点満点、100点満点)&lt;/p>
+&lt;p>検出結果の写真を確認し、物体の検出が正しくおこなわれていれば+10点、さらに分類結果も正しければ+10点&lt;/p>
+&lt;p>フォルダに保存された写真が5枚を超える場合、保存時刻が新しい5枚を採点に用います&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;h4 id="task2">Task2&lt;/h4>
+&lt;details class="spoiler " id="spoiler-3">
+&lt;summary>ルール&lt;/summary>
+&lt;p>&lt;p>Task2では、3分の制限時間の間で、Room2のStarting Pointからルンバを自律移動させ、Area2にいる2人の人のうち、手を振っている人の前で停止することが目標になります。&lt;/p>
+&lt;p>2人の人がArea2にある2つの椅子に座っており、そのうち一方のみが手を振っていることが保証されています。&lt;/p>
+&lt;p>途中でロボットが停止した場合などは再びStarting Pointからリスタートすることができます。&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-4">
+&lt;summary>採点基準&lt;/summary>
+&lt;p>&lt;p>Task2全体で150点満点です、また、Task2の得点が負になることはありません。&lt;/p>
+&lt;p>いずれかの人の前に移動が成功する(人の50cm以内に到達する)+50点&lt;/p>
+&lt;p>上に加え、正しい人の前に移動が成功する+100点&lt;/p>
+&lt;p>ロボットをStarting Pointからリスタートする度に-10点&lt;/p>
+&lt;/p>
+&lt;/details></description></item><item><title>ロボットシステムにおけるセンシング・アクチュエーション・通信②</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/</link><pubDate>Tue, 05 Apr 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/</guid><description>&lt;p>複数のセンサを組み合わせてよりかしこくロボットを動かしてみよう&lt;/p>
 &lt;h2 id="learn">Learn&lt;/h2>
 &lt;p>&lt;a href="../../chap2/sensing1/#%e6%bc%94%e7%bf%92">前回の演習&lt;/a>では，速度と時間の指令を使ってロボットを制御しました．&lt;/p>
 &lt;p>周囲に障害物が何もない状況や，ロボットの滑りがない環境では，速度と時間のコマンドを使って思った通りにロボットを動かすことができるかもしれませんが，実環境では，ロボットの周囲には障害物が存在しますし，移動距離で制御する方が直感的です．&lt;/p>
