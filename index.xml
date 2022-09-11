@@ -3,18 +3,18 @@
 &lt;p>それまでに各チームで以下のタスクを行うコードを準備してください。
 また、チームでGitHubにリポジトリを作成し、準備したコードをアップロードしてください。&lt;/p>
 &lt;p>すべてのタスクを完璧に実装しようとすると少し大変なので、まずは、ヒントを参考に「はじめの一歩」を実装するのを目指しましょう。&lt;/p>
-&lt;p>ルールの質問、実装のやり方などわからないことは #q_roomba で質問お願いします！
+&lt;p>ルールの質問、実装のやり方などわからないことは #q-roomba で質問お願いします！
 また、角川でも質問対応デーを設ける予定です。&lt;/p>
 &lt;h3 id="ルール">ルール&lt;/h3>
-&lt;p>Task1とTask2の2つのタスクを行い、その合計点を競います。&lt;/p>
-&lt;p>それぞれのタスクは図の環境で行われます。&lt;/p>
+&lt;p>1チームずつTask1とTask2の2つのタスクを行い、その合計点を競います。&lt;/p>
+&lt;p>それぞれのタスクは図の環境で行われます。(角川にある環境です。)&lt;/p>
 &lt;figure id="figure-タスクがおこなわれるフィールド図">
 &lt;div class="d-flex justify-content-center">
 &lt;div class="w-100" >&lt;img src="../feild.png" alt="タスクがおこなわれるフィールド図" loading="lazy" data-zoomable />&lt;/div>
 &lt;/div>&lt;figcaption>
 タスクがおこなわれるフィールド図
 &lt;/figcaption>&lt;/figure>
-&lt;p>それぞれのTaskのStaring Pointではルンバの自己位置を合わせることはできますが、一度ルンバが動き始めたら自律移動のみで制御させることに注意してください。(リスタートを除く)&lt;/p>
+&lt;p>それぞれのTaskのStaring Pointではルンバの自己位置を合わせることはできますが、一度ルンバが動き始めたら人が介入することができないことに注意してください。(リスタートを除く)&lt;/p>
 &lt;h4 id="task1">Task1&lt;/h4>
 &lt;details class="spoiler " id="spoiler-1">
 &lt;summary>ルール&lt;/summary>
@@ -41,7 +41,7 @@ Task1で出現する物体
 &lt;li>wood block
 です。&lt;/li>
 &lt;/ul>
-&lt;p>実際に使用する物体は角川に置いてあり、あらかじめ学習データを作成することができます。&lt;/p>
+&lt;p>実際に使用する物体は角川に置いてあります。&lt;/p>
 &lt;/p>
 &lt;/details>
 &lt;details class="spoiler " id="spoiler-2">
