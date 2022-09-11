@@ -10,7 +10,7 @@
 &lt;p>それぞれのタスクは図の環境で行われます。(角川にある環境です。)&lt;/p>
 &lt;figure id="figure-タスクがおこなわれるフィールド図">
 &lt;div class="d-flex justify-content-center">
-&lt;div class="w-100" >&lt;img src="../feild.png" alt="タスクがおこなわれるフィールド図" loading="lazy" data-zoomable />&lt;/div>
+&lt;div class="w-100" >&lt;img src="../field.png" alt="タスクがおこなわれるフィールド図" loading="lazy" data-zoomable />&lt;/div>
 &lt;/div>&lt;figcaption>
 タスクがおこなわれるフィールド図
 &lt;/figcaption>&lt;/figure>
