@@ -3,167 +3,197 @@
 &lt;p>&lt;a href="https://docs.google.com/presentation/d/1-q6zq3vV91GTj7mw9uqwT4B8LyHDpFHBNVi4lEyCa5A/edit?usp=sharing">https://docs.google.com/presentation/d/1-q6zq3vV91GTj7mw9uqwT4B8LyHDpFHBNVi4lEyCa5A/edit?usp=sharing&lt;/a>&lt;/p>
 &lt;h2 id="learn">Learn&lt;/h2>
 &lt;h3 id="linuxコマンド">Linuxコマンド&lt;/h3>
-&lt;table>
-&lt;thead>
-&lt;tr>
-&lt;th>command&lt;/th>
-&lt;th>　説明&lt;/th>
-&lt;th>option&lt;/th>
-&lt;/tr>
-&lt;/thead>
-&lt;tbody>
-&lt;tr>
-&lt;td>ls&lt;/td>
-&lt;td>ディレクトリ内のファイル・ディレクトリの表示&lt;/td>
-&lt;td>-l: 詳細を表示 -a: 全て表示&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>mkdir&lt;/td>
-&lt;td>ディレクトリ作成&lt;/td>
-&lt;td>&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>cd&lt;/td>
-&lt;td>ディレクトリ移動&lt;/td>
-&lt;td>&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>mv&lt;/td>
-&lt;td>ファイル移動&lt;/td>
-&lt;td>&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>rm&lt;/td>
-&lt;td>ファイル削除&lt;/td>
-&lt;td>-r:ディレクトリ内を再起的に削除 -f:強制削除&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>cat&lt;/td>
-&lt;td>&lt;/td>
-&lt;td>&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>&lt;/td>
-&lt;td>&lt;/td>
-&lt;td>&lt;/td>
-&lt;/tr>
-&lt;/tbody>
-&lt;/table>
-&lt;h3 id="ssh">ssh&lt;/h3>
-&lt;pre>&lt;code>ssh &amp;lt;username&amp;gt;@&amp;lt;hostname&amp;gt; -p &amp;lt;port&amp;gt; -i &amp;lt;identity_file&amp;gt;
+&lt;p>コンピュータやロボットの研究・開発では、LinuxというOS(Operating System)がよく使用されます。&lt;br>
+ROSはLinux(とくにUbuntuというディストリビューション)で動かすことを想定されているので、ROSを使うにはある程度Linuxの知識が必要になります。
+Linuxについてあまり知らないという方は、以下のページに目を通しておくと良いと思います。&lt;br>
+&lt;a href="https://kitsune.blog/engineer/linux" target="_blank" rel="noopener">Linuxについてまとまっているページ&lt;/a>&lt;br>
+特に、&lt;a href="https://kitsune.blog/linux-command-summary" target="_blank" rel="noopener">Linuxコマンドについて&lt;/a>軽く知っておくと講義が理解しやすくなると思います。&lt;/p>
+&lt;pre>&lt;code>&amp;quot;&amp;quot;&amp;quot;
+ここではLinuxのコマンドを十分に説明できないので、コマンドの例を挙げることに留めます。
+詳しいサイトに沿って自分で使いながら覚えていくことをお勧めします。
+&amp;quot;&amp;quot;&amp;quot;
+# カレントディレクトリ(自分が今いるディレクトリ)を確認
+pwd
+# ディレクトリ内のファイル・ディレクトリの表示
+ls
+# カレントディレクトリを変更
+cd &amp;lt;DirectoryName&amp;gt;
+# ディレクトリ作成
+mkdir &amp;lt;NewDirectoryName&amp;gt;
+# ディレクトリ削除
+rmdir &amp;lt;DirectoryName&amp;gt;
+# ファイル作成
+touch &amp;lt;NewFileName&amp;gt;
+# ファイル消去
+rm &amp;lt;FileName&amp;gt;
+# ファイルの内容を表示
+cat &amp;lt;FileName&amp;gt;
 &lt;/code>&lt;/pre>
 &lt;h3 id="エディタ">エディタ&lt;/h3>
+&lt;p>プログラミング言語でコードを書くときに使用するツールをEditor（エディタ）と呼びます。&lt;br>
+テキストファイルを編集するツールなのでメモ帳でも同じ事ができるのですが、コード編集用のエディタは便利な機能が多く、効率よく書けるようになります。&lt;br>
+研究室のPCでは以下の二つが使えます。&lt;/p>
 &lt;ul>
 &lt;li>vim
 &lt;ul>
-&lt;li>チュートリアル： &lt;code>vimtuter&lt;/code>&lt;/li>
+&lt;li>シンプルで使いやすいエディタ。&lt;/li>
+&lt;li>macだと標準で使える。
+&lt;ul>
+&lt;li>ターミナルで&lt;code>vimtutor&lt;/code>を実行するとチュートリアルが受けられる.&lt;/li>
 &lt;/ul>
 &lt;/li>
-&lt;li>emacs&lt;/li>
+&lt;li>Windowsだとインストールする必要がある。&lt;/li>
 &lt;/ul>
-&lt;h3 id="gitgithub">git/GitHub&lt;/h3>
+&lt;/li>
+&lt;li>vscode
 &lt;ul>
-&lt;li>gitとは
-&lt;ul>
-&lt;li>add&lt;/li>
-&lt;li>push&lt;/li>
-&lt;li>pull&lt;/li>
-&lt;li>fetch&lt;/li>
-&lt;li>clone&lt;/li>
-&lt;li>merge&lt;/li>
-&lt;li>reset&lt;/li>
+&lt;li>visual studio code&lt;/li>
+&lt;li>ダウンロードする必要がある&lt;/li>
+&lt;li>さまざまな機能を追加でき、とても便利&lt;/li>
+&lt;li>&lt;a href="https://www.youtube.com/watch?v=csOaPNMDEwg&amp;amp;ab_channel=%E3%81%97%E3%81%BE%E3%81%B6%E3%83%BC%E3%81%AEIT%E5%A4%A7%E5%AD%A6" target="_blank" rel="noopener">詳しい動画&lt;/a>&lt;/li>
 &lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="gitgithub">Git/GitHub&lt;/h3>
+&lt;ul>
+&lt;li>Gitとは
+&lt;ul>
+&lt;li>
+&lt;p>ファイルのバージョン管理が簡単にできるツール。&lt;/p>
+&lt;p>使い方を知っておくと開発が快適になります。&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;h2 id="githubとは">GitHubとは&lt;/h2>
+&lt;p>&lt;a href="https://qiita.com/noshishi/items/2821c01d590bf9c96038" target="_blank" rel="noopener">詳しい記事(コマンドなし)&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;a href="https://qiita.com/satona-oinuma/items/97205ca0ce04dcae2adb" target="_blank" rel="noopener">詳しい記事(コマンドあり)&lt;/a>&lt;/p>
 &lt;/li>
 &lt;/ul>
-&lt;h3 id="docker">docker&lt;/h3>
+&lt;/li>
+&lt;li>GitHubとは
+&lt;ul>
+&lt;li>
+&lt;p>gitで管理しているファイルを他の人と共有できるようにするサービス。&lt;/p>
+&lt;p>チーム開発で大変重宝します。&lt;br>
+自分が書いたコードを公開して世界中の人に使ってもらったり、他の人が公開しているコードを使わせてもらうこともできます。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;a href="https://github.co.jp/">https://github.co.jp/&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;a href="https://qiita.com/b150005/items/508009234bf9813b230f" target="_blank" rel="noopener">詳しい記事&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;a href="https://learn.utcode.net/docs/team-development/git-workflow/" target="_blank" rel="noopener">GitとGitHubを用いたワークフロー&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>このサイトもGitHubを使って開発しています。もしわかりにくいところや改善要望があれば、&lt;a href="https://github.com/matsuolab/roomba_hack_course" target="_blank" rel="noopener">このサイトのリポジトリ&lt;/a>にissueを立ててくれれば、対応してくれるかもしれません。
+　&lt;/p>
+&lt;ul>
+&lt;li>自分で編集して改善の提案を出すこともできるので、ぜひやってみてください！&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h3 id="docker">Docker&lt;/h3>
 &lt;ul>
 &lt;li>
 &lt;p>Dockerとは&lt;/p>
+&lt;p>「データやプログラムを隔離できる」仕組み。&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>DockerFileのビルド&lt;/p>
-&lt;pre>&lt;code>docker build -t &amp;lt;image_name&amp;gt;:&amp;lt;tag_name&amp;gt; -f &amp;lt;Dockerfile&amp;gt; &amp;lt;relative_dir&amp;gt;
-&lt;/code>&lt;/pre>
+&lt;p>例えば、PCの中でAというシステムとBというシステムを動かしたいとします。そして、これらは他のCというシステムに依存しているものとします。
+もし、AがCのバージョン2で動かすことにのみ対応していて、BはCのバージョン3にのみ対応していた場合、Bを動かせるようにCのバージョンを3にしてしまうと、Aが実行できなくなってしまいます。&lt;/p>
+&lt;figure >
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../docker_1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;p>このような場合、dockerコンテナを複数作成し（コンテナI、コンテナIIとします）、&lt;/p>
+&lt;ul>
+&lt;li>コンテナIの中にはプログラムAとCのバージョン2をインストールして使い、&lt;/li>
+&lt;li>コンテナIIの中にはプログラムBとCのバージョン3をインストールして使用する&lt;/li>
+&lt;/ul>
+&lt;p>のようなことことができます。&lt;/p>
+&lt;figure >
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../docker_2.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;p>コンテナの中の環境はPC本体の環境からは隔離されるため、安全に開発をすることができます(他の人が書いたプログラムが動かなくなるということも防げる)。&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>Docker Image&lt;/p>
-&lt;pre>&lt;code># Docker image一覧
+&lt;p>&lt;a href="https://kitsune.blog/docker-summary" target="_blank" rel="noopener">詳しい記事&lt;/a>&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;!-- - DockerFileのビルド
+```
+docker build -t &lt;image_name>:&lt;tag_name> -f &lt;Dockerfile> &lt;relative_dir>
+```
+- Docker Image
+```
+# Docker image一覧
 docker images
 # Docker Imageのダウンロード
-docker pull &amp;lt;image_name&amp;gt;:&amp;lt;tag_name&amp;gt;
+docker pull &lt;image_name>:&lt;tag_name>
 # 削除
-docker rmi &amp;lt;image_id&amp;gt;
+docker rmi &lt;image_id>
 # 不要なDocker imageを消す
 docker image prune
-&lt;/code>&lt;/pre>
-&lt;/li>
-&lt;li>
-&lt;p>Docker Container&lt;/p>
-&lt;pre>&lt;code># Docker containerの起動
-docker run &amp;lt;image_name&amp;gt; &amp;lt;command&amp;gt;
+```
+- Docker Container
+```
+# Docker containerの起動
+docker run &lt;image_name> &lt;command>
 # Docker container一覧
 docker ps -a
 # Docker containerに接続
-docker exec -it &amp;lt;container_name&amp;gt; bash
-&lt;/code>&lt;/pre>
-&lt;p>※&lt;code>docker run&lt;/code>でよく使うオプション&lt;/p>
+docker exec -it &lt;container_name> bash
+```
+-->
+&lt;!-- ※`docker run`でよく使うオプション
+- `-it`
+- 標準入出力有効になる
+- `--name &lt;container_name>`
+- コンテナの名前の指定
+- `--rm`
+- コンテナを抜けた際に自動的にコンテナを削除する
+- `--gpus all`
+- コンテナに全gpuを渡す
+- gpuの個数を指定する場合は all の代わりに数字(0, 1,...)
+- gpuを指定する場合は `--gpus '"device=0,1"'`
+- `-v &lt;host/path/to/dir:container/path/to/dir>`
+- コンテナ内にホストのディレクトリをマウントする
+- `-p &lt;host_port>:&lt;container_port>`
+- ホストのポートをコンテナのポートにマップする
+- コンテナ内でwebサーバを動かす場合などに使う
+- `--net=host`
+- コンテナとホストでネットワークを共有する(IPアドレスなどが同じになる)
+- ROSノードをコンテナ内で動かす場合などはこれを使うと楽
+- `--privileged`
+- コンテナからのデバイスへのアクセスを許可
+- コンテナからWEBカメラにアクセスしたいときなど
+-->
+&lt;h3 id="ssh">ssh&lt;/h3>
 &lt;ul>
-&lt;li>&lt;code>-it&lt;/code>
-&lt;ul>
-&lt;li>標準入出力有効になる&lt;/li>
-&lt;/ul>
+&lt;li>
+&lt;p>&lt;a href="https://e-words.jp/w/SSH.html" target="_blank" rel="noopener">sshとは&lt;/a>&lt;/p>
 &lt;/li>
-&lt;li>&lt;code>--name &amp;lt;container_name&amp;gt;&lt;/code>
-&lt;ul>
-&lt;li>コンテナの名前の指定&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;code>--rm&lt;/code>
-&lt;ul>
-&lt;li>コンテナを抜けた際に自動的にコンテナを削除する&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;code>--gpus all&lt;/code>
-&lt;ul>
-&lt;li>コンテナに全gpuを渡す&lt;/li>
-&lt;li>gpuの個数を指定する場合は all の代わりに数字(0, 1,&amp;hellip;)&lt;/li>
-&lt;li>gpuを指定する場合は &lt;code>--gpus '&amp;quot;device=0,1&amp;quot;'&lt;/code>&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;code>-v &amp;lt;host/path/to/dir:container/path/to/dir&amp;gt;&lt;/code>
-&lt;ul>
-&lt;li>コンテナ内にホストのディレクトリをマウントする&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;code>-p &amp;lt;host_port&amp;gt;:&amp;lt;container_port&amp;gt;&lt;/code>
-&lt;ul>
-&lt;li>ホストのポートをコンテナのポートにマップする&lt;/li>
-&lt;li>コンテナ内でwebサーバを動かす場合などに使う&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;code>--net=host&lt;/code>
-&lt;ul>
-&lt;li>コンテナとホストでネットワークを共有する(IPアドレスなどが同じになる)&lt;/li>
-&lt;li>ROSノードをコンテナ内で動かす場合などはこれを使うと楽&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;code>--privileged&lt;/code>
-&lt;ul>
-&lt;li>コンテナからのデバイスへのアクセスを許可&lt;/li>
-&lt;li>コンテナからWEBカメラにアクセスしたいときなど&lt;/li>
-&lt;/ul>
+&lt;li>
+&lt;p>sshを使用することで、開発PCからルンバに載っているjetsonというコンピュータを遠隔で操作することや、各自のPCから開発PCを遠隔で操作することができる。&lt;/p>
 &lt;/li>
 &lt;/ul>
-&lt;/li>
-&lt;/ul>
+&lt;!--
+コマンドだけあってもわからないと思うので
+```
+ssh &lt;username>@&lt;hostname> -p &lt;port> -i &lt;identity_file>
+```
+-->
 &lt;h2 id="演習">演習&lt;/h2>
 &lt;p>演習には個人PC, 開発PC, ルンバに搭載されているjetsonの3種類のコンピュータを用います。&lt;/p>
 &lt;p>開発PC : robot_dev系, hsr_dev系&lt;/p>
 &lt;p>jetson : roomba_dev系&lt;/p>
-&lt;details class="spoiler " id="spoiler-0">
+&lt;!--
+&lt;details class="spoiler " id="spoiler-2">
 &lt;summary>【ssh】開発用PCにsshする&lt;/summary>
 &lt;p>&lt;p>個人PCから開発PCにsshする&lt;/p>
 &lt;pre>&lt;code class="language-shell">(個人PC):~$ vim ~/.ssh/config
@@ -175,61 +205,74 @@ docker exec -it &amp;lt;container_name&amp;gt; bash
 &lt;p>などと表記が変わり、開発PCに接続できたことが確認できます。&lt;/p>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-1">
+-->
+&lt;details class="spoiler " id="spoiler-3">
 &lt;summary>【Linuxコマンド】グループのディレクトリを作成し移動する&lt;/summary>
 &lt;p>&lt;pre>&lt;code class="language-shell">(開発PC):~$ mkdir group_a
 (開発PC):~$ cd group_a
 &lt;/code>&lt;/pre>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-2">
+&lt;details class="spoiler " id="spoiler-4">
 &lt;summary>【git】roomba_hackリポジトリをcloneし移動する&lt;/summary>
 &lt;p>&lt;pre>&lt;code class="language-shell">(開発PC):~/group_a$ git clone https://github.com/matsuolab/roomba_hack.git
-(開発PC):~/group_a$ cd roomba_hack
+# group_a ディレクトリの中に新しいディレクトリができていることを確認
 (開発PC):~/group_a$ ls
+(開発PC):~/group_a$ cd roomba_hack
+(開発PC):~/group_a/roomba_hack$ ls
 &lt;/code>&lt;/pre>
 &lt;p>&lt;a href="https://github.com/matsuolab/roomba_hack">https://github.com/matsuolab/roomba_hack&lt;/a> をそのままダウンロードできたことが確認できると思います。&lt;/p>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-3">
+&lt;details class="spoiler " id="spoiler-5">
 &lt;summary>【git】ブランチを確認する&lt;/summary>
 &lt;p>&lt;p>git branchコマンドを使ってみましょう。&lt;/p>
-&lt;pre>&lt;code class="language-shell">(開発PC):~/group_a/roomba_hack$ git branch
+&lt;pre>&lt;code># ローカルブランチの一覧を表示
+(開発PC):~/group_a/roomba_hack$ git branch
 &lt;/code>&lt;/pre>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-4">
-&lt;summary>【docker】roomba_hackの開発環境のdocker imageをビルドする&lt;/summary>
-&lt;p>&lt;p>shellファイルを実行してビルドを行います。&lt;/p>
-&lt;pre>&lt;code>(開発PC):~/group_a/roomba_hack$ ./BUILD-DOCKER-IMAGE.sh
+&lt;details class="spoiler " id="spoiler-6">
+&lt;summary>【docker】roomba_hackの開発環境のdockerイメージをビルドする&lt;/summary>
+&lt;p>&lt;pre>&lt;code># shellファイルの中身をcatコマンドで確認してみる。
+(開発PC):~/group_a/roomba_hack$ cat BUILD-DOCKER-IMAGE.sh
+# ファイルの中身が表示される
+# ファイルの最後の
+# docker build . -f docker/${DOCKERFILE_NAME} -t ${IMAGE_NAME}:${TAG_NAME} --build-arg BASE_IMAGE=${BASE_IMAGE}
+# の部分でDockerイメージのビルドを実行するようです。
+# shellファイルを実行してビルドを行います。
+(開発PC):~/group_a/roomba_hack$ ./BUILD-DOCKER-IMAGE.sh
 &lt;/code>&lt;/pre>
-&lt;p>shellファイルの中身をcatコマンドで確認してみましょう。&lt;/p>
-&lt;pre>&lt;code>(開発PC)2:~/group_a/roomba_hack$ cat BUILD-DOCKER-IMAGE.sh
-&lt;/code>&lt;/pre>
-&lt;p>細かいところは気にしなくていいですが、ファイルの最後の&lt;/p>
-&lt;pre>&lt;code>docker build . -f docker/${DOCKERFILE_NAME} -t ${IMAGE_NAME}:${TAG_NAME} --build-arg BASE_IMAGE=${BASE_IMAGE}
-&lt;/code>&lt;/pre>
-&lt;p>でビルドが行われていることが確認できると思います。&lt;/p>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-5">
+&lt;details class="spoiler " id="spoiler-7">
 &lt;summary>【ssh】jetsonにsshする&lt;/summary>
 &lt;p>&lt;p>開発用PCからルンバに載っているjetson nanoへsshします。&lt;/p>
-&lt;pre>&lt;code class="language-shell">(開発PC):~/group_a/roomba_hack$ ssh roomba_dev2
+&lt;pre>&lt;code>(開発PC):~/group_a/roomba_hack$ ssh roomba_dev2
 roomba_dev2@roomba-dev-jetson2:~$
 &lt;/code>&lt;/pre>
 &lt;p>先頭の表記が&lt;code>roomba_dev2@roomba-dev-jetson2&lt;/code>と変わり、jetsonへ接続されたことがわかります。&lt;/p>
 &lt;p>jetsonでも同様にグループのディレクトリを作成し、移動し、roomba_hackリポジトリをcloneしてみましょう。&lt;/p>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-6">
+&lt;!--
+&lt;details class="spoiler " id="spoiler-8">
 &lt;summary>【ssh】VNCを使う&lt;/summary>
 &lt;p>&lt;p>個人PCから開発PCにsshで接続&lt;/p>
 &lt;pre>&lt;code class="language-shell">(個人PC):~$ ssh robot_dev2 -L 5900:localhost:5900
 &lt;/code>&lt;/pre>
 &lt;p>手元のVNC viewerでlocalhost:5900を開く&lt;/p>
 &lt;/p>
-&lt;/details></description></item><item><title>ROSとは</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap1/ros/</link><pubDate>Wed, 11 May 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap1/ros/</guid><description>&lt;p>ロボット開発によく用いられるROSの概要を理解する&lt;/p>
+&lt;/details>
+-->
+&lt;!--
+TODO:
+- RUN-DOCKER-CONTAINER.shの中身を説明する
+- BUILD-DOCKER-IMAGE.shの中身を説明する
+- sshに必要な設定を説明する
+- VNCに必要な設定を説明する
+- VNC viewerの使い方を説明する
+--></description></item><item><title>ROSとは</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap1/ros/</link><pubDate>Wed, 11 May 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap1/ros/</guid><description>&lt;p>ロボット開発によく用いられるROSの概要を理解する&lt;/p>
 &lt;h2 id="learn">Learn&lt;/h2>
 &lt;h3 id="rosの概要">ROSの概要&lt;/h3>
 &lt;p>ROS(Robot Operating System)は、ロボット・アプリケーション開発に便利な機能を提供するフレームワークです。
