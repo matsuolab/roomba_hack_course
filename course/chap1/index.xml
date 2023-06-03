@@ -229,57 +229,85 @@ roomba_dev2@roomba-dev-jetson2:~$
 &lt;/code>&lt;/pre>
 &lt;p>手元のVNC viewerでlocalhost:5900を開く&lt;/p>
 &lt;/p>
-&lt;/details></description></item><item><title>ROSとは</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap1/ros/</link><pubDate>Sat, 22 Jan 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap1/ros/</guid><description>&lt;p>ロボット開発によく用いられるROSの概要を理解する&lt;/p>
+&lt;/details></description></item><item><title>ROSとは</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap1/ros/</link><pubDate>Wed, 11 May 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap1/ros/</guid><description>&lt;p>ロボット開発によく用いられるROSの概要を理解する&lt;/p>
 &lt;h2 id="learn">Learn&lt;/h2>
 &lt;h3 id="rosの概要">ROSの概要&lt;/h3>
-&lt;p>ROS(Robot Operating System)は、ロボット・アプリケーション作成を支援するライブラリとツールを提供するミドルウェアです。
-具体的には以下にあげるものをROSは提供しています。&lt;/p>
+&lt;p>ROS(Robot Operating System)は、ロボット・アプリケーション開発に便利な機能を提供するフレームワークです。
+フレームワークとは、プログラミング言語を特定の目的に特化させて使うためのツールのことです。
+具体的には以下にあげる機能を提供しています。&lt;/p>
 &lt;ul>
 &lt;li>
 &lt;p>メッセージ通信&lt;/p>
-&lt;p>プロセス間、コンピュータ間の通信ライブラリが提供されています。用途に応じて、多対多や一対多、非同期、同期などの通信形態を選択することができます。&lt;/p>
+&lt;ul>
+&lt;li>プロセス間、コンピュータ間の通信ライブラリが提供されています。&lt;/li>
+&lt;/ul>
 &lt;/li>
 &lt;li>
 &lt;p>デバイスドライバ&lt;/p>
-&lt;p>ロボットに搭載される多くのセンサやアクチュエータがROSのAPIで標準化された形で提供されています。&lt;/p>
-&lt;p>&lt;a href="https://github.com/ros-drivers">https://github.com/ros-drivers&lt;/a>
-&lt;a href="http://wiki.ros.org/Sensors">http://wiki.ros.org/Sensors&lt;/a>&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>ROSに対応しているセンサやアクチュエータを搭載したロボットであれば、違うロボットであってもほぼ同じソースコードを使用して動かすことができます。&lt;br>
+roombaを動かすために書いたソースコードをそのまま使用してHSRを動かす、といったことができます。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;a href="https://github.com/ros-drivers">https://github.com/ros-drivers&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>&lt;a href="http://wiki.ros.org/Sensors">http://wiki.ros.org/Sensors&lt;/a>&lt;/p>
+&lt;/li>
+&lt;/ul>
 &lt;/li>
 &lt;li>
 &lt;p>ライブラリ&lt;/p>
-&lt;p>ロボットを動作させるソフトウェア(ナビゲーション、マニピュレーション)の基本機能の大半が提供されています。&lt;/p>
+&lt;ul>
+&lt;li>ロボットを動作させるソフトウェア(ナビゲーション、マニピュレーション)の基本機能の大半が提供されています。&lt;/li>
+&lt;/ul>
 &lt;/li>
 &lt;li>
 &lt;p>視覚化ツール&lt;/p>
-&lt;p>ロボットの内部状態やセンサ出力を2次元、3次元で視覚化するRvizや3次元動力学シミュレータのGazeboなどが提供されています。&lt;/p>
+&lt;ul>
+&lt;li>ロボットの内部状態やセンサ出力を2次元、3次元で視覚化するRvizや3次元動力学シミュレータのGazeboなどが提供されています。&lt;/li>
+&lt;/ul>
 &lt;/li>
 &lt;li>
 &lt;p>パッケージ管理&lt;/p>
-&lt;p>多種多様なプログラミング言語(python, C++, &amp;hellip;)、依存関係で記述されたプログラム(パッケージ)同士を統合的にセットアップ、ビルド、テスト、リリースすることが可能です。&lt;/p>
-&lt;p>たとえば、経路計画など処理が重いプロセスはC++で、画像認識など機械学習系のプロセスはpythonで実装し、それらプロセス間の通信を容易に実装できる。&lt;/p>
+&lt;ul>
+&lt;li>多種多様なプログラミング言語(python, C++, &amp;hellip;)、依存関係で記述されたプログラム同士を統合的に使用することが可能です。&lt;/li>
+&lt;li>これにより、経路計画など処理が重いプロセスはC++でコードを書き、画像認識など機械学習系のプロセスはpythonでコードを書く、といったこともできるようになります。&lt;/li>
+&lt;/ul>
 &lt;/li>
 &lt;/ul>
 &lt;h3 id="rosのメッセージ通信">ROSのメッセージ通信&lt;/h3>
-&lt;p>ロボットシステムでは、多数のプログラムを並列に実行し、それぞれがデータをやりとりします。
-それらのプログラム間の通信ライブラリをROSは提供します。&lt;/p>
+&lt;p>ロボットを動かす際には、多くのプログラムを並列して実行し、それぞれがデータをやりとりする必要があります。
+ROSはそのようなプログラム間の通信に必要な機能を提供しています。&lt;/p>
 &lt;ul>
 &lt;li>
 &lt;p>ノード(node)&lt;/p>
-&lt;p>ROSでは、一つのプログラム単位を「ノード(node)」と呼びます。
-ノードは、ROSクライアントライブラリを用いて、他のノードとデータをやりとりします。
-ROSクライアントライブラリは異なるプログラミング言語で記述されたノードがやりとりできるようにしています。
-ノードは、次に述べるトピックの配信・購読、またはサービスの提供・使用が可能です。&lt;/p>
+&lt;ul>
+&lt;li>ROSでは、一つのプログラム単位を「ノード(node)」と呼びます。&lt;/li>
+&lt;li>基本的には、一つのファイルが一つのノードに対応しています。&lt;/li>
+&lt;li>各ノードは次に述べるtopic、service、actionの三つの通信方法を使って、他のノードとデータのやり取りを行います。&lt;/li>
+&lt;/ul>
 &lt;/li>
 &lt;li>
 &lt;p>トピック(topic)&lt;/p>
-&lt;p>ROSでの、標準的なデータ通信の経路を「トピック(topic)」と呼びます。
-ノードはメッセージをトピックへ向けて配信(Publish)し、同様に購読する(Subscribe)ことでトピックからメッセージを受け取ることができます。&lt;/p>
-&lt;p>トピックには名前が付けられ、同じトピックに複数のノードがデータを送り、複数のノードがデータを受け取ることができます。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>ROSでの、最も基本的なデータ通信の経路を「トピック(topic)」と呼びます。&lt;/p>
 &lt;/li>
+&lt;li>
+&lt;p>ノードはメッセージをトピックへ向けて配信(Publish)し、また購読する(Subscribe)ことで他のノードと情報を共有することができます。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>配信を行うノードをPublisher、購読を行うノードをSubscriberと呼びます。ノードはこのどちらかに二分することができるというわけではなく、実際には一つのノードがpublisherであり、subscriberでもあるという状況がほとんどです。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>トピックには名前が付けられており、同じトピックに複数のノードがデータを送ったり、複数のノードが同じデータを受け取ることができます。&lt;/p>
+&lt;ul>
 &lt;li>
 &lt;p>メッセージ(message)&lt;/p>
 &lt;p>トピックへ配信したり、購読したりするときのROSのデータ型のことを「メッセージ(message)」と呼びます。
-メッセージの型はmsgファイルに記述されており、使用言語に依存しないデータ形式になっています。&lt;/p>
+メッセージの型はmsgファイルに記述されており、使用するプログラミング言語に依存しないデータ形式になっています。&lt;/p>
 &lt;p>以下に、物体やロボットの位置を表す時によく用いる&lt;code>geomemtry_msgs/PoseStamped&lt;/code>型のmsgファイルを示します。
 位置情報の時間や座標フレームの情報が含まれるheaderと座標位置を表すposeで定義されています。&lt;/p>
 &lt;pre>&lt;code>std_msgs/Header header
@@ -297,14 +325,44 @@ float64 y
 float64 z
 float64 w
 &lt;/code>&lt;/pre>
+&lt;p>各行の左側にはデータ型が、右側には変数名が記述されています。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>Topic通信のイメージ
+&lt;figure >
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../node.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>&lt;/p>
+&lt;/li>
+&lt;/ul>
 &lt;/li>
 &lt;li>
 &lt;p>サービス(service)&lt;/p>
-&lt;p>「サービス(service)」はノードが他のノードとお互いに通信するための一つの手段です。
-サービスを提供しているノードに引数を渡して、関数の実行結果を戻り値として受け取ることができます。&lt;/p>
-&lt;p>呼び出される側のノードは、サービス名とデータ形式の宣言を「アドバタイズ(advertise)」し、呼び出す側のノードは、サービスを「コール(call)」します。&lt;/p>
-&lt;p>サービスにおいて送受信されるデータの型はsrvファイルに記述されています。
-メッセージと同様使用言語に依存しないデータ形式ですが、メッセージと異なるのは、引数と戻り値の二つの形式を定義する必要があるところです。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>「サービス(service)」も、ノードが他のノードと通信するための手段の一つです。少しだけtopicより複雑な通信の仕方を提供します.&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>サービスには、サービスを提供するノード（service server）とサービスを要求するノード(service client)があります。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>サービスは以下のような流れで使用されます。&lt;/p>
+&lt;ol>
+&lt;li>service clientがservice serverに引数を渡す。&lt;/li>
+&lt;li>引数を受け取ったservice serverが何らかのプログラムを実行する。&lt;/li>
+&lt;li>service serverは行為の結果を返り値としてservice clientに返す。&lt;/li>
+&lt;li>service clientはその返り値に応じて後の挙動を変える。&lt;/li>
+&lt;/ol>
+&lt;/li>
+&lt;li>
+&lt;p>サービスにおいて送受信されるデータの型は.srvファイルに記述されています。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>メッセージと同様使用言語に依存しないデータ形式ですが、メッセージと異なるのは、引数と戻り値の二つの形式を定義する必要があるところです。&lt;/p>
+&lt;/li>
+&lt;li>
 &lt;p>以下に、srvの例として&lt;code>std_srvs/SetBool&lt;/code>を示します。
 このように引数と戻り値の間に&lt;code>---&lt;/code>を入れて定義します。&lt;/p>
 &lt;pre>&lt;code>bool data
@@ -314,83 +372,137 @@ string message
 &lt;/code>&lt;/pre>
 &lt;/li>
 &lt;li>
-&lt;p>ROSマスタ(ROS master)&lt;/p>
-&lt;p>「ROSマスタ(ROS master)」は、ノード、トピックおよびサービスの名前登録を行い、それぞれのノードが他のノードから見えるようにする役割を担っています。
-通信するノード名とトピック名およびサービス名の対応が決定した後、ノード同士が「peer-to-peer」で通信します。&lt;/p>
-&lt;p>ROSマスタとノード間の通信はXML-RPCを用いて行われます。
-ROSマスタを起動するには「roscore」というコマンドを実行します。&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>パラメータサーバ(parameter server)&lt;/p>
-&lt;p>「パラメータサーバ(parameter server)」は、設定データを複数のノードで共有するための軽量なサーバです。
-各ノードのパラメータを、パラメータサーバで一括して管理できます。
-パラメータサーバもROSマスタ同様に「roscore」コマンドで起動します。&lt;/p>
-&lt;p>パラメータサーバで扱える型は、整数・小数・真偽値・辞書・リストになります。&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>ROSのデータ通信のまとめ&lt;/p>
+&lt;p>service通信のイメージ
+&lt;figure >
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../ros_service.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>&lt;/p>
 &lt;/li>
 &lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>アクション(action)&lt;/p>
+&lt;ul>
+&lt;li>アクションもノード間通信の一つの手段です。serviceよりもさらに複雑な通信ができます。&lt;/li>
+&lt;li>トピックやサービスほど頻繁には使われないので、ここでは説明を省略します。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>
+&lt;p>ROSマスタ(ROS master)&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>「ROSマスタ(ROS master)」は、ノード、トピックおよびサービスの名前登録を行い、それぞれのノードが他のノードから見えるようにする役割を担っています。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>通信するノード名とトピック名およびサービス名の対応が決定した後、ノード同士が「peer-to-peer」で通信します。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>ROSマスタを起動するには「roscore」というコマンドを実行します（が、RoombaやHSRをつかうときにはこのコマンドが自動で実行されることが多いため、あまり意識する機会はないかもしれません）。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;!--
+パラメータサーバは必須ではないと思うのでコメントアウト。
+- パラメータサーバ(parameter server)
+「パラメータサーバ(parameter server)」は、設定データを複数のノードで共有するための軽量なサーバです。
+各ノードのパラメータを、パラメータサーバで一括して管理できます。
+パラメータサーバもROSマスタ同様に「roscore」コマンドで起動します。
+パラメータサーバで扱える型は、整数・小数・真偽値・辞書・リストになります。
+-->
+&lt;!--
+- ROSのデータ通信のまとめ
 &lt;figure id="figure-ros通信">
 &lt;div class="d-flex justify-content-center">
 &lt;div class="w-100" >&lt;img src="../ros_communication.png" alt="ROS通信" loading="lazy" data-zoomable />&lt;/div>
 &lt;/div>&lt;figcaption>
 ROS通信
 &lt;/figcaption>&lt;/figure>
+-->
 &lt;!-- ### デバイスドライバ
 - カメラ
 - LiDAR
 - IMU -->
 &lt;h3 id="rosと連動するソフトウェア">ROSと連動するソフトウェア&lt;/h3>
-&lt;p>ROSは以下のソフトウェアと連動して使うためのパッケージが提供されています。&lt;/p>
+&lt;p>ROSは以下のようなソフトウェアと連動して使うためのパッケージを提供しています。簡単な説明にとどめるので、詳しい使い方は必要になったときに勉強してください。&lt;/p>
 &lt;ul>
 &lt;li>
 &lt;p>OpenCV&lt;/p>
-&lt;p>コンピュータビジョンの標準的なライブラリ。&lt;/p>
-&lt;p>OpenCVのデータ形式である、MatクラスとROSのメッセージ形式を変換するcv_bridgeや３次元座標上の物体を２次元画像上に投影する機能であるimage_geometryといったパッケージ(vision_opencv)が提供されています。&lt;/p>
+&lt;p>豊富な機能を持つ2D画像処理用のライブラリです。
+カメラで撮影した画像を処理する際に使用します。&lt;/p>
+&lt;!--
+OpenCVのデータ形式である、MatクラスとROSのメッセージ形式を変換するcv_bridgeや３次元座標上の物体を２次元画像上に投影する機能であるimage_geometryといったパッケージ(vision_opencv)が提供されています。
+-->
 &lt;/li>
 &lt;li>
 &lt;p>PCL(Point Cloud Library)&lt;/p>
-&lt;p>3次元点群処理のライブラリ。&lt;/p>
-&lt;p>OpenCV同様PCLのデータ形式とROSのメッセージ形式を変換するパッケージが提供されています。&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>OpenSLAM, Navigation Stack&lt;/p>
-&lt;p>移動ロボットの自己位置推定と地図生成を同時に行うSLAM(Simultaneous Localization and Mapping)のソースコードを公開するためのプラットフォームと、。&lt;/p>
-&lt;p>ROSではOpenSLAMで実装されているgmappingパッケージのラッパーやそれと連携して自律走行を実現するnavigationメタパッケージが提供されています。&lt;/p>
-&lt;/li>
-&lt;li>
-&lt;p>Move it&lt;/p>
-&lt;/li>
-&lt;/ul>
-&lt;h3 id="視覚化ツール">視覚化ツール&lt;/h3>
 &lt;ul>
-&lt;li>rqt&lt;/li>
+&lt;li>3次元点群処理のライブラリ。&lt;/li>
+&lt;li>HSRやRoombaにはRGBDカメラが搭載されています。DはDepthという意味で、画像の各ピクセルに距離情報を対応させたDepth画像を取得することができます。&lt;br>
+このような三次元の点群の情報を処理する際にPCLを使うと便利です。&lt;/li>
 &lt;/ul>
-&lt;figure id="figure-rqt-window">
+&lt;!--OpenCV同様PCLのデータ形式とROSのメッセージ形式を変換するパッケージが提供されています。-->
+&lt;/li>
+&lt;li>
+&lt;p>OpenSLAM&lt;/p>
+&lt;ul>
+&lt;li>地図を効果的に使うことで、より安定したロボットのナビゲーションを行うことができます。&lt;/li>
+&lt;li>移動ロボットの自己位置推定と地図生成を同時に行うSLAM(Simultaneous Localization and Mapping)という手法は、それだけで一つの研究分野になる程奥深い分野で、活発に研究が行われています。&lt;/li>
+&lt;li>OpenSLAMは、SLAMのソースコードを公開するためのプラットフォームを提供しており、様々なSLAMの手法を実装しています。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;!--
+roombaには手がついていないので、MoveIt!の説明は省略。
+- **Move it**
+-->
+&lt;p>これ以外にも本当にたくさんのツールがROSと連動しています。&lt;/p>
+&lt;h3 id="可視化ツール">可視化ツール&lt;/h3>
+&lt;p>ロボット内部の大量のデータが正しく処理されているか知りたい場合、変数の中身の数値などを直接みるのは大変です。直感的にわかりづらいためミスも増えます。&lt;br>
+可視化をすることで、開発やデバッグがより効率よく進められます。&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>rqt&lt;/p>
+&lt;p>rqtはROSのGUIフレームワークで、様々なツールを提供しています。&lt;br>
+ノードの状態を可視化する&lt;code>rqt_graph&lt;/code>(下図1)、メッセージの値を時系列に沿ってプロットする&lt;code>rqt_plot&lt;/code>(下図2)などがあります。&lt;/p>
+&lt;figure id="figure-図1-rqt_graph-wikipediahttpwikirosorgrqt_graphより引用">
 &lt;div class="d-flex justify-content-center">
-&lt;div class="w-100" >&lt;img src="../ros_gui.png" alt="rqt window" loading="lazy" data-zoomable />&lt;/div>
+&lt;div class="w-100" >&lt;img src="../rqt_graph.png" alt="図1 rqt_graph [wikipedia](http://wiki.ros.org/rqt_graph)より引用" loading="lazy" data-zoomable />&lt;/div>
 &lt;/div>&lt;figcaption>
-rqt window
+図1 rqt_graph &lt;a href="http://wiki.ros.org/rqt_graph">wikipedia&lt;/a>より引用
 &lt;/figcaption>&lt;/figure>
+&lt;figure id="figure-図2-rqt_plot-wikipediahttpwikirosorgrqt_plotより引用">
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../rqt_plot.png" alt="図2 rqt_plot [wikipedia](http://wiki.ros.org/rqt_plot)より引用" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;figcaption>
+図2 rqt_plot &lt;a href="http://wiki.ros.org/rqt_plot">wikipedia&lt;/a>より引用
+&lt;/figcaption>&lt;/figure>
+&lt;/li>
+&lt;/ul>
 &lt;!-- http://wiki.ros.org/rqt -->
 &lt;ul>
-&lt;li>rviz&lt;/li>
-&lt;/ul>
+&lt;li>
+&lt;p>RViz&lt;/p>
+&lt;p>ロボットの三次元モデルや座標系、測定した三次元点群などを可視化するツールです。&lt;br>
+三次元空間の情報以外に、カメラに写っている画像なども表示できます。&lt;/p>
 &lt;div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
 &lt;iframe src="https://www.youtube.com/embed/i--Sd4xH9ZE" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;" allowfullscreen title="YouTube Video">&lt;/iframe>
 &lt;/div>
 &lt;!-- http://wiki.ros.org/ja/rviz -->
-&lt;ul>
-&lt;li>gazebo&lt;/li>
+&lt;/li>
+&lt;li>
+&lt;p>gazebo&lt;/p>
+&lt;p>オープンソースのロボット用三次元動力学シミュレータ。&lt;br>
+説明は割愛します。&lt;/p>
+&lt;/li>
 &lt;/ul>
 &lt;!-- ### パッケージ管理
 - プログラミング言語
 - rosdep
 - -->
 &lt;h2 id="演習">演習&lt;/h2>
-&lt;details class="spoiler " id="spoiler-3">
-&lt;summary>roomba driverを起動し、動作していることを確認する&lt;/summary>
+&lt;details class="spoiler " id="spoiler-6">
+&lt;summary>&lt;strong>roombaドライバを起動し、動作していることを確認する&lt;/strong>&lt;/summary>
 &lt;p>&lt;ul>
 &lt;li>
 &lt;p>jetsonにアクセスする&lt;/p>
@@ -399,7 +511,7 @@ rqt window
 &lt;/code>&lt;/pre>
 &lt;/li>
 &lt;li>
-&lt;p>docker containerを起動する
+&lt;p>docker containerを起動する&lt;br>
 余裕があれば&lt;code>RUN-DOCKER-CONTAINER.sh&lt;/code>ファイルの中身を確認してみましょう。&lt;/p>
 &lt;pre>&lt;code class="language-sh">(jetson):~$ cd ~/team_a/roomba_hack
 (jetson):~/team_a/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
@@ -409,7 +521,7 @@ root@roomba-dev-jetson:~/roomba_hack#
 &lt;p>今後docker内部であることは(docker)と表記します。&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>roomba driverなどを起動するlaunchファイルを起動する
+&lt;p>roomba driverなどを起動するlaunchファイルを起動する&lt;br>
 このタイミングでルンバの電源が入っているかを確認しておきましょう。&lt;/p>
 &lt;pre>&lt;code class="language-sh">(jetson)(docker):~/roomba_hack# roslaunch roomba_bringup bringup.launch
 &lt;/code>&lt;/pre>
@@ -418,18 +530,18 @@ root@roomba-dev-jetson:~/roomba_hack#
 &lt;/ul>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-4">
-&lt;summary>コントローラーを使って、ロボットを動かす&lt;/summary>
+&lt;details class="spoiler " id="spoiler-7">
+&lt;summary>&lt;strong>コントローラーを使ってロボットを動かす&lt;/strong>&lt;/summary>
 &lt;p>&lt;ul>
 &lt;li>
-&lt;p>開発PCでdocker containerを起動する
-　　xにはroomba_devの後につく数字を入れてください。&lt;/p>
+&lt;p>開発PCでdocker containerを起動する&lt;br>
+xにはroomba_devの後につく数字を入れてください。&lt;/p>
 &lt;pre>&lt;code class="language-sh">(開発PC):~$ cd ~/team_a/roomba_hack
 (開発PC):~/team_a/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
 &lt;/code>&lt;/pre>
 &lt;/li>
 &lt;li>
-&lt;p>コントローラーを起動
+&lt;p>コントローラーを起動&lt;br>
 コントローラーが開発PCに刺さってることを確認してください。&lt;/p>
 &lt;pre>&lt;code class="language-sh">(開発PC)(docker):~/roomba_hack# cd catkin_ws
 (開発PC)(docker):~/roomba_hack/catkin_ws# catkin_make
@@ -457,7 +569,7 @@ L1を押している時のみ移動コマンドが動作します。&lt;/li>
 &lt;/ul>
 &lt;/li>
 &lt;li>
-&lt;p>正常に起動できているかを確認
+&lt;p>正常に起動できているかを確認&lt;br>
 開発PCで新しくターミナルを開いてdockerの中に入ります。&lt;/p>
 &lt;p>すでに開発PCで起動されているdockerコンテナに入る場合は、&lt;/p>
 &lt;pre>&lt;code class="language-sh">(開発PC):~/group_a/roomba_hack$ docker exec -it roomba_hack bash
