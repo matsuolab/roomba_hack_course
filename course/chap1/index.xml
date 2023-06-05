@@ -87,10 +87,12 @@ cat &amp;lt;FileName&amp;gt;
 &lt;p>&lt;a href="https://learn.utcode.net/docs/team-development/git-workflow/" target="_blank" rel="noopener">GitとGitHubを用いたワークフロー&lt;/a>&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>このサイトもGitHubを使って開発しています。もしわかりにくいところや改善要望があれば、&lt;a href="https://github.com/matsuolab/roomba_hack_course" target="_blank" rel="noopener">このサイトのリポジトリ&lt;/a>にissueを立ててくれれば、対応してくれるかもしれません。
-　&lt;/p>
+&lt;p>このサイトもGitHubを使って開発しています。&lt;a href="https://github.com/matsuolab/roomba_hack_course" target="_blank" rel="noopener">このサイトのリポジトリ&lt;/a>&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>公開されているリポジトリの例&lt;/p>
 &lt;ul>
-&lt;li>自分で編集して改善の提案を出すこともできるので、ぜひやってみてください！&lt;/li>
+&lt;li>&lt;a href="https://github.com/gundam-global-challenge/gundam_robot">https://github.com/gundam-global-challenge/gundam_robot&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;/li>
 &lt;/ul>
@@ -101,10 +103,10 @@ cat &amp;lt;FileName&amp;gt;
 &lt;li>
 &lt;p>Dockerとは&lt;/p>
 &lt;p>「データやプログラムを隔離できる」仕組み。&lt;/p>
-&lt;/li>
+&lt;ul>
 &lt;li>
-&lt;p>例えば、PCの中でAというシステムとBというシステムを動かしたいとします。そして、これらは他のCというシステムに依存しているものとします。
-もし、AがCのバージョン2で動かすことにのみ対応していて、BはCのバージョン3にのみ対応していた場合、Bを動かせるようにCのバージョンを3にしてしまうと、Aが実行できなくなってしまいます。&lt;/p>
+&lt;p>例えば、コンピュータの中でシステムAとシステムBを動かしたいとします。そして、これらは他のシステムCに依存しているものとします。&lt;br>
+もし、AがCのver.2にのみ対応していて、BはCのver.3にのみ対応していた場合、Bを実行できるようにCをver.3にしてしまうと、Aが実行できなくなってしまいます。&lt;/p>
 &lt;figure >
 &lt;div class="d-flex justify-content-center">
 &lt;div class="w-100" >&lt;img src="../docker_1.png" alt="" loading="lazy" data-zoomable />&lt;/div>
@@ -119,7 +121,11 @@ cat &amp;lt;FileName&amp;gt;
 &lt;div class="d-flex justify-content-center">
 &lt;div class="w-100" >&lt;img src="../docker_2.png" alt="" loading="lazy" data-zoomable />&lt;/div>
 &lt;/div>&lt;/figure>
+&lt;/li>
+&lt;li>
 &lt;p>コンテナの中の環境はPC本体の環境からは隔離されるため、安全に開発をすることができます(他の人が書いたプログラムが動かなくなるということも防げる)。&lt;/p>
+&lt;/li>
+&lt;/ul>
 &lt;/li>
 &lt;li>
 &lt;p>&lt;a href="https://kitsune.blog/docker-summary" target="_blank" rel="noopener">詳しい記事&lt;/a>&lt;/p>
@@ -208,18 +214,18 @@ ssh &lt;username>@&lt;hostname> -p &lt;port> -i &lt;identity_file>
 -->
 &lt;details class="spoiler " id="spoiler-3">
 &lt;summary>【Linuxコマンド】グループのディレクトリを作成し移動する&lt;/summary>
-&lt;p>&lt;pre>&lt;code class="language-shell">(開発PC):~$ mkdir group_a
-(開発PC):~$ cd group_a
+&lt;p>&lt;pre>&lt;code class="language-sh">(開発PC):~$ mkdir group_x
+(開発PC):~$ cd group_x
 &lt;/code>&lt;/pre>
 &lt;/p>
 &lt;/details>
 &lt;details class="spoiler " id="spoiler-4">
 &lt;summary>【git】roomba_hackリポジトリをcloneし移動する&lt;/summary>
-&lt;p>&lt;pre>&lt;code class="language-shell">(開発PC):~/group_a$ git clone https://github.com/matsuolab/roomba_hack.git
-# group_a ディレクトリの中に新しいディレクトリができていることを確認
-(開発PC):~/group_a$ ls
-(開発PC):~/group_a$ cd roomba_hack
-(開発PC):~/group_a/roomba_hack$ ls
+&lt;p>&lt;pre>&lt;code class="language-sh">(開発PC):~/group_x$ git clone https://github.com/matsuolab/roomba_hack.git
+(開発PC):~/group_x$ ls
+# group_xディレクトリの中に新しいディレクトリができていることを確認
+(開発PC):~/group_x$ cd roomba_hack
+(開発PC):~/group_x/roomba_hack$ ls
 &lt;/code>&lt;/pre>
 &lt;p>&lt;a href="https://github.com/matsuolab/roomba_hack">https://github.com/matsuolab/roomba_hack&lt;/a> をそのままダウンロードできたことが確認できると思います。&lt;/p>
 &lt;/p>
@@ -227,28 +233,29 @@ ssh &lt;username>@&lt;hostname> -p &lt;port> -i &lt;identity_file>
 &lt;details class="spoiler " id="spoiler-5">
 &lt;summary>【git】ブランチを確認する&lt;/summary>
 &lt;p>&lt;p>git branchコマンドを使ってみましょう。&lt;/p>
-&lt;pre>&lt;code># ローカルブランチの一覧を表示
-(開発PC):~/group_a/roomba_hack$ git branch
+&lt;pre>&lt;code class="language-sh"># ローカルブランチの一覧を表示
+(開発PC):~/group_x/roomba_hack$ git branch
 &lt;/code>&lt;/pre>
 &lt;/p>
 &lt;/details>
 &lt;details class="spoiler " id="spoiler-6">
 &lt;summary>【docker】roomba_hackの開発環境のdockerイメージをビルドする&lt;/summary>
-&lt;p>&lt;pre>&lt;code># shellファイルの中身をcatコマンドで確認してみる。
-(開発PC):~/group_a/roomba_hack$ cat BUILD-DOCKER-IMAGE.sh
+&lt;p>&lt;pre>&lt;code class="language-sh"># shellファイルの中身をcatコマンドで確認してみます。
+(開発PC):~/group_x/roomba_hack$ cat BUILD-DOCKER-IMAGE.sh
 # ファイルの中身が表示される
 # ファイルの最後の
 # docker build . -f docker/${DOCKERFILE_NAME} -t ${IMAGE_NAME}:${TAG_NAME} --build-arg BASE_IMAGE=${BASE_IMAGE}
 # の部分でDockerイメージのビルドを実行するようです。
-# shellファイルを実行してビルドを行います。
-(開発PC):~/group_a/roomba_hack$ ./BUILD-DOCKER-IMAGE.sh
+# shellファイルを実行してdockerイメージのビルドを行います。
+(開発PC):~/group_x/roomba_hack$ ./BUILD-DOCKER-IMAGE.sh
 &lt;/code>&lt;/pre>
+&lt;p>「イメージ」とは、dockerコンテナを作成するための素となるもので、コンテナの設計図のようなものです。上のコマンドを実行することで、roomba_hackの開発環境のdockerイメージが作成されます（まだコンテナ自体は作っていません）。&lt;/p>
 &lt;/p>
 &lt;/details>
 &lt;details class="spoiler " id="spoiler-7">
 &lt;summary>【ssh】jetsonにsshする&lt;/summary>
 &lt;p>&lt;p>開発用PCからルンバに載っているjetson nanoへsshします。&lt;/p>
-&lt;pre>&lt;code>(開発PC):~/group_a/roomba_hack$ ssh roomba_dev2
+&lt;pre>&lt;code class="language-sh">(開発PC):~/group_x/roomba_hack$ ssh roomba_dev2
 roomba_dev2@roomba-dev-jetson2:~$
 &lt;/code>&lt;/pre>
 &lt;p>先頭の表記が&lt;code>roomba_dev2@roomba-dev-jetson2&lt;/code>と変わり、jetsonへ接続されたことがわかります。&lt;/p>
@@ -545,7 +552,7 @@ roombaには手がついていないので、MoveIt!の説明は省略。
 - -->
 &lt;h2 id="演習">演習&lt;/h2>
 &lt;details class="spoiler " id="spoiler-6">
-&lt;summary>&lt;strong>roombaドライバを起動し、動作していることを確認する&lt;/strong>&lt;/summary>
+&lt;summary>roombaドライバを起動し、動作していることを確認する&lt;/summary>
 &lt;p>&lt;ul>
 &lt;li>
 &lt;p>jetsonにアクセスする&lt;/p>
@@ -556,8 +563,9 @@ roombaには手がついていないので、MoveIt!の説明は省略。
 &lt;li>
 &lt;p>docker containerを起動する&lt;br>
 余裕があれば&lt;code>RUN-DOCKER-CONTAINER.sh&lt;/code>ファイルの中身を確認してみましょう。&lt;/p>
-&lt;pre>&lt;code class="language-sh">(jetson):~$ cd ~/team_a/roomba_hack
-(jetson):~/team_a/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
+&lt;pre>&lt;code class="language-sh">(jetson):~$ cd ~/group_x/roomba_hack
+(jetson):~/group_x/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
+# このファイルを実行することでdockerコンテナを作成し、コンテナの中に入っている。
 root@roomba-dev-jetson:~/roomba_hack#
 &lt;/code>&lt;/pre>
 &lt;p>&lt;code>root@roomba-dev-jetson:~/roomba_hack#&lt;/code>などと表示されればdocker内部に入れています。&lt;/p>
@@ -574,22 +582,43 @@ root@roomba-dev-jetson:~/roomba_hack#
 &lt;/p>
 &lt;/details>
 &lt;details class="spoiler " id="spoiler-7">
-&lt;summary>&lt;strong>コントローラーを使ってロボットを動かす&lt;/strong>&lt;/summary>
+&lt;summary>コントローラーを使ってロボットを動かす&lt;/summary>
 &lt;p>&lt;ul>
 &lt;li>
 &lt;p>開発PCでdocker containerを起動する&lt;br>
 xにはroomba_devの後につく数字を入れてください。&lt;/p>
-&lt;pre>&lt;code class="language-sh">(開発PC):~$ cd ~/team_a/roomba_hack
-(開発PC):~/team_a/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
+&lt;pre>&lt;code class="language-sh">(開発PC):~$ cd ~/group_x/roomba_hack
+(開発PC):~/group_x/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
+&lt;/code>&lt;/pre>
+&lt;p>先ほどはjetson内でdockerコンテナを起動しましたが、今回は開発PC内でdockerコンテナを起動します。
+このとき、引数にjetsonのIPアドレスを入れることで、jetson内のROSマスタに(前述)、開発PCからアクセスできるようにしています。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>パッケージのビルド&lt;/p>
+&lt;pre>&lt;code class="language-sh">(開発PC)(docker):~/roomba_hack# cd catkin_ws
+(開発PC)(docker):~/roomba_hack/catkin_ws# ls
+# catkin_ws内に存在するディレクトリを確認する。
+(開発PC)(docker):~/roomba_hack/catkin_ws# catkin_make
+# いろいろな出力が生成される。
+(開発PC)(docker):~/roomba_hack/catkin_ws# ls
+# 再度catkin_ws内に存在するディレクトリを確認する。
+&lt;/code>&lt;/pre>
+&lt;p>ここで、buildとdevelというディレクトリが生成されていると、うまくいっています。&lt;/p>
+&lt;ul>
+&lt;li>build&lt;br>
+C++のコードを用いる際に、コンパイルされたファイルが生成されるディレクトリ。pythonを使っているときにはほとんど意識しない。&lt;/li>
+&lt;li>devel&lt;br>
+様々なファイルを含んでいるが、特にsetupファイルが重要。&lt;br>
+このファイルを実行することで、現在いるワークスペースに含まれるコードを使用するようにROSの環境が設定される。&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-sh">(開発PC)(docker):~/roomba_hack/catkin_ws# source devel/setup.bash
+# setupファイルを実行
 &lt;/code>&lt;/pre>
 &lt;/li>
 &lt;li>
 &lt;p>コントローラーを起動&lt;br>
 コントローラーが開発PCに刺さってることを確認してください。&lt;/p>
-&lt;pre>&lt;code class="language-sh">(開発PC)(docker):~/roomba_hack# cd catkin_ws
-(開発PC)(docker):~/roomba_hack/catkin_ws# catkin_make
-(開発PC)(docker):~/roomba_hack/catkin_ws# source devel/setup.bash
-(開発PC)(docker):~/roomba_hack/catkin_ws#roslaunch roomba_teleop teleop.launch
+&lt;pre>&lt;code class="language-sh">(開発PC)(docker):~/roomba_hack/catkin_ws# roslaunch roomba_teleop teleop.launch
 &lt;/code>&lt;/pre>
 &lt;/li>
 &lt;li>
@@ -623,10 +652,15 @@ L1を押している時のみ移動コマンドが動作します。&lt;/li>
 &lt;p>のいずれかの方法で入ることができます。&lt;/p>
 &lt;p>さまざまなコマンドを使ってroombaの情報を取得してみましょう。&lt;/p>
 &lt;pre>&lt;code class="language-sh">(開発PC)(docker):~/roomba_hack# rosnode list
+# ノードの一覧を表示する
 (開発PC)(docker):~/roomba_hack# rostopic list
+# トピックの一覧を表示する
 (開発PC)(docker):~/roomba_hack# rostopic echo /cmd_vel
+# /cmd_velというトピックの中身を表示する
 (開発PC)(docker):~/roomba_hack# rqt_graph
+# ノードとトピックの関係を表示
 (開発PC)(docker):~/roomba_hack# rviz
+# rvizを起動
 &lt;/code>&lt;/pre>
 &lt;/li>
 &lt;/ul>
