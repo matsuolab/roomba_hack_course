@@ -216,7 +216,7 @@ roombaには手がついていないので、MoveIt!の説明は省略。
 -  -->
 
 ## 演習
-{{< spoiler text= **roombaドライバを起動し、動作していることを確認する** >}}
+{{< spoiler text= roombaドライバを起動し、動作していることを確認する >}}
 
 - jetsonにアクセスする
     ``` sh
@@ -227,8 +227,11 @@ roombaには手がついていないので、MoveIt!の説明は省略。
 - docker containerを起動する  
   余裕があれば`RUN-DOCKER-CONTAINER.sh`ファイルの中身を確認してみましょう。
     ``` sh
-    (jetson):~$ cd ~/team_a/roomba_hack
-    (jetson):~/team_a/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
+    (jetson):~$ cd ~/group_x/roomba_hack
+
+    (jetson):~/group_x/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
+    # このファイルを実行することでdockerコンテナを作成し、コンテナの中に入っている。
+
     root@roomba-dev-jetson:~/roomba_hack#
     ```
   `root@roomba-dev-jetson:~/roomba_hack#`などと表示されればdocker内部に入れています。
@@ -245,23 +248,46 @@ roombaには手がついていないので、MoveIt!の説明は省略。
 {{< /spoiler >}}
 
 
-{{< spoiler text= **コントローラーを使ってロボットを動かす** >}}
+{{< spoiler text= コントローラーを使ってロボットを動かす >}}
 
 - 開発PCでdocker containerを起動する  
   xにはroomba_devの後につく数字を入れてください。
 
-    ``` sh
-    (開発PC):~$ cd ~/team_a/roomba_hack
-    (開発PC):~/team_a/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
+    ```sh
+    (開発PC):~$ cd ~/group_x/roomba_hack
+    (開発PC):~/group_x/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
     ```
+    先ほどはjetson内でdockerコンテナを起動しましたが、今回は開発PC内でdockerコンテナを起動します。
+    このとき、引数にjetsonのIPアドレスを入れることで、jetson内のROSマスタに(前述)、開発PCからアクセスできるようにしています。
     
+- パッケージのビルド
+  ```sh
+  (開発PC)(docker):~/roomba_hack# cd catkin_ws
+  
+  (開発PC)(docker):~/roomba_hack/catkin_ws# ls
+  # catkin_ws内に存在するディレクトリを確認する。
+
+  (開発PC)(docker):~/roomba_hack/catkin_ws# catkin_make
+  # いろいろな出力が生成される。
+
+  (開発PC)(docker):~/roomba_hack/catkin_ws# ls
+  # 再度catkin_ws内に存在するディレクトリを確認する。
+  ```
+  ここで、buildとdevelというディレクトリが生成されていると、うまくいっています。  
+  - build  
+    C++のコードを用いる際に、コンパイルされたファイルが生成されるディレクトリ。pythonを使っているときにはほとんど意識しない。
+  - devel  
+    様々なファイルを含んでいるが、特にsetupファイルが重要。  
+    このファイルを実行することで、現在いるワークスペースに含まれるコードを使用するようにROSの環境が設定される。  
+  ```sh
+  (開発PC)(docker):~/roomba_hack/catkin_ws# source devel/setup.bash
+  # setupファイルを実行
+  ```
+
 - コントローラーを起動  
   コントローラーが開発PCに刺さってることを確認してください。
     ``` sh
-    (開発PC)(docker):~/roomba_hack# cd catkin_ws
-    (開発PC)(docker):~/roomba_hack/catkin_ws# catkin_make
-    (開発PC)(docker):~/roomba_hack/catkin_ws# source devel/setup.bash
-    (開発PC)(docker):~/roomba_hack/catkin_ws#roslaunch roomba_teleop teleop.launch
+    (開発PC)(docker):~/roomba_hack/catkin_ws# roslaunch roomba_teleop teleop.launch
     ```
 
 - コントローラのモード
@@ -282,22 +308,31 @@ roombaには手がついていないので、MoveIt!の説明は省略。
   
   すでに開発PCで起動されているdockerコンテナに入る場合は、
   
-  ``` sh
+  ```sh
   (開発PC):~/group_a/roomba_hack$ docker exec -it roomba_hack bash
   ```
   または
-  ``` sh
+  ```sh
   (開発PC):~/group_a/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
   ```
   のいずれかの方法で入ることができます。
    
   さまざまなコマンドを使ってroombaの情報を取得してみましょう。
-    ``` sh
+    ```sh
     (開発PC)(docker):~/roomba_hack# rosnode list
+    # ノードの一覧を表示する
+
     (開発PC)(docker):~/roomba_hack# rostopic list
+    # トピックの一覧を表示する
+
     (開発PC)(docker):~/roomba_hack# rostopic echo /cmd_vel
+    # /cmd_velというトピックの中身を表示する
+
     (開発PC)(docker):~/roomba_hack# rqt_graph
+    # ノードとトピックの関係を表示
+
     (開発PC)(docker):~/roomba_hack# rviz
+    # rvizを起動
     ```
 
 {{< /spoiler >}}
