@@ -1,6 +1,6 @@
 ---
 title: ROSとは
-date: '2022-05-11'
+date: '2023-06-06'
 type: book
 weight: 21
 ---
@@ -88,19 +88,21 @@ ROSはそのようなプログラム間の通信に必要な機能を提供し�
 
 - サービス(service)
 
-    - 「サービス(service)」も、ノードが他のノードと通信するための手段の一つです。少しだけtopicより複雑な通信の仕方を提供します. 
+    - 「サービス(service)」も、ノードが他のノードと通信するための手段の一つです。topicより少し複雑な通信の仕方を提供します. 
     - サービスには、サービスを提供するノード（service server）とサービスを要求するノード(service client)があります。  
     - サービスは以下のような流れで使用されます。
 
-      1. service clientがservice serverに引数を渡す。
-      1. 引数を受け取ったservice serverが何らかのプログラムを実行する。
-      1. service serverは行為の結果を返り値としてservice clientに返す。
-      1. service clientはその返り値に応じて後の挙動を変える。
+      1. clientがserverに引数を渡す。
+      1. 引数を受け取ったserverが何らかのプログラムを実行する。
+      1. serverは行為の結果を返り値としてclientに返す。
+      1. clientはその返り値に応じて後の挙動を変える。
 
+      {{< figure src="../ros_service.png">}}
+    
     - サービスにおいて送受信されるデータの型は.srvファイルに記述されています。
     - メッセージと同様使用言語に依存しないデータ形式ですが、メッセージと異なるのは、引数と戻り値の二つの形式を定義する必要があるところです。
 
-    - 以下に、srvの例として`std_srvs/SetBool`を示します。
+    - 以下に、srvの例として`std_srvs/SetBool`を示します。  
       このように引数と戻り値の間に`---`を入れて定義します。
       ```
       bool data
@@ -108,14 +110,13 @@ ROSはそのようなプログラム間の通信に必要な機能を提供し�
       bool success
       string message
       ```
-
-    - service通信のイメージ
-      {{< figure src="../ros_service.png">}}
+      
 
 - アクション(action)
 
     - アクションもノード間通信の一つの手段です。serviceよりもさらに複雑な通信ができます。  
-    - トピックやサービスほど頻繁には使われないので、ここでは説明を省略します。
+    - サービスは動作の終了時にのみserverからclientに結果を返すのに対し、アクションは動作の途中経過をclientに渡すことができます。
+    - ここでは詳しい説明を省略します。
 
 - ROSマスタ(ROS master)
 
@@ -142,23 +143,13 @@ ROSはそのようなプログラム間の通信に必要な機能を提供し�
     {{< figure src="../ros_communication.png" caption="ROS通信" >}}
 -->
 
-<!-- ### デバイスドライバ
-
-- カメラ
-- LiDAR
-- IMU -->
-
 ### ROSと連動するソフトウェア
-ROSは以下のようなソフトウェアと連動して使うためのパッケージを提供しています。簡単な説明にとどめるので、詳しい使い方は必要になったときに勉強してください。  
+ROSは以下のようなソフトウェアと連動して使うためのパッケージを提供しています。簡単な説明にとどめるので、詳しい使い方は必要になった際に調べてください。  
 
 - OpenCV
     
     豊富な機能を持つ2D画像処理用のライブラリです。
     カメラで撮影した画像を処理する際に使用します。
-
-    <!--
-    OpenCVのデータ形式である、MatクラスとROSのメッセージ形式を変換するcv_bridgeや３次元座標上の物体を２次元画像上に投影する機能であるimage_geometryといったパッケージ(vision_opencv)が提供されています。
-    -->
 
 - PCL(Point Cloud Library)
 
@@ -179,7 +170,7 @@ roombaには手がついていないので、MoveIt!の説明は省略。
 - **Move it**
 -->
 
-これ以外にも本当にたくさんのツールがROSと連動しています。
+これ以外にも多くのツールがROSと連動しています。
 
 ### 可視化ツール
 
@@ -216,108 +207,125 @@ roombaには手がついていないので、MoveIt!の説明は省略。
 -  -->
 
 ## 演習
-{{< spoiler text= roombaドライバを起動し、動作していることを確認する >}}
 
-- jetsonにアクセスする
+{{< spoiler text= roombaドライバを起動し、動作することを確認する >}}
+
+1. jetsonにアクセスする
     ``` sh
     (開発PC):~$ ssh roomba_dev1
     (jetson):~$
     ```
 
-- docker containerを起動する  
-  余裕があれば`RUN-DOCKER-CONTAINER.sh`ファイルの中身を確認してみましょう。
+1. dockerコンテナを起動する  
+    <!--余裕があれば`RUN-DOCKER-CONTAINER.sh`ファイルの中身を確認してみましょう。-->
     ``` sh
-    (jetson):~$ cd ~/group_x/roomba_hack
+    (jetson):~$ cd ~/23_group_x/roomba_hack
 
-    (jetson):~/group_x/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
-    # このファイルを実行することでdockerコンテナを作成し、コンテナの中に入っている。
+    (jetson):~/23_group_x/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
+    # このファイルを実行することでdockerコンテナを作成し、コンテナの中に入る。
 
     root@roomba-dev-jetson:~/roomba_hack#
+    # 上のように表示されればコンテナ内部に入れています。
     ```
-  `root@roomba-dev-jetson:~/roomba_hack#`などと表示されればdocker内部に入れています。
   
-  今後docker内部であることは(docker)と表記します。
+    今後docker内部であることは(docker)と表記します。
 
-- roomba driverなどを起動するlaunchファイルを起動する  
-  このタイミングでルンバの電源が入っているかを確認しておきましょう。
+1. roomba driverなどを起動するlaunchファイルを実行する  
+    このタイミングでルンバの電源が入っているかを確認しておきましょう。
     ``` sh
     (jetson)(docker):~/roomba_hack# roslaunch roomba_bringup bringup.launch
     ```
-  起動に成功すればルンバからピッと短い音が鳴り、ターミナルには赤い文字が出続けるはずです。
+    起動に成功すればルンバからピッと短い音が鳴り、ターミナルには赤い文字が出続けるはずです。
 
 {{< /spoiler >}}
 
+{{< spoiler text= 開発PCでdockerコンテナを起動する >}}
+1. 開発PCでdockerコンテナを起動する  
+
+    ```sh
+    (開発PC):~$ cd ~/23_group_x/roomba_hack
+
+    (開発PC):~/23_group_x/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
+    # xにはroomba_devの後につく数字を入れてください。
+    ```
+    - 先ほどjetson内でdockerコンテナを起動しましたが、今回は開発PC内でコンテナを起動します。  
+    - このとき引数にjetsonのIPアドレスを入れることで、jetson内のROSマスタ(前述)に、開発PCからアクセスできるようにしています。
+
+1. パッケージのビルド
+
+    ```sh
+    (開発PC)(docker):~/roomba_hack# cd catkin_ws
+    
+    (開発PC)(docker):~/roomba_hack/catkin_ws# ls
+    # catkin_ws内に存在するディレクトリを確認する。
+
+    (開発PC)(docker):~/roomba_hack/catkin_ws# catkin_make
+    # いろいろな出力が生成される。
+
+    (開発PC)(docker):~/roomba_hack/catkin_ws# ls
+    # 再度catkin_ws内に存在するディレクトリを確認する。
+    ```
+
+    ここで、buildとdevelというディレクトリが生成されていると、うまくいっています。  
+    - build  
+      C++のコードを用いる際に、コンパイルされたファイルが生成されるディレクトリ。pythonを使っているときにはほとんど意識しない。
+    - devel  
+      様々なファイルを含んでいるが、特にsetupファイルが重要。  
+      このファイルを実行することで、現在いるワークスペースに含まれるコードを使用するようにROSの環境が設定される。  
+
+1. setupファイルを実行する
+
+    ```sh
+    (開発PC)(docker):~/roomba_hack/catkin_ws# source devel/setup.bash
+    # setupファイルを実行
+    ```
+
+{{< /spoiler >}}
 
 {{< spoiler text= コントローラーを使ってロボットを動かす >}}
 
-- 開発PCでdocker containerを起動する  
-  xにはroomba_devの後につく数字を入れてください。
-
-    ```sh
-    (開発PC):~$ cd ~/group_x/roomba_hack
-    (開発PC):~/group_x/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
-    ```
-    先ほどはjetson内でdockerコンテナを起動しましたが、今回は開発PC内でdockerコンテナを起動します。
-    このとき、引数にjetsonのIPアドレスを入れることで、jetson内のROSマスタに(前述)、開発PCからアクセスできるようにしています。
-    
-- パッケージのビルド
-  ```sh
-  (開発PC)(docker):~/roomba_hack# cd catkin_ws
-  
-  (開発PC)(docker):~/roomba_hack/catkin_ws# ls
-  # catkin_ws内に存在するディレクトリを確認する。
-
-  (開発PC)(docker):~/roomba_hack/catkin_ws# catkin_make
-  # いろいろな出力が生成される。
-
-  (開発PC)(docker):~/roomba_hack/catkin_ws# ls
-  # 再度catkin_ws内に存在するディレクトリを確認する。
-  ```
-  ここで、buildとdevelというディレクトリが生成されていると、うまくいっています。  
-  - build  
-    C++のコードを用いる際に、コンパイルされたファイルが生成されるディレクトリ。pythonを使っているときにはほとんど意識しない。
-  - devel  
-    様々なファイルを含んでいるが、特にsetupファイルが重要。  
-    このファイルを実行することで、現在いるワークスペースに含まれるコードを使用するようにROSの環境が設定される。  
-  ```sh
-  (開発PC)(docker):~/roomba_hack/catkin_ws# source devel/setup.bash
-  # setupファイルを実行
-  ```
-
 - コントローラーを起動  
-  コントローラーが開発PCに刺さってることを確認してください。
+  コントローラーが開発PCに接続されていることを確認してください。
     ``` sh
     (開発PC)(docker):~/roomba_hack/catkin_ws# roslaunch roomba_teleop teleop.launch
     ```
 
-- コントローラのモード
-    - 移動・停止 
-    - 自動・マニュアル
-    - ドッキング・アンドッキング
+  - コントローラのモード
+      - 移動・停止 
+      - 自動・マニュアル
+      - ドッキング・アンドッキング
 
-- コントローラによる操縦
-    - 移動ロック解除
-        L1を押している時のみ移動コマンドが動作します。
-    - 左ジョイスティック
-        縦方向で前進速度(手前に倒すとバック)、横方向は回転速度に対応しています。
-    - 左矢印
-        それぞれ、一定に低速度で前進・後退・回転します。
+  - コントローラによる操縦
+      - 移動ロック解除
+          L1を押している時のみ移動コマンドが動作します。
+      - 左ジョイスティック
+          縦方向で前進速度(手前に倒すとバック)、横方向は回転速度に対応しています。
+      - 左矢印
+          それぞれ、一定に低速度で前進・後退・回転します。
 
-- 正常に起動できているかを確認  
-  開発PCで新しくターミナルを開いてdockerの中に入ります。
-  
-  すでに開発PCで起動されているdockerコンテナに入る場合は、
-  
-  ```sh
-  (開発PC):~/group_a/roomba_hack$ docker exec -it roomba_hack bash
-  ```
-  または
-  ```sh
-  (開発PC):~/group_a/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
-  ```
-  のいずれかの方法で入ることができます。
+{{< /spoiler >}}
+
+
+{{< spoiler text= Roombaの情報を取得する >}}
+
+1. 開発PCの新しいターミナルでdockerコンテナに入る  
+
+    bringup.launch及びteleop.launchを実行したターミナルは実行中のプログラムに占領されているので、開発PCで新しくターミナルを開いてコンテナの中に入ります。  
+    すでに開発PCで起動されているコンテナに入る場合は、
+    
+    ```sh
+    (開発PC):~/23_group_x/roomba_hack$ docker exec -it roomba_hack bash
+    # docker exec -it <コンテナ名> bash で起動中のコンテナに入ることができる。
+    ```
+    または
+    ```sh
+    (開発PC):~/23_group_x/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
+    ```
+    のいずれかのコマンドで入ることができます。
    
-  さまざまなコマンドを使ってroombaの情報を取得してみましょう。
+1. Roombaの情報を取得する  
+
+    さまざまなコマンドを使ってRoombaの情報を取得してみましょう。  
     ```sh
     (開発PC)(docker):~/roomba_hack# rosnode list
     # ノードの一覧を表示する
@@ -327,6 +335,7 @@ roombaには手がついていないので、MoveIt!の説明は省略。
 
     (開発PC)(docker):~/roomba_hack# rostopic echo /cmd_vel
     # /cmd_velというトピックの中身を表示する
+    # teleop.launchを実行している状態でコントローラーを操作すると、/cmd_velの中身が変化することがわかる。
 
     (開発PC)(docker):~/roomba_hack# rqt_graph
     # ノードとトピックの関係を表示
@@ -336,3 +345,29 @@ roombaには手がついていないので、MoveIt!の説明は省略。
     ```
 
 {{< /spoiler >}}
+
+{{< spoiler text= プロセスの終了・dockerコンテナから出る >}}
+
+  1. プロセスの終了  
+      一部のプログラムは終了するまで処理を続けるため、明示的に終了させる必要があります。
+
+      多くのプログラムは`Ctrl+C`で終了します。
+
+  1. dockerコンテナ・ターミナルから出る
+
+      コマンドライン上で
+
+      ```shell
+      exit
+      ```
+
+      を実行することで、
+
+      - コンテナの中にいる場合はコンテナ外にでる。
+      - sshしている場合はsshを終了する。
+      - ターミナルを使用している場合はターミナルを終了する。
+
+      ことができます。また、`Ctrl+D`でも同様のことができます。
+
+{{< /spoiler >}}
+
