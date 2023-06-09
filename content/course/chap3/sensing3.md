@@ -67,7 +67,7 @@ rvizでLiDARのスキャン結果を可視化してみましょう．
 
 #### LiDARを使って障害物を回避しよう
 
-それでは，LiDARスキャン`/scen`の情報を使った制御の実装の例として`navigation_tutorial`パッケージの中の`avoidance.py`を見てみましょう（[github](https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/avoidance.py)）．
+それでは，LiDARスキャン`/scan`の情報を使った制御の実装の例として`navigation_tutorial`パッケージの中の`avoidance.py`を見てみましょう（[github](https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/avoidance.py)）．
 
 このプログラムでは，LiDARを使って進行方向に存在する障害物を見つけ，それを回避しながら進むようにロボットを制御しています．具体的には，
 
