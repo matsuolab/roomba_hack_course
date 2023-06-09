@@ -265,7 +265,7 @@ float32[] intensities
 LiDARスキャンをrvizで可視化
 &lt;/figcaption>&lt;/figure>
 &lt;h4 id="lidarを使って障害物を回避しよう">LiDARを使って障害物を回避しよう&lt;/h4>
-&lt;p>それでは，LiDARスキャン&lt;code>/scen&lt;/code>の情報を使った制御の実装の例として&lt;code>navigation_tutorial&lt;/code>パッケージの中の&lt;code>avoidance.py&lt;/code>を見てみましょう（&lt;a href="https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/avoidance.py" target="_blank" rel="noopener">github&lt;/a>）．&lt;/p>
+&lt;p>それでは，LiDARスキャン&lt;code>/scan&lt;/code>の情報を使った制御の実装の例として&lt;code>navigation_tutorial&lt;/code>パッケージの中の&lt;code>avoidance.py&lt;/code>を見てみましょう（&lt;a href="https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/avoidance.py" target="_blank" rel="noopener">github&lt;/a>）．&lt;/p>
 &lt;p>このプログラムでは，LiDARを使って進行方向に存在する障害物を見つけ，それを回避しながら進むようにロボットを制御しています．具体的には，&lt;/p>
 &lt;ul>
 &lt;li>ロボットの進行方向に物体がなかったら直進&lt;/li>
