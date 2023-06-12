@@ -6,7 +6,8 @@
 <button class="form-control sidebar-search js-search d-none d-md-flex">
 <i class="fas fa-search pr-2"></i>
 <span class=sidebar-search-text>Search...</span>
-<span class=sidebar-search-shortcut>/</span></button></form><nav class="collapse docs-links" id=docs-nav><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/>ロボットシステム入門</a></li><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap1/><i class="fas fa-book pr-1"></i>Chapter 1</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap1/%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83/>開発環境</a></li><li><a href=/roomba_hack_course/course/chap1/ros/>ROSとは</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap2/><i class="fas fa-book pr-1"></i>Chapter 2</a><ul class="nav docs-sidenav"><li class=active><a href=/roomba_hack_course/course/chap2/rosbasic/>ROSのパッケージ・ワークスペース</a></li><li><a href=/roomba_hack_course/course/chap2/sensing1/>ロボットシステムにおけるセンシング・アクチュエーション・通信①</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap3/><i class="fas fa-book pr-1"></i>Chapter 3</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap3/sensing2/>ロボットシステムにおけるセンシング・アクチュエーション・通信②</a></li><li><a href=/roomba_hack_course/course/chap3/sensing3/>ロボットシステムにおけるセンシング・アクチュエーション・通信③</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap4/><i class="fas fa-book pr-1"></i>Chapter 4</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap4/localization/>自己位置推定</a></li><li><a href=/roomba_hack_course/course/chap4/navigation/>ナビゲーション</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap5/><i class="fas fa-book pr-1"></i>Chapter 5</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap5/three-dimensions/>三次元画像処理</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap6/><i class="fas fa-book pr-1"></i>Chapter 6</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap6/service-actionlib/>serviceとactionlib</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap7/><i class="fas fa-book pr-1"></i>Chapter 7</a></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap8/><i class="fas fa-book pr-1"></i>Chapter 8</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap8/final_project/>最終プロジェクト</a></li></ul></div></ul></nav></div><div class="d-none d-xl-block col-xl-2 docs-toc"><ul class="nav toc-top"><li><a href=# id=back_to_top class=docs-toc-title>Contents</a></li></ul><nav id=TableOfContents><ul><li><a href=#learn>Learn</a><ul><li><a href=#rosのパッケージ>ROSのパッケージ</a></li><li><a href=#rosのワークスペース>ROSのワークスペース</a></li><li><a href=#rosのコマンド>ROSのコマンド</a></li><li><a href=#rosのプログラムの書き方>ROSのプログラムの書き方</a></li></ul></li><li><a href=#演習>演習</a><ul><li><a href=#rosメッセージの可視化>ROSメッセージの可視化</a></li></ul></li></ul></nav></div><main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 docs-content" role=main><article class=article><div class=docs-article-container><nav class="d-none d-md-flex" aria-label=breadcrumb><ol class=breadcrumb><li class=breadcrumb-item><a href=/roomba_hack_course/>Home</a></li><li class=breadcrumb-item><a href=/roomba_hack_course/course/>ロボットシステム入門</a></li><li class=breadcrumb-item><a href=/roomba_hack_course/course/chap2/>Chapter 2</a></li><li class="breadcrumb-item active" aria-current=page>ROSのパッケージ・ワークスペース</li></ol></nav><h1>ROSのパッケージ・ワークスペース</h1><div class=article-style><p>ROSのパッケージ管理について理解しよう</p><h2 id=learn>Learn</h2><h3 id=rosのパッケージ>ROSのパッケージ</h3><p>ROSでは、特定の目的のためのプログラム群をまとめてパッケージとして管理する。</p><p>例として、navigation_tutorialパッケージのファイル構成を示す。</p><pre><code>navigation_tutorial
+<span class=sidebar-search-shortcut>/</span></button></form><nav class="collapse docs-links" id=docs-nav><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/>ロボットシステム入門</a></li><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap1/><i class="fas fa-book pr-1"></i>Chapter 1</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap1/%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83/>開発環境</a></li><li><a href=/roomba_hack_course/course/chap1/ros/>ROSとは</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap2/><i class="fas fa-book pr-1"></i>Chapter 2</a><ul class="nav docs-sidenav"><li class=active><a href=/roomba_hack_course/course/chap2/rosbasic/>ROSのパッケージ・ワークスペース</a></li><li><a href=/roomba_hack_course/course/chap2/sensing1/>ロボットシステムにおけるセンシング・アクチュエーション・通信①</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap3/><i class="fas fa-book pr-1"></i>Chapter 3</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap3/sensing2/>ロボットシステムにおけるセンシング・アクチュエーション・通信②</a></li><li><a href=/roomba_hack_course/course/chap3/sensing3/>ロボットシステムにおけるセンシング・アクチュエーション・通信③</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap4/><i class="fas fa-book pr-1"></i>Chapter 4</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap4/localization/>自己位置推定</a></li><li><a href=/roomba_hack_course/course/chap4/navigation/>ナビゲーション</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap5/><i class="fas fa-book pr-1"></i>Chapter 5</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap5/three-dimensions/>三次元画像処理</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap6/><i class="fas fa-book pr-1"></i>Chapter 6</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap6/service-actionlib/>serviceとactionlib</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap7/><i class="fas fa-book pr-1"></i>Chapter 7</a></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap8/><i class="fas fa-book pr-1"></i>Chapter 8</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap8/final_project/>最終プロジェクト</a></li></ul></div></ul></nav></div><div class="d-none d-xl-block col-xl-2 docs-toc"><ul class="nav toc-top"><li><a href=# id=back_to_top class=docs-toc-title>Contents</a></li></ul><nav id=TableOfContents><ul><li><a href=#learn>Learn</a><ul><li><a href=#rosのパッケージ>ROSのパッケージ</a></li><li><a href=#rosのワークスペース>ROSのワークスペース</a></li><li><a href=#rosのコマンド>ROSのコマンド</a></li><li><a href=#rosのプログラムの書き方>ROSのプログラムの書き方</a></li></ul></li><li><a href=#演習>演習</a><ul><li><a href=#rosメッセージの可視化>ROSメッセージの可視化</a></li></ul></li></ul></nav></div><main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 docs-content" role=main><article class=article><div class=docs-article-container><nav class="d-none d-md-flex" aria-label=breadcrumb><ol class=breadcrumb><li class=breadcrumb-item><a href=/roomba_hack_course/>Home</a></li><li class=breadcrumb-item><a href=/roomba_hack_course/course/>ロボットシステム入門</a></li><li class=breadcrumb-item><a href=/roomba_hack_course/course/chap2/>Chapter 2</a></li><li class="breadcrumb-item active" aria-current=page>ROSのパッケージ・ワークスペース</li></ol></nav><h1>ROSのパッケージ・ワークスペース</h1><div class=article-style><p>ROSのパッケージ管理について理解しよう</p><h2 id=learn>Learn</h2><h3 id=rosのパッケージ>ROSのパッケージ</h3><p>ROSでは、特定の機能やタスクを実現するためのコードやファイルををまとめてパッケージとして管理します。
+各パッケージは独立して開発・保守され、他のパッケージと組み合わせて使用することができます。また、各パッケージが独立していることで、一度開発した機能を他のプロジェクトで再利用することも容易になります。</p><p>例として、navigation_tutorialパッケージのファイル構成を示します。</p><pre><code>navigation_tutorial
    ├── CMakeLists.txt
    ├── launch
    │   ├── amcl.launch
@@ -34,10 +35,18 @@
        ├── avoidance.cpp
        └── go_straight.cpp
 
-</code></pre><p>一般的に、<code>scripts</code>ディレクトリや<code>src</code>ディレクトリにそれぞれPython, C++のプログラムが配置される。</p><p>作成したプログラムは<code>rosrun</code>コマンドで実行することができる。</p><pre><code class=language-shell>(Python) rosrun navigation_tutorial simple_control2.py
-(C++) rosrun navigation_tutorial go_straight
-</code></pre><p><code>launch</code>ディレクトリに入っているlaunchファイルは複数のプログラムを同時に実行できるための仕組みである。</p><p>launchファイルについてでも同様に<code>roslaunch</code>コマンドで実行することができる。</p><pre><code class=language-shell>roslaunch navigation_tutorial move_base.launch
-</code></pre><p>実行時にパッケージ名(今回だとnavigation_tutorial)を指定するので、現在どこのディレクトリにいるかに関係なく実行が可能である。</p><h3 id=rosのワークスペース>ROSのワークスペース</h3><p>ROSのパッケージはワークスペースと呼ばれる作業スペースに配置される。</p><p>一般的に<code>catkin_ws</code>という名前が使われることが多い。</p><p>catkin_wsのファイル構成を示す。</p><pre><code>catkin_ws
+</code></pre><details class=spoiler id=spoiler-0><summary>scriptsディレクトリ、srcディレクトリの役割</summary><p><p>一般的に、<code>scripts</code>ディレクトリ内にpythonのプログラムが、<code>src</code>ディレクトリ内にC++のプログラムが配置されます。</p><p>作成したプログラムは<code>rosrun</code>コマンドで実行することができます。</p><pre><code class=language-shell>$ rosrun &lt;package name&gt; &lt;file name&gt;
+
+# pythonファイルの場合
+$ rosrun navigation_tutorial simple_control2.py
+
+# C++ファイルの場合
+$ rosrun navigation_tutorial go_straight
+</code></pre><p>実行時にパッケージ名を指定するので、現在どこのディレクトリにいるかに関係なく実行が可能です。</p></p></details><details class=spoiler id=spoiler-1><summary>launchディレクトリの役割</summary><p><p><code>launch</code>ディレクトリにはlaunchファイルが配置されています。<br>launchファイルは複数のROSノードを一括で起動するための設定が書かれたファイルです。複数のノードを起動したい時に、必要なファイルを一つ一つコマンドラインで実行していくことは大変ですが、launchファイルを用いることで一括で起動することができます。</p><p>launchファイルは<code>roslaunch</code>コマンドで実行することができます。</p><pre><code class=language-shell>$ roslaunch &lt;package name&gt; &lt;launch file name&gt;
+
+# 例
+$ roslaunch navigation_tutorial move_base.launch
+</code></pre><p>.pyファイルや.cppファイルと同様、実行時にパッケージを指定するので、現在どこのディレクトリにいるかに関係なく実行が可能です。</p></p></details><h3 id=rosのワークスペース>ROSのワークスペース</h3><p>新しいROSのパッケージの開発は、一般にワークスペースと呼ばれる作業スペースのもとで行われます。<br>ワークスペースは、パッケージのビルドや実行に必要なファイルをまとめて管理するためのディレクトリです。<code>catkin_make</code>コマンドを実行することで作成することができます。ワークスペースのディレクトリ名は任意ですが、よく<code>catkin_ws</code>という名前が使われます。</p><p>roomba_hackリポジトリ下にあるcatkin_wsのファイル構成を示します。</p><pre><code>catkin_ws
    ├── build
    ├── devel
    └── src
@@ -72,24 +81,27 @@
                ├── launch
                ├── package.xml
                └── src
-</code></pre><p>catkin_wsのsrc内でパッケージ作成を行い、catkin_ws直下で<code>catkin_make</code>コマンドを実行すると、Cプログラムのビルドが行われ、buildディレクトリとdevelディレクトリが作成される。</p><p>作成されたdevelディレクトリの中のsetup.bashをソース<code>source devel/setup.bash</code>することで、ワークスペース内のパッケージのパスを通すことができる。　</p><p>パッケージのパスを通すことで、ROSのパッケージに関するコマンドや、プログラムの実行(<code>rosrun</code>や<code>roslaunch</code>)が行えるようになる。</p><h3 id=rosのコマンド>ROSのコマンド</h3><p>ROSのコマンドのうち、よく用いるものを紹介する。</p><ul><li>Topic関連</li></ul><pre><code>rostopic list                 　　　　　　   topicの一覧を表示する
-rostopic echo &lt;topic name&gt;   　 　　　　　   指定されたtopicの中身を表示する
-rostopic hz &lt;topic name&gt;      　　　　　　　  topicの配信周波数を取得する
-rostopic info &lt;topic name&gt;    　　　　　　　  topicの情報を表示する
-rostopic pub &lt;topic name&gt; &lt;topic&gt; 　 　topicを配信する
-rostopic type &lt;topic name&gt;          topicの型を確認する  
-</code></pre><ul><li>Node関連</li></ul><pre><code>rosnode list                nodeの一覧を表示する
-rosnode ping &lt;node name&gt;    nodeの接続テストを行う
-rosnode info &lt;node name&gt;    nodeの情報を表示する
-rosnode kill &lt;node name&gt;    nodeをシャットダウンする
-</code></pre><ul><li>Package関連</li></ul><pre><code>rospack list             packageの一覧を表示する
-roscd &lt;package name&gt;     指定したpackage内に移動する
-</code></pre><h3 id=rosのプログラムの書き方>ROSのプログラムの書き方</h3><p>それでは実際にプログラム例を見てみましょう。</p><pre><code class=language-python:simple_control.py>#!/usr/bin/env python3
+</code></pre><p>catkin_ws内でよく使用される<code>catkin_make</code>コマンドについて説明します。</p><pre><code class=language-shell>$ cd catkin_ws  # catkin_wsに移動
+$ catkin_make
+</code></pre><p>のように使用します。この時、以下の手順が実行されています。</p><ol><li>ワークスペースのsrcディレクトリ内に配置されたROSパッケージを検出し、ビルド対象として認識する。</li><li>各パッケージの依存関係を解決し、ビルドが必要な場合はコンパイルを行う。</li><li>ビルドが完了したパッケージをdevelディレクトリに配置する。</li></ol><p>また、<code>catkin_make</code>コマンドの実行後に</p><pre><code class=language-shell>$ source devel/setup.bash
+</code></pre><p>を実行することで環境変数に自分が今いるワークスペースのパスを追加することができます。<br>これにより、ワークスペース内のパッケージを使用できるようになります。</p><h3 id=rosのコマンド>ROSのコマンド</h3><p>ROSのコマンドのうち、よく使用するものを紹介します。</p><ul><li><p>Topic関連</p><pre><code>$ rostopic list                 　　　　　　   topicの一覧を表示する
+$ rostopic echo &lt;topic name&gt;   　 　　　　　   指定されたtopicの中身を表示する
+$ rostopic hz &lt;topic name&gt;      　　　　　　　  topicの配信周波数を取得する
+$ rostopic info &lt;topic name&gt;    　　　　　　　  topicの情報を表示する
+$ rostopic pub &lt;topic name&gt; &lt;topic&gt; 　 　topicを配信する
+$ rostopic type &lt;topic name&gt;          topicの型を確認する  
+</code></pre></li><li><p>Node関連</p><pre><code>$ rosnode list                nodeの一覧を表示する
+$ rosnode ping &lt;node name&gt;    nodeの接続テストを行う
+$ rosnode info &lt;node name&gt;    nodeの情報を表示する
+$ rosnode kill &lt;node name&gt;    nodeをシャットダウンする
+</code></pre></li><li><p>Package関連</p><pre><code>$ rospack list             packageの一覧を表示する
+$ roscd &lt;package name&gt;     指定したpackage内に移動する
+</code></pre></li></ul><h3 id=rosのプログラムの書き方>ROSのプログラムの書き方</h3><p>それでは実際にプログラム例を見てみましょう。</p><pre><code class=language-python:simple_control.py>#!/usr/bin/env python3
 
 import rospy
 from geometry_msgs.msg import Twist
 
-def time_control(pub, velocity, yawrate, time):
+def time_control(pub, velocity, yawrate, time):  # (2)
     vel = Twist()
     start_time = rospy.get_rostime().secs
     while(rospy.get_rostime().secs-start_time&lt;time):
@@ -98,7 +110,7 @@ def time_control(pub, velocity, yawrate, time):
         pub.publish(vel)
         rospy.sleep(0.1)
 
-def simple_controller():
+def simple_controller():  # (1)
     rospy.init_node('simple_controller', anonymous=True)
     pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
 
@@ -114,14 +126,14 @@ def simple_controller():
     time_control(pub,  0.0,  0.0, 0.5)
     time_control(pub,  0.0, -0.5, 2.0)
 
-if __name__=='__main__':
+if __name__=='__main__':  # (3)
     try:
         simple_controller()
     except rospy.ROSInitException:
         pass
-</code></pre><p>まずsimple_controller関数内をみていきましょう。</p><p>以下の部分で<code>simple_controller</code>という名前でノードを定義しています。</p><pre><code class=language-python>rospy.init_node('simple_controller', anonymous=True)
-</code></pre><p>以下の部分でPublisher(トピックのpublish)を宣言しています。</p><p>今回の場合は、<code>/cmd_vel</code>トピックを<code>Twist</code>型で送信するPublisherを宣言しています。</p><pre><code class=language-python>pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
-</code></pre><p>続いて、time_control関数です。</p><p>この関数はpublisher、速度、角速度、時間を受け取り、速度指令をpublishします。</p><pre><code class=language-python>def time_control(pub, velocity, yawrate, time):
+</code></pre><details class=spoiler id=spoiler-2><summary>(1) simple_controller関数</summary><p><p>まずsimple_controller関数内をみていきましょう。<br>以下の部分で"simple_controller"という名前のノードを定義しています。</p><pre><code class=language-python>rospy.init_node('simple_controller', anonymous=True)
+</code></pre><p>以下の部分で、このノードがPublisherであることを宣言しています。</p><pre><code class=language-python>pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+</code></pre><p>今回の場合は、<code>/cmd_vel</code>トピックを<code>Twist</code>型で送信するPublisherを宣言しています。</p></p></details><details class=spoiler id=spoiler-3><summary>(2) time_control関数</summary><p><p>続いて、time_control関数です。</p><p>この関数はpublisher、速度、角速度、時間を受け取り、速度指令をpublishします。</p><pre><code class=language-python>def time_control(pub, velocity, yawrate, time):
     vel = Twist()
     start_time = rospy.get_rostime().secs
     while(rospy.get_rostime().secs-start_time&lt;time):
@@ -135,27 +147,29 @@ if __name__=='__main__':
         vel.angular.z = yawrate
         pub.publish(vel)
         rospy.sleep(0.1)
-</code></pre><h2 id=演習>演習</h2><details class=spoiler id=spoiler-0><summary>【jetson・開発マシン】それぞれdockerコンテナを起動</summary><p><p>jetsonでdockerコンテナを起動</p><pre><code class=language-shell>(開発PC):~$ ssh roomba_dev1
+</code></pre></p></details><details class=spoiler id=spoiler-4><summary>(3) グローバル変数__name__を用いたファイルの実行</summary><p><p>(1)や(2)は関数の定義をしているだけで、実際にプログラムを実行した際には</p><pre><code class=language-python>if __name__=='__main__':
+</code></pre><p>以下の部分が実行されます。</p><p>__name__はpythonの特殊な変数の一つで、ファイル実行時に自動で設定されます。
+pythonのプログラムはコマンドで直接実行するか、importで他のプログラムから参照されるかのいずれかの方法により実行されますが、__name__はこの実行方法によって値が変わります。</p><ul><li>直接実行された場合、__name__には<code>__main__</code>と言う文字列が代入されます。</li><li>importされた場合、__name__にはファイル名が代入されます。</li></ul><p>この性質を利用し、ファイルが直接実行された場合のみ実行したい処理をif文で囲んでいます。<br>大抵の場合、rosのプログラムでは、上に挙げたファイルのように、関数やクラスの定義と実際にプログラムを実行する部分を分けて記述します。</p></p></details><h2 id=演習>演習</h2><details class=spoiler id=spoiler-5><summary>【jetson・開発マシン】それぞれdockerコンテナを起動</summary><p><p>jetsonでdockerコンテナを起動</p><pre><code class=language-shell>(開発PC):~$ ssh roomba_dev1
 (jetson):~$ cd ~/group_a/roomba_hack
 (jetson):~/group_a/roomba_hack ./RUN-DOCKER-CONTAINER.sh
 (jetson)(docker):~/roomba_hack#  
 </code></pre><p>開発PCでdockerコンテナを起動</p><pre><code class=language-shell>(開発PC):~$ cd ~/group_a/roomba_hack
 (開発PC):~/group_a/roomba_hack ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
 (開発PC)(docker):~/roomba_hack#  
-</code></pre></p></details><details class=spoiler id=spoiler-1><summary>【jetson・開発マシン】ビルドをしてパスを通す</summary><p><p>catkin_make後に<code>devel</code>と<code>build</code>ディレクトリが作成されることを確認しましょう。</p><pre><code class=language-shell>(開発PC)(docker):~/roomba_hack# cd catkin_ws
+</code></pre></p></details><details class=spoiler id=spoiler-6><summary>【jetson・開発マシン】ビルドをしてパスを通す</summary><p><p>catkin_make後に<code>devel</code>と<code>build</code>ディレクトリが作成されることを確認しましょう。</p><pre><code class=language-shell>(開発PC)(docker):~/roomba_hack# cd catkin_ws
 (開発PC)(docker):~/roomba_hack/catkin_ws# rm -rf devel build
 (開発PC)(docker):~/roomba_hack/catkin_ws# ls
 (開発PC)(docker):~/roomba_hack/catkin_ws# catkin_make
 (開発PC)(docker):~/roomba_hack/catkin_ws# ls
 (開発PC)(docker):~/roomba_hack/catkin_ws# source ./devel/setup.bash
-</code></pre></p></details><details class=spoiler id=spoiler-2><summary>【jetson】ROSマスタ、各種ノードを起動</summary><p><pre><code class=language-shell>(jetson)(docker):~/roomba_hack# roslaunch roomba_bringup bringup.launch
-</code></pre></p></details><h3 id=rosメッセージの可視化>ROSメッセージの可視化</h3><details class=spoiler id=spoiler-3><summary>【開発PC】topicの確認</summary><p><p>Topic関連のコマンドのところの<code>rostopic list</code>コマンドを使用してtopic一覧を表示してみましょう</p><pre><code class=language-shell>(開発PC)(docker):~/roomba_hack# rostopic list
+</code></pre></p></details><details class=spoiler id=spoiler-7><summary>【jetson】ROSマスタ、各種ノードを起動</summary><p><pre><code class=language-shell>(jetson)(docker):~/roomba_hack# roslaunch roomba_bringup bringup.launch
+</code></pre></p></details><h3 id=rosメッセージの可視化>ROSメッセージの可視化</h3><details class=spoiler id=spoiler-8><summary>【開発PC】topicの確認</summary><p><p>Topic関連のコマンドのところの<code>rostopic list</code>コマンドを使用してtopic一覧を表示してみましょう</p><pre><code class=language-shell>(開発PC)(docker):~/roomba_hack# rostopic list
 </code></pre><p>特定のtopicの型を確認</p><pre><code class=language-shell>(開発PC)(docker)# rostopic type /camera/color/image_raw
 (開発PC)(docker)# rostopic type /scan
 </code></pre><p>その型が実際にどのような構成をしているのかは<code>rosmsg info &lt;topic type></code>で調べられます。</p><p>参考</p><p>sensor_msgs/LaserScan型 <a href=http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/LaserScan.html>http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/LaserScan.html</a></p><p>sensor_msgs/Image型 <a href=http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/Image.html>http://docs.ros.org/en/noetic/api/sensor_msgs/html/msg/Image.html</a></p><p>特定のtopicの中身を確認</p><pre><code class=language-shell>(開発PC)(docker)# rostopic echo /camera/color/image_raw
 (開発PC)(docker)# rostopic echo /scan
 </code></pre><p>rvizを用いて可視化</p><pre><code class=language-shell>(開発PC)(docker)# rviz
-</code></pre></p></details><details class=spoiler id=spoiler-4><summary>【開発PC】topicのpublish(配信)</summary><p><p>topic<code>/cmd_vel</code>の情報を確認</p><pre><code class=language-shell>(開発PC)(docker)# rostopic info /cmd_vel
+</code></pre></p></details><details class=spoiler id=spoiler-9><summary>【開発PC】topicのpublish(配信)</summary><p><p>topic<code>/cmd_vel</code>の情報を確認</p><pre><code class=language-shell>(開発PC)(docker)# rostopic info /cmd_vel
 </code></pre><p>topic<code>/cmd_vel</code>の型を確認</p><pre><code class=language-shell>(開発PC)(docker)# rostopic type /cmd_vel
 </code></pre><p>geometry_msgs/Twist型 <a href=http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html>http://docs.ros.org/en/noetic/api/geometry_msgs/html/msg/Twist.html</a></p><p>topic<code>/cmd_vel</code>をpublish</p><pre><code class=language-shell>(開発PC)(docker)# rostopic pub /cmd_vel geometry_msgs/Twist &quot;linear:
     x: 1.0
@@ -166,7 +180,7 @@ if __name__=='__main__':
     y: 0.0
     z: 0.0&quot;
 </code></pre><pre><code class=language-shell>(開発PC)(docker)# rosrun navigation_tutorial simple_control.py
-</code></pre></p></details><details class=spoiler id=spoiler-5><summary>Try it! 時間が余った人向け</summary><p><p>try it! <code>roomba_bringup</code>パッケージの<code>bringup.launch</code>の中身を読んでみよう</p><p>hint roscdコマンドを使うとパッケージへ簡単に移動ができます。ファイルの中身を表示するには<code>cat</code>コマンドを使用します。</p><p>try it! 開発PCで<code>rosnode</code>関連のコマンドを使ってみよう</p><p>try it! 開発PCで<code>rosrun rqt_graph rqt_graph</code>を実行してnodeとtopicの関連を可視化してみよう</p><p>try it! 開発PCで<code>simple_control.py</code>の中身を読んでコードを変更してみよう</p><p>hint コードを編集するときはエディタを使うことがおすすめです。新しくターミナルを開いて</p><pre><code class=language-shell>(開発PC):~$ cd group_a/roomba_hack
+</code></pre></p></details><details class=spoiler id=spoiler-10><summary>Try it! 時間が余った人向け</summary><p><p>try it! <code>roomba_bringup</code>パッケージの<code>bringup.launch</code>の中身を読んでみよう</p><p>hint roscdコマンドを使うとパッケージへ簡単に移動ができます。ファイルの中身を表示するには<code>cat</code>コマンドを使用します。</p><p>try it! 開発PCで<code>rosnode</code>関連のコマンドを使ってみよう</p><p>try it! 開発PCで<code>rosrun rqt_graph rqt_graph</code>を実行してnodeとtopicの関連を可視化してみよう</p><p>try it! 開発PCで<code>simple_control.py</code>の中身を読んでコードを変更してみよう</p><p>hint コードを編集するときはエディタを使うことがおすすめです。新しくターミナルを開いて</p><pre><code class=language-shell>(開発PC):~$ cd group_a/roomba_hack
 (開発PC):~group_a/roomba_hack$ code .
 </code></pre><p>でVScodeを起動することができます。</p></p></details></div><div class=article-widget><div class=post-nav><div class=post-nav-item><div class=meta-nav>Next</div><a href=/roomba_hack_course/course/chap2/sensing1/ rel=prev>ロボットシステムにおけるセンシング・アクチュエーション・通信①</a></div></div></div></div><div class=body-footer><p>Last updated on 2022/4/5</p><p class=edit-page><a href=https://github.com/matsuolab/roomba_hack/edit/master/content/course/chap2/ROSbasic.md><i class="fas fa-pen pr-2"></i>Edit this page</a></p></div></article><footer class=site-footer><p class=powered-by>© 2023 Tokyo Robot And Intelligence Lab (TRAIL)</p><p class=powered-by>Published with <a href="https://wowchemy.com/?utm_campaign=poweredby" target=_blank rel=noopener>Wowchemy</a> — the free, <a href=https://github.com/wowchemy/wowchemy-hugo-modules target=_blank rel=noopener>open source</a> website builder that empowers creators.</p></footer></main></div></div></div><div class=page-footer></div><div id=modal class="modal fade" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><h5 class=modal-title>Cite</h5><button type=button class=close data-dismiss=modal aria-label=Close>
 <span aria-hidden=true>&#215;</span></button></div><div class=modal-body><pre><code class="tex hljs"></code></pre></div><div class=modal-footer><a class="btn btn-outline-primary my-1 js-copy-cite" href=# target=_blank><i class="fas fa-copy"></i> Copy</a>

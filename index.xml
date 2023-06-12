@@ -1552,8 +1552,9 @@ L1を押している時のみ移動コマンドが動作します。&lt;/li>
 &lt;/details></description></item><item><title>ROSのパッケージ・ワークスペース</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap2/rosbasic/</link><pubDate>Tue, 05 Apr 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap2/rosbasic/</guid><description>&lt;p>ROSのパッケージ管理について理解しよう&lt;/p>
 &lt;h2 id="learn">Learn&lt;/h2>
 &lt;h3 id="rosのパッケージ">ROSのパッケージ&lt;/h3>
-&lt;p>ROSでは、特定の目的のためのプログラム群をまとめてパッケージとして管理する。&lt;/p>
-&lt;p>例として、navigation_tutorialパッケージのファイル構成を示す。&lt;/p>
+&lt;p>ROSでは、特定の機能やタスクを実現するためのコードやファイルををまとめてパッケージとして管理します。
+各パッケージは独立して開発・保守され、他のパッケージと組み合わせて使用することができます。また、各パッケージが独立していることで、一度開発した機能を他のプロジェクトで再利用することも容易になります。&lt;/p>
+&lt;p>例として、navigation_tutorialパッケージのファイル構成を示します。&lt;/p>
 &lt;pre>&lt;code>navigation_tutorial
    ├── CMakeLists.txt
    ├── launch
@@ -1582,20 +1583,35 @@ L1を押している時のみ移動コマンドが動作します。&lt;/li>
    ├── avoidance.cpp
    └── go_straight.cpp
 &lt;/code>&lt;/pre>
-&lt;p>一般的に、&lt;code>scripts&lt;/code>ディレクトリや&lt;code>src&lt;/code>ディレクトリにそれぞれPython, C++のプログラムが配置される。&lt;/p>
-&lt;p>作成したプログラムは&lt;code>rosrun&lt;/code>コマンドで実行することができる。&lt;/p>
-&lt;pre>&lt;code class="language-shell">(Python) rosrun navigation_tutorial simple_control2.py
-(C++) rosrun navigation_tutorial go_straight
+&lt;details class="spoiler " id="spoiler-0">
+&lt;summary>scriptsディレクトリ、srcディレクトリの役割&lt;/summary>
+&lt;p>&lt;p>一般的に、&lt;code>scripts&lt;/code>ディレクトリ内にpythonのプログラムが、&lt;code>src&lt;/code>ディレクトリ内にC++のプログラムが配置されます。&lt;/p>
+&lt;p>作成したプログラムは&lt;code>rosrun&lt;/code>コマンドで実行することができます。&lt;/p>
+&lt;pre>&lt;code class="language-shell">$ rosrun &amp;lt;package name&amp;gt; &amp;lt;file name&amp;gt;
+# pythonファイルの場合
+$ rosrun navigation_tutorial simple_control2.py
+# C++ファイルの場合
+$ rosrun navigation_tutorial go_straight
 &lt;/code>&lt;/pre>
-&lt;p>&lt;code>launch&lt;/code>ディレクトリに入っているlaunchファイルは複数のプログラムを同時に実行できるための仕組みである。&lt;/p>
-&lt;p>launchファイルについてでも同様に&lt;code>roslaunch&lt;/code>コマンドで実行することができる。&lt;/p>
-&lt;pre>&lt;code class="language-shell">roslaunch navigation_tutorial move_base.launch
+&lt;p>実行時にパッケージ名を指定するので、現在どこのディレクトリにいるかに関係なく実行が可能です。&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-1">
+&lt;summary>launchディレクトリの役割&lt;/summary>
+&lt;p>&lt;p>&lt;code>launch&lt;/code>ディレクトリにはlaunchファイルが配置されています。&lt;br>
+launchファイルは複数のROSノードを一括で起動するための設定が書かれたファイルです。複数のノードを起動したい時に、必要なファイルを一つ一つコマンドラインで実行していくことは大変ですが、launchファイルを用いることで一括で起動することができます。&lt;/p>
+&lt;p>launchファイルは&lt;code>roslaunch&lt;/code>コマンドで実行することができます。&lt;/p>
+&lt;pre>&lt;code class="language-shell">$ roslaunch &amp;lt;package name&amp;gt; &amp;lt;launch file name&amp;gt;
+# 例
+$ roslaunch navigation_tutorial move_base.launch
 &lt;/code>&lt;/pre>
-&lt;p>実行時にパッケージ名(今回だとnavigation_tutorial)を指定するので、現在どこのディレクトリにいるかに関係なく実行が可能である。&lt;/p>
+&lt;p>.pyファイルや.cppファイルと同様、実行時にパッケージを指定するので、現在どこのディレクトリにいるかに関係なく実行が可能です。&lt;/p>
+&lt;/p>
+&lt;/details>
 &lt;h3 id="rosのワークスペース">ROSのワークスペース&lt;/h3>
-&lt;p>ROSのパッケージはワークスペースと呼ばれる作業スペースに配置される。&lt;/p>
-&lt;p>一般的に&lt;code>catkin_ws&lt;/code>という名前が使われることが多い。&lt;/p>
-&lt;p>catkin_wsのファイル構成を示す。&lt;/p>
+&lt;p>新しいROSのパッケージの開発は、一般にワークスペースと呼ばれる作業スペースのもとで行われます。&lt;br>
+ワークスペースは、パッケージのビルドや実行に必要なファイルをまとめて管理するためのディレクトリです。&lt;code>catkin_make&lt;/code>コマンドを実行することで作成することができます。ワークスペースのディレクトリ名は任意ですが、よく&lt;code>catkin_ws&lt;/code>という名前が使われます。&lt;/p>
+&lt;p>roomba_hackリポジトリ下にあるcatkin_wsのファイル構成を示します。&lt;/p>
 &lt;pre>&lt;code>catkin_ws
    ├── build
    ├── devel
@@ -1632,41 +1648,64 @@ L1を押している時のみ移動コマンドが動作します。&lt;/li>
    ├── package.xml
    └── src
 &lt;/code>&lt;/pre>
-&lt;p>catkin_wsのsrc内でパッケージ作成を行い、catkin_ws直下で&lt;code>catkin_make&lt;/code>コマンドを実行すると、Cプログラムのビルドが行われ、buildディレクトリとdevelディレクトリが作成される。&lt;/p>
-&lt;p>作成されたdevelディレクトリの中のsetup.bashをソース&lt;code>source devel/setup.bash&lt;/code>することで、ワークスペース内のパッケージのパスを通すことができる。　&lt;/p>
-&lt;p>パッケージのパスを通すことで、ROSのパッケージに関するコマンドや、プログラムの実行(&lt;code>rosrun&lt;/code>や&lt;code>roslaunch&lt;/code>)が行えるようになる。&lt;/p>
+&lt;p>catkin_ws内でよく使用される&lt;code>catkin_make&lt;/code>コマンドについて説明します。&lt;/p>
+&lt;pre>&lt;code class="language-shell">$ cd catkin_ws # catkin_wsに移動
+$ catkin_make
+&lt;/code>&lt;/pre>
+&lt;p>のように使用します。この時、以下の手順が実行されています。&lt;/p>
+&lt;ol>
+&lt;li>ワークスペースのsrcディレクトリ内に配置されたROSパッケージを検出し、ビルド対象として認識する。&lt;/li>
+&lt;li>各パッケージの依存関係を解決し、ビルドが必要な場合はコンパイルを行う。&lt;/li>
+&lt;li>ビルドが完了したパッケージをdevelディレクトリに配置する。&lt;/li>
+&lt;/ol>
+&lt;p>また、&lt;code>catkin_make&lt;/code>コマンドの実行後に&lt;/p>
+&lt;pre>&lt;code class="language-shell">$ source devel/setup.bash
+&lt;/code>&lt;/pre>
+&lt;p>を実行することで環境変数に自分が今いるワークスペースのパスを追加することができます。&lt;br>
+これにより、ワークスペース内のパッケージを使用できるようになります。&lt;/p>
+&lt;!--
+catkin_wsのsrc内でパッケージ作成を行い、catkin_ws直下で`catkin_make`コマンドを実行すると、Cプログラムのビルドが行われ、buildディレクトリとdevelディレクトリが作成されます。
+作成されたdevelディレクトリの中のsetup.bashをソース
+```
+$ source devel/setup.bash
+```
+することで、ワークスペース内のパッケージのパスを通すことができます。　
+パッケージのパスを通すことで、ROSのパッケージに関するコマンドの使用や、プログラムの実行（`rosrun`, `roslaunch`）ができるようになります。
+-->
 &lt;h3 id="rosのコマンド">ROSのコマンド&lt;/h3>
-&lt;p>ROSのコマンドのうち、よく用いるものを紹介する。&lt;/p>
+&lt;p>ROSのコマンドのうち、よく使用するものを紹介します。&lt;/p>
 &lt;ul>
-&lt;li>Topic関連&lt;/li>
-&lt;/ul>
-&lt;pre>&lt;code>rostopic list 　　　　　　 topicの一覧を表示する
-rostopic echo &amp;lt;topic name&amp;gt; 　 　　　　　 指定されたtopicの中身を表示する
-rostopic hz &amp;lt;topic name&amp;gt; 　　　　　　　 topicの配信周波数を取得する
-rostopic info &amp;lt;topic name&amp;gt; 　　　　　　　 topicの情報を表示する
-rostopic pub &amp;lt;topic name&amp;gt; &amp;lt;topic&amp;gt; 　 　topicを配信する
-rostopic type &amp;lt;topic name&amp;gt; topicの型を確認する
+&lt;li>
+&lt;p>Topic関連&lt;/p>
+&lt;pre>&lt;code>$ rostopic list 　　　　　　 topicの一覧を表示する
+$ rostopic echo &amp;lt;topic name&amp;gt; 　 　　　　　 指定されたtopicの中身を表示する
+$ rostopic hz &amp;lt;topic name&amp;gt; 　　　　　　　 topicの配信周波数を取得する
+$ rostopic info &amp;lt;topic name&amp;gt; 　　　　　　　 topicの情報を表示する
+$ rostopic pub &amp;lt;topic name&amp;gt; &amp;lt;topic&amp;gt; 　 　topicを配信する
+$ rostopic type &amp;lt;topic name&amp;gt; topicの型を確認する
 &lt;/code>&lt;/pre>
-&lt;ul>
-&lt;li>Node関連&lt;/li>
-&lt;/ul>
-&lt;pre>&lt;code>rosnode list nodeの一覧を表示する
-rosnode ping &amp;lt;node name&amp;gt; nodeの接続テストを行う
-rosnode info &amp;lt;node name&amp;gt; nodeの情報を表示する
-rosnode kill &amp;lt;node name&amp;gt; nodeをシャットダウンする
+&lt;/li>
+&lt;li>
+&lt;p>Node関連&lt;/p>
+&lt;pre>&lt;code>$ rosnode list nodeの一覧を表示する
+$ rosnode ping &amp;lt;node name&amp;gt; nodeの接続テストを行う
+$ rosnode info &amp;lt;node name&amp;gt; nodeの情報を表示する
+$ rosnode kill &amp;lt;node name&amp;gt; nodeをシャットダウンする
 &lt;/code>&lt;/pre>
-&lt;ul>
-&lt;li>Package関連&lt;/li>
-&lt;/ul>
-&lt;pre>&lt;code>rospack list packageの一覧を表示する
-roscd &amp;lt;package name&amp;gt; 指定したpackage内に移動する
+&lt;/li>
+&lt;li>
+&lt;p>Package関連&lt;/p>
+&lt;pre>&lt;code>$ rospack list packageの一覧を表示する
+$ roscd &amp;lt;package name&amp;gt; 指定したpackage内に移動する
 &lt;/code>&lt;/pre>
+&lt;/li>
+&lt;/ul>
 &lt;h3 id="rosのプログラムの書き方">ROSのプログラムの書き方&lt;/h3>
 &lt;p>それでは実際にプログラム例を見てみましょう。&lt;/p>
 &lt;pre>&lt;code class="language-python:simple_control.py">#!/usr/bin/env python3
 import rospy
 from geometry_msgs.msg import Twist
-def time_control(pub, velocity, yawrate, time):
+def time_control(pub, velocity, yawrate, time): # (2)
 vel = Twist()
 start_time = rospy.get_rostime().secs
 while(rospy.get_rostime().secs-start_time&amp;lt;time):
@@ -1674,7 +1713,7 @@ vel.linear.x = velocity
 vel.angular.z = yawrate
 pub.publish(vel)
 rospy.sleep(0.1)
-def simple_controller():
+def simple_controller(): # (1)
 rospy.init_node('simple_controller', anonymous=True)
 pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
 time_control(pub, 0.0, 0.0, 0.5)
@@ -1685,21 +1724,27 @@ time_control(pub, 0.0, 0.0, 0.5)
 time_control(pub, 0.0, 0.5, 2.0)
 time_control(pub, 0.0, 0.0, 0.5)
 time_control(pub, 0.0, -0.5, 2.0)
-if __name__=='__main__':
+if __name__=='__main__': # (3)
 try:
 simple_controller()
 except rospy.ROSInitException:
 pass
 &lt;/code>&lt;/pre>
-&lt;p>まずsimple_controller関数内をみていきましょう。&lt;/p>
-&lt;p>以下の部分で&lt;code>simple_controller&lt;/code>という名前でノードを定義しています。&lt;/p>
+&lt;details class="spoiler " id="spoiler-2">
+&lt;summary>(1) simple_controller関数&lt;/summary>
+&lt;p>&lt;p>まずsimple_controller関数内をみていきましょう。&lt;br>
+以下の部分で&amp;quot;simple_controller&amp;quot;という名前のノードを定義しています。&lt;/p>
 &lt;pre>&lt;code class="language-python">rospy.init_node('simple_controller', anonymous=True)
 &lt;/code>&lt;/pre>
-&lt;p>以下の部分でPublisher(トピックのpublish)を宣言しています。&lt;/p>
-&lt;p>今回の場合は、&lt;code>/cmd_vel&lt;/code>トピックを&lt;code>Twist&lt;/code>型で送信するPublisherを宣言しています。&lt;/p>
+&lt;p>以下の部分で、このノードがPublisherであることを宣言しています。&lt;/p>
 &lt;pre>&lt;code class="language-python">pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
 &lt;/code>&lt;/pre>
-&lt;p>続いて、time_control関数です。&lt;/p>
+&lt;p>今回の場合は、&lt;code>/cmd_vel&lt;/code>トピックを&lt;code>Twist&lt;/code>型で送信するPublisherを宣言しています。&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-3">
+&lt;summary>(2) time_control関数&lt;/summary>
+&lt;p>&lt;p>続いて、time_control関数です。&lt;/p>
 &lt;p>この関数はpublisher、速度、角速度、時間を受け取り、速度指令をpublishします。&lt;/p>
 &lt;pre>&lt;code class="language-python">def time_control(pub, velocity, yawrate, time):
 vel = Twist()
@@ -1720,8 +1765,26 @@ vel.angular.z = yawrate
 pub.publish(vel)
 rospy.sleep(0.1)
 &lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-4">
+&lt;summary>(3) グローバル変数__name__を用いたファイルの実行&lt;/summary>
+&lt;p>&lt;p>(1)や(2)は関数の定義をしているだけで、実際にプログラムを実行した際には&lt;/p>
+&lt;pre>&lt;code class="language-python">if __name__=='__main__':
+&lt;/code>&lt;/pre>
+&lt;p>以下の部分が実行されます。&lt;/p>
+&lt;p>__name__はpythonの特殊な変数の一つで、ファイル実行時に自動で設定されます。
+pythonのプログラムはコマンドで直接実行するか、importで他のプログラムから参照されるかのいずれかの方法により実行されますが、__name__はこの実行方法によって値が変わります。&lt;/p>
+&lt;ul>
+&lt;li>直接実行された場合、__name__には&lt;code>__main__&lt;/code>と言う文字列が代入されます。&lt;/li>
+&lt;li>importされた場合、__name__にはファイル名が代入されます。&lt;/li>
+&lt;/ul>
+&lt;p>この性質を利用し、ファイルが直接実行された場合のみ実行したい処理をif文で囲んでいます。&lt;br>
+大抵の場合、rosのプログラムでは、上に挙げたファイルのように、関数やクラスの定義と実際にプログラムを実行する部分を分けて記述します。&lt;/p>
+&lt;/p>
+&lt;/details>
 &lt;h2 id="演習">演習&lt;/h2>
-&lt;details class="spoiler " id="spoiler-0">
+&lt;details class="spoiler " id="spoiler-5">
 &lt;summary>【jetson・開発マシン】それぞれdockerコンテナを起動&lt;/summary>
 &lt;p>&lt;p>jetsonでdockerコンテナを起動&lt;/p>
 &lt;pre>&lt;code class="language-shell">(開発PC):~$ ssh roomba_dev1
@@ -1736,7 +1799,7 @@ rospy.sleep(0.1)
 &lt;/code>&lt;/pre>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-1">
+&lt;details class="spoiler " id="spoiler-6">
 &lt;summary>【jetson・開発マシン】ビルドをしてパスを通す&lt;/summary>
 &lt;p>&lt;p>catkin_make後に&lt;code>devel&lt;/code>と&lt;code>build&lt;/code>ディレクトリが作成されることを確認しましょう。&lt;/p>
 &lt;pre>&lt;code class="language-shell">(開発PC)(docker):~/roomba_hack# cd catkin_ws
@@ -1748,14 +1811,14 @@ rospy.sleep(0.1)
 &lt;/code>&lt;/pre>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-2">
+&lt;details class="spoiler " id="spoiler-7">
 &lt;summary>【jetson】ROSマスタ、各種ノードを起動&lt;/summary>
 &lt;p>&lt;pre>&lt;code class="language-shell">(jetson)(docker):~/roomba_hack# roslaunch roomba_bringup bringup.launch
 &lt;/code>&lt;/pre>
 &lt;/p>
 &lt;/details>
 &lt;h3 id="rosメッセージの可視化">ROSメッセージの可視化&lt;/h3>
-&lt;details class="spoiler " id="spoiler-3">
+&lt;details class="spoiler " id="spoiler-8">
 &lt;summary>【開発PC】topicの確認&lt;/summary>
 &lt;p>&lt;p>Topic関連のコマンドのところの&lt;code>rostopic list&lt;/code>コマンドを使用してtopic一覧を表示してみましょう&lt;/p>
 &lt;pre>&lt;code class="language-shell">(開発PC)(docker):~/roomba_hack# rostopic list
@@ -1777,7 +1840,7 @@ rospy.sleep(0.1)
 &lt;/code>&lt;/pre>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-4">
+&lt;details class="spoiler " id="spoiler-9">
 &lt;summary>【開発PC】topicのpublish(配信)&lt;/summary>
 &lt;p>&lt;p>topic&lt;code>/cmd_vel&lt;/code>の情報を確認&lt;/p>
 &lt;pre>&lt;code class="language-shell">(開発PC)(docker)# rostopic info /cmd_vel
@@ -1800,7 +1863,7 @@ z: 0.0&amp;quot;
 &lt;/code>&lt;/pre>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-5">
+&lt;details class="spoiler " id="spoiler-10">
 &lt;summary>Try it! 時間が余った人向け&lt;/summary>
 &lt;p>&lt;p>try it! &lt;code>roomba_bringup&lt;/code>パッケージの&lt;code>bringup.launch&lt;/code>の中身を読んでみよう&lt;/p>
 &lt;p>hint roscdコマンドを使うとパッケージへ簡単に移動ができます。ファイルの中身を表示するには&lt;code>cat&lt;/code>コマンドを使用します。&lt;/p>
@@ -1820,17 +1883,39 @@ z: 0.0&amp;quot;
 &lt;p>1つ目が外界センサで、これはロボットが行動する環境の情報を取得するためのセンサーである。
 具体的なセンサとして、&lt;/p>
 &lt;ul>
-&lt;li>LiDAR&lt;/li>
-&lt;li>デプスカメラ&lt;/li>
-&lt;li>ホイールエンコーダ&lt;/li>
-&lt;li>IMU&lt;/li>
+&lt;li>レーザスキャナ
+&lt;ul>
+&lt;li>レーザービームを照射して物体上の点までの距離と方向を計測する。レーザビームを走査することで、センサ周囲の広い範囲を計測した点群を得られる。&lt;/li>
+&lt;li>レーザスキャナを用いて対象物までの距離や位置、形状を検知することをLiDAR(Light Detection And Ranging(光による検知と測距))という。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>デプスカメラ
+&lt;ul>
+&lt;li>赤外線などを発光して距離情報を画像として計測する。それと同時に通常のRGB画像も取得できるものがある。&lt;/li>
+&lt;/ul>
+&lt;/li>
 &lt;/ul>
 &lt;p>などがあげられる。&lt;/p>
 &lt;p>センサのノイズの影響を軽減するため、複数のセンサを組み合わせて利用されることもある。&lt;/p>
 &lt;p>2つ目は内界センサで、これは(ロボットアームのような変形可能な)ロボットが自身の内部状態を把握し、位置や姿勢を制御するために使われるセンサーである。&lt;/p>
 &lt;ul>
-&lt;li>関節位置・角度センサ&lt;/li>
-&lt;li>関節姿勢センサ&lt;/li>
+&lt;li>ホイールエンコーダ
+&lt;ul>
+&lt;li>回転信号を電気信号に変換するデバイス。&lt;/li>
+&lt;li>ロボットの位置の推定：台車に取り付けられたホイールエンコーダが回転角度や回転速度を計測し、ロボットの位置や向きを推定する。&lt;/li>
+&lt;li>ロボットアームの制御：ロボットアームは、ベースや関節にモーターとホイールエンコーダを備えている。ホイールエンコーダは関節の回転角度を計測し、アームの位置制御に使用される。これにより、アームは所望の位置や角度に正確に移動することができる。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>IMU(Internal Measurement Unit)
+&lt;ul>
+&lt;li>ジャイロ、加速度センサ、磁気センサなどが一体となったもの。
+&lt;ul>
+&lt;li>ジャイロセンサは回転角・各速度を求めるセンサ。&lt;/li>
+&lt;li>加速度センサは衝撃の検出、歩行ロボットの姿勢制御などに使われる。&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
 &lt;/ul>
 &lt;p>などが内界センサである。&lt;/p>
 &lt;p>参考&lt;/p>
