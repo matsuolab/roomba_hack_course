@@ -154,7 +154,7 @@ pythonのプログラムはコマンドで直接実行するか、importで他�
 (jetson):~/group_a/roomba_hack ./RUN-DOCKER-CONTAINER.sh
 (jetson)(docker):~/roomba_hack#  
 </code></pre><p>開発PCでdockerコンテナを起動</p><pre><code class=language-shell>(開発PC):~$ cd ~/group_a/roomba_hack
-(開発PC):~/group_a/roomba_hack ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
+(開発PC):~/group_a/roomba_hack# ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
 (開発PC)(docker):~/roomba_hack#  
 </code></pre></p></details><details class=spoiler id=spoiler-6><summary>【jetson・開発マシン】ビルドをしてパスを通す</summary><p><p>catkin_make後に<code>devel</code>と<code>build</code>ディレクトリが作成されることを確認しましょう。</p><pre><code class=language-shell>(開発PC)(docker):~/roomba_hack# cd catkin_ws
 (開発PC)(docker):~/roomba_hack/catkin_ws# rm -rf devel build
