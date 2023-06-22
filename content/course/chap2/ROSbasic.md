@@ -307,7 +307,7 @@ jetsonでdockerコンテナを起動
 
 ```shell
 (開発PC):~$ cd ~/group_a/roomba_hack
-(開発PC):~/group_a/roomba_hack ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
+(開発PC):~/group_a/roomba_hack# ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
 (開発PC)(docker):~/roomba_hack#  
 ```
 {{< /spoiler >}}
