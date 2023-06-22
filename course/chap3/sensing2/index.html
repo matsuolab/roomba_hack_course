@@ -1,4 +1,4 @@
-<!doctype html><html lang=ja><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=generator content="Wowchemy 5.2.0 for Hugo"><meta name=author content="TRAIL Admin"><meta name=description content="複数のセンサを組み合わせてよりかしこくロボットを動かしてみよう"><link rel=alternate hreflang=ja href=https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/><link rel=preconnect href=https://fonts.gstatic.com crossorigin><meta name=theme-color content="#4caf50"><script src=/roomba_hack_course/js/mathjax-config.js></script><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css integrity="sha256-FMvZuGapsJLjouA6k7Eo2lusoAX9i0ShlWFG6qt7SLc=" crossorigin=anonymous><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.0/styles/github.min.css crossorigin=anonymous title=hl-light media=print onload="this.media='all'"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.0/styles/dracula.min.css crossorigin=anonymous title=hl-dark media=print onload="this.media='all'" disabled><script src=https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js integrity crossorigin=anonymous async></script><link rel=preload as=style href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto+Mono&family=Roboto:wght@400;700&display=swap"><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto+Mono&family=Roboto:wght@400;700&display=swap" media=print onload="this.media='all'"><link rel=stylesheet href=/roomba_hack_course/css/wowchemy.e6acd01addd9a75ba87b4d40035795b4.css><link rel=manifest href=/roomba_hack_course/index.webmanifest><link rel=icon type=image/png href=/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_32x32_fill_lanczos_center_2.png><link rel=apple-touch-icon type=image/png href=/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_180x180_fill_lanczos_center_2.png><link rel=canonical href=https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/><meta property="twitter:card" content="summary"><meta property="og:site_name" content="ロボットシステム入門"><meta property="og:url" content="https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/"><meta property="og:title" content="ロボットシステムにおけるセンシング・アクチュエーション・通信② | ロボットシステム入門"><meta property="og:description" content="複数のセンサを組み合わせてよりかしこくロボットを動かしてみよう"><meta property="og:image" content="https://matsuolab.github.io/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png"><meta property="twitter:image" content="https://matsuolab.github.io/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png"><meta property="og:locale" content="ja"><meta property="article:published_time" content="2022-04-05T00:00:00+00:00"><meta property="article:modified_time" content="2022-04-05T00:00:00+00:00"><title>ロボットシステムにおけるセンシング・アクチュエーション・通信② | ロボットシステム入門</title></head><body id=top data-spy=scroll data-offset=70 data-target=#TableOfContents class=page-wrapper data-wc-page-id=2ee7ed9f0716848dbd6ffe877377e500><script src=/roomba_hack_course/js/wowchemy-init.min.b8153d4570dcbb34350a2a846dba8c03.js></script><aside class=search-modal id=search><div class=container><section class=search-header><div class="row no-gutters justify-content-between mb-3"><div class=col-6><h1>Search</h1></div><div class="col-6 col-search-close"><a class=js-search href=# aria-label=Close><i class="fas fa-times-circle text-muted" aria-hidden=true></i></a></div></div><div id=search-box><input name=q id=search-query placeholder=Search... autocapitalize=off autocomplete=off autocorrect=off spellcheck=false type=search class=form-control aria-label=Search...></div></section><section class=section-search-results><div id=search-hits></div></section></div></aside><div class=page-header><nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id=navbar-main><div class=container-xl><div class="d-none d-lg-inline-flex"><a class=navbar-brand href=/roomba_hack_course/>ロボットシステム入門</a></div><button type=button class=navbar-toggler data-toggle=collapse data-target=#navbar-content aria-controls=navbar-content aria-expanded=false aria-label="Toggle navigation">
+<!doctype html><html lang=ja><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=generator content="Wowchemy 5.2.0 for Hugo"><meta name=author content="TRAIL Admin"><meta name=description content="複数のセンサを組み合わせてよりかしこくロボットを動かしてみよう"><link rel=alternate hreflang=ja href=https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/><link rel=preconnect href=https://fonts.gstatic.com crossorigin><meta name=theme-color content="#4caf50"><script src=/roomba_hack_course/js/mathjax-config.js></script><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css integrity="sha256-FMvZuGapsJLjouA6k7Eo2lusoAX9i0ShlWFG6qt7SLc=" crossorigin=anonymous><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.0/styles/github.min.css crossorigin=anonymous title=hl-light media=print onload="this.media='all'"><link rel=stylesheet href=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.0/styles/dracula.min.css crossorigin=anonymous title=hl-dark media=print onload="this.media='all'" disabled><script src=https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js integrity crossorigin=anonymous async></script><link rel=preload as=style href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto+Mono&family=Roboto:wght@400;700&display=swap"><link rel=stylesheet href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto+Mono&family=Roboto:wght@400;700&display=swap" media=print onload="this.media='all'"><link rel=stylesheet href=/roomba_hack_course/css/wowchemy.e6acd01addd9a75ba87b4d40035795b4.css><link rel=manifest href=/roomba_hack_course/index.webmanifest><link rel=icon type=image/png href=/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_32x32_fill_lanczos_center_2.png><link rel=apple-touch-icon type=image/png href=/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_180x180_fill_lanczos_center_2.png><link rel=canonical href=https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/><meta property="twitter:card" content="summary"><meta property="og:site_name" content="ロボットシステム入門"><meta property="og:url" content="https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/"><meta property="og:title" content="ロボットシステムにおけるセンシング・アクチュエーション・通信② | ロボットシステム入門"><meta property="og:description" content="複数のセンサを組み合わせてよりかしこくロボットを動かしてみよう"><meta property="og:image" content="https://matsuolab.github.io/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png"><meta property="twitter:image" content="https://matsuolab.github.io/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png"><meta property="og:locale" content="ja"><meta property="article:published_time" content="2023-06-22T00:00:00+00:00"><meta property="article:modified_time" content="2023-06-22T00:00:00+00:00"><title>ロボットシステムにおけるセンシング・アクチュエーション・通信② | ロボットシステム入門</title></head><body id=top data-spy=scroll data-offset=70 data-target=#TableOfContents class=page-wrapper data-wc-page-id=2ee7ed9f0716848dbd6ffe877377e500><script src=/roomba_hack_course/js/wowchemy-init.min.b8153d4570dcbb34350a2a846dba8c03.js></script><aside class=search-modal id=search><div class=container><section class=search-header><div class="row no-gutters justify-content-between mb-3"><div class=col-6><h1>Search</h1></div><div class="col-6 col-search-close"><a class=js-search href=# aria-label=Close><i class="fas fa-times-circle text-muted" aria-hidden=true></i></a></div></div><div id=search-box><input name=q id=search-query placeholder=Search... autocapitalize=off autocomplete=off autocorrect=off spellcheck=false type=search class=form-control aria-label=Search...></div></section><section class=section-search-results><div id=search-hits></div></section></div></aside><div class=page-header><nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id=navbar-main><div class=container-xl><div class="d-none d-lg-inline-flex"><a class=navbar-brand href=/roomba_hack_course/>ロボットシステム入門</a></div><button type=button class=navbar-toggler data-toggle=collapse data-target=#navbar-content aria-controls=navbar-content aria-expanded=false aria-label="Toggle navigation">
 <span><i class="fas fa-bars"></i></span></button><div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none"><a class=navbar-brand href=/roomba_hack_course/>ロボットシステム入門</a></div><div class="navbar-collapse main-menu-item collapse justify-content-start" id=navbar-content><ul class="navbar-nav d-md-inline-flex"><li class=nav-item><a class="nav-link active" href=/roomba_hack_course/course><span>Courses</span></a></li><li class=nav-item><a class=nav-link href=/roomba_hack_course/post><span>Blog</span></a></li><li class=nav-item><a class=nav-link href=/roomba_hack_course/contact><span>Contact</span></a></li></ul></div><ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2"><li class=nav-item><a class="nav-link js-search" href=# aria-label=Search><i class="fas fa-search" aria-hidden=true></i></a></li><li class="nav-item dropdown theme-dropdown"><a href=# class=nav-link data-toggle=dropdown aria-haspopup=true aria-label="Display preferences"><i class="fas fa-moon" aria-hidden=true></i></a><div class=dropdown-menu><a href=# class="dropdown-item js-set-theme-light"><span>Light</span></a>
 <a href=# class="dropdown-item js-set-theme-dark"><span>Dark</span></a>
 <a href=# class="dropdown-item js-set-theme-auto"><span>Automatic</span></a></div></li></ul></div></nav></div><div class=page-body><div class="container-fluid docs"><div class="row flex-xl-nowrap"><div class="col-12 col-md-3 col-xl-2 docs-sidebar"><form class="docs-search d-flex align-items-center"><button class="btn docs-toggle d-md-none p-0 mr-md-3 w-100" type=button data-toggle=collapse data-target=#docs-nav aria-controls=docs-nav aria-expanded=false aria-label="Toggle section navigation"><div class=d-flex><span class="d-md-none pl-1 flex-grow-1 text-left overflow-hidden">Chapter 3</span>
@@ -6,8 +6,21 @@
 <button class="form-control sidebar-search js-search d-none d-md-flex">
 <i class="fas fa-search pr-2"></i>
 <span class=sidebar-search-text>Search...</span>
-<span class=sidebar-search-shortcut>/</span></button></form><nav class="collapse docs-links" id=docs-nav><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/>ロボットシステム入門</a></li><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap1/><i class="fas fa-book pr-1"></i>Chapter 1</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap1/%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83/>開発環境</a></li><li><a href=/roomba_hack_course/course/chap1/ros/>ROSとは</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap2/><i class="fas fa-book pr-1"></i>Chapter 2</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap2/rosbasic/>ROSのパッケージ・ワークスペース</a></li><li><a href=/roomba_hack_course/course/chap2/sensing1/>ロボットシステムにおけるセンシング・アクチュエーション・通信①</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap3/><i class="fas fa-book pr-1"></i>Chapter 3</a><ul class="nav docs-sidenav"><li class=active><a href=/roomba_hack_course/course/chap3/sensing2/>ロボットシステムにおけるセンシング・アクチュエーション・通信②</a></li><li><a href=/roomba_hack_course/course/chap3/sensing3/>ロボットシステムにおけるセンシング・アクチュエーション・通信③</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap4/><i class="fas fa-book pr-1"></i>Chapter 4</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap4/localization/>自己位置推定</a></li><li><a href=/roomba_hack_course/course/chap4/navigation/>ナビゲーション</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap5/><i class="fas fa-book pr-1"></i>Chapter 5</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap5/three-dimensions/>三次元画像処理</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap6/><i class="fas fa-book pr-1"></i>Chapter 6</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap6/service-actionlib/>serviceとactionlib</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap7/><i class="fas fa-book pr-1"></i>Chapter 7</a></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap8/><i class="fas fa-book pr-1"></i>Chapter 8</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap8/final_project/>最終プロジェクト</a></li></ul></div></ul></nav></div><div class="d-none d-xl-block col-xl-2 docs-toc"><ul class="nav toc-top"><li><a href=# id=back_to_top class=docs-toc-title>Contents</a></li></ul><nav id=TableOfContents><ul><li><a href=#learn>Learn</a><ul><li><a href=#オドメトリのセンサ情報を使ってロボットを動かしてみよう>オドメトリのセンサ情報を使ってロボットを動かしてみよう</a></li></ul></li><li><a href=#演習>演習</a><ul><li><a href=#rosメッセージの可視化>ROSメッセージの可視化</a></li></ul></li></ul></nav></div><main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 docs-content" role=main><article class=article><div class=docs-article-container><nav class="d-none d-md-flex" aria-label=breadcrumb><ol class=breadcrumb><li class=breadcrumb-item><a href=/roomba_hack_course/>Home</a></li><li class=breadcrumb-item><a href=/roomba_hack_course/course/>ロボットシステム入門</a></li><li class=breadcrumb-item><a href=/roomba_hack_course/course/chap3/>Chapter 3</a></li><li class="breadcrumb-item active" aria-current=page>ロボットシステムにおけるセンシング・アクチュエーション・通信②</li></ol></nav><h1>ロボットシステムにおけるセンシング・アクチュエーション・通信②</h1><div class=article-style><p>複数のセンサを組み合わせてよりかしこくロボットを動かしてみよう</p><h2 id=learn>Learn</h2><p><a href=../../chap2/sensing1/#%e6%bc%94%e7%bf%92>前回の演習</a>では，速度と時間の指令を使ってロボットを制御しました．</p><p>周囲に障害物が何もない状況や，ロボットの滑りがない環境では，速度と時間のコマンドを使って思った通りにロボットを動かすことができるかもしれませんが，実環境では，ロボットの周囲には障害物が存在しますし，移動距離で制御する方が直感的です．</p><p>前回の演習のようにロボットに速度と時間を一回与えて，その通りに動かすようなフィードフォワード制御ではなく，今回は，ロボットが逐次的にセンサの情報を反映して振る舞いを変える<mark>フィードバック制御</mark>を行なってみましょう．</p><h3 id=オドメトリのセンサ情報を使ってロボットを動かしてみよう>オドメトリのセンサ情報を使ってロボットを動かしてみよう</h3><p>まずは，ロボットのタイヤの回転量から計算される移動距離である<mark>（ホイール）オドメトリ（odometry）</mark>を使った制御をしてみましょう．</p><h4 id=オドメトリのメッセージodomの中身を見てみよう>オドメトリのメッセージ（<code>/odom</code>）の中身を見てみよう</h4><p>roombaのオドメトリの情報は，<code>/odom</code>トピックにpublishされています．</p><p><code>rostopic echo /odom</code>をしてみるとメッセージとしてどんな情報が流れているかわかります．
-<details class=spoiler id=spoiler-2><summary><code>rostopic echo -n 1 /odom</code></summary><p><pre><code class=language-bash>root@dynamics:~/roomba_hack# rostopic echo -n 1 /odom
+<span class=sidebar-search-shortcut>/</span></button></form><nav class="collapse docs-links" id=docs-nav><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/>ロボットシステム入門</a></li><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap1/><i class="fas fa-book pr-1"></i>Chapter 1</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap1/%E9%96%8B%E7%99%BA%E7%92%B0%E5%A2%83/>開発環境</a></li><li><a href=/roomba_hack_course/course/chap1/ros/>ROSとは</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap2/><i class="fas fa-book pr-1"></i>Chapter 2</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap2/rosbasic/>ROSのパッケージ・ワークスペース</a></li><li><a href=/roomba_hack_course/course/chap2/sensing1/>ロボットシステムにおけるセンシング・アクチュエーション・通信①</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap3/><i class="fas fa-book pr-1"></i>Chapter 3</a><ul class="nav docs-sidenav"><li class=active><a href=/roomba_hack_course/course/chap3/sensing2/>ロボットシステムにおけるセンシング・アクチュエーション・通信②</a></li><li><a href=/roomba_hack_course/course/chap3/sensing3/>ロボットシステムにおけるセンシング・アクチュエーション・通信③</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap4/><i class="fas fa-book pr-1"></i>Chapter 4</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap4/localization/>自己位置推定</a></li><li><a href=/roomba_hack_course/course/chap4/navigation/>ナビゲーション</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap5/><i class="fas fa-book pr-1"></i>Chapter 5</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap5/three-dimensions/>三次元画像処理</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap6/><i class="fas fa-book pr-1"></i>Chapter 6</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap6/service-actionlib/>serviceとactionlib</a></li></ul></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap7/><i class="fas fa-book pr-1"></i>Chapter 7</a></div><div class=docs-toc-item><a class=docs-toc-link href=/roomba_hack_course/course/chap8/><i class="fas fa-book pr-1"></i>Chapter 8</a><ul class="nav docs-sidenav"><li><a href=/roomba_hack_course/course/chap8/final_project/>最終プロジェクト</a></li></ul></div></ul></nav></div><div class="d-none d-xl-block col-xl-2 docs-toc"><ul class="nav toc-top"><li><a href=# id=back_to_top class=docs-toc-title>Contents</a></li></ul><nav id=TableOfContents><ul><li><a href=#learn>Learn</a><ul><li><a href=#オドメトリのセンサ情報を用いた制御>オドメトリのセンサ情報を用いた制御</a></li><li><a href=#ソースコードを読んでみよう>ソースコードを読んでみよう</a></li></ul></li><li><a href=#演習>演習</a><ul><li><a href=#rosメッセージの可視化>ROSメッセージの可視化</a></li></ul></li></ul></nav></div><main class="col-12 col-md-9 col-xl-8 py-md-3 pl-md-5 docs-content" role=main><article class=article><div class=docs-article-container><nav class="d-none d-md-flex" aria-label=breadcrumb><ol class=breadcrumb><li class=breadcrumb-item><a href=/roomba_hack_course/>Home</a></li><li class=breadcrumb-item><a href=/roomba_hack_course/course/>ロボットシステム入門</a></li><li class=breadcrumb-item><a href=/roomba_hack_course/course/chap3/>Chapter 3</a></li><li class="breadcrumb-item active" aria-current=page>ロボットシステムにおけるセンシング・アクチュエーション・通信②</li></ol></nav><h1>ロボットシステムにおけるセンシング・アクチュエーション・通信②</h1><div class=article-style><p>複数のセンサを組み合わせてよりかしこくロボットを動かしてみよう</p><h2 id=learn>Learn</h2><p>前回使用した<a href=https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/simple_control.py target=_blank rel=noopener>simple_control.py</a>
+では，速度，角速度，時間を指定し，
+&ldquo;速度 * 時間&rdquo; あるいは &ldquo;角速度 * 時間&rdquo; という演算を行うことで，
+ロボットを意図した場所へ移動させる命令を与えていました．</p><p>しかし，この制御の仕方には，いくつかの問題があります．</p><ul><li>ホイールと地面との間に滑りがあった場合，ロボットは指定した距離より小さい距離しか移動しない可能性がある．</li><li>ロボット本体の問題で，指定した速度よりも実際の速度が大きいまたは小さい場合，
+ロボットは指定した位置には移動しない可能性がある．</li></ul><p>これらは，動作の結果を考慮せず，はじめに指定した速度と時間にのみ従って動く，という制御の仕方のために起こります．</p><p>このように，あらかじめ指定された制御信号にのみ基づいて制御を行い，
+その結果（フィードバック情報）を考慮しない制御の仕方を
+<mark>フィードフォワード制御</mark>（開ループ制御）と呼びます．
+フィードフォワード制御は，制御対象が予測可能で外乱が少ない場合や，
+システムが簡潔である場合に使用されることがあります．</p><p>一方で，センサーからのフィードバック情報を利用して制御信号を修正する制御の仕方を
+<mark>フィードバック制御</mark>（閉ループ制御）と呼びます．
+フィードバック制御は，制御対象の予測が難しく，外乱が大きい場合に有効です．</p><p>今回は，ロボットのセンサ情報を用いるフィードバック制御
+によってロボットをより柔軟に動かしてみましょう．
+オドメトリとLiDARという2種類のセンサの情報を用います．</p><h3 id=オドメトリのセンサ情報を用いた制御>オドメトリのセンサ情報を用いた制御</h3><p>まずは，ロボットのタイヤの回転量から計算される移動距離である<mark>（ホイール）オドメトリ（odometry）</mark>を使った制御をしてみましょう．</p><h4 id=オドメトリのメッセージodomの中身を見てみよう>オドメトリのメッセージ（<code>/odom</code>）の中身を見てみよう</h4><p>roombaのオドメトリの情報は，<code>/odom</code>トピックにpublishされています．</p><pre><code>$ rostopic echo /odom
+</code></pre><p>を実行するとメッセージとしてどのような情報が流れているかがわかります．
+<details class=spoiler id=spoiler-4><summary><code>$ rostopic echo -n 1 /odom</code></summary><p><pre><code class=language-bash>root@dynamics:~/roomba_hack# rostopic echo -n 1 /odom
 header:
   seq: 2115
   stamp:
@@ -39,11 +52,13 @@ twist:
       z: 0.0
   covariance: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1e-05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1e-05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1e-05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 ---
-</code></pre></p></details></p><p><code>rostopic type /odom</code>をしてみると，メッセージとして，<code>nav_msgs/Odometry</code>型が使われていることがわかります．
-<details class=spoiler id=spoiler-3><summary><code>rostopic type /odom</code></summary><p><pre><code class=language-bash>root@dynamics:~/roomba_hack# rostopic type /odom
+</code></pre></p></details></p><p>また，</p><pre><code>$ rostopic type /odom
+</code></pre><p>を実行すると，メッセージとして，<code>nav_msgs/Odometry</code>型が使われていることがわかります．
+<details class=spoiler id=spoiler-5><summary><code>$ rostopic type /odom</code></summary><p><pre><code class=language-bash>root@dynamics:~/roomba_hack# rostopic type /odom
 nav_msgs/Odometry
-</code></pre></p></details></p><p><code>nav_msgs/Odometry</code>型の<a href=http://docs.ros.org/en/noetic/api/nav_msgs/html/msg/Odometry.html target=_blank rel=noopener>ドキュメント</a>を確認してみると，このメッセージは<code>pose</code>と<code>twist</code>で構成されていることがわかります．</p><p><code>pose</code>は．（<code>child_frame</code>から見た）ロボットの推定姿勢（位置と回転角）を表していて，<code>covariance</code>にはその不確かさを表す共分散が記録されています．</p><p>一方，<code>twist</code>は，（<code>child_frame</code>から見た）ロボットの速度を表していて，<code>pose</code>と同様に<code>covariance</code>にはその不確かさを表す共分散が記録されています．</p><p>なお，メッセージ型の定義は，<code>rosmsg info nav_msgs/Odometry</code>することでもコマンドから確認できます．
-<details class=spoiler id=spoiler-4><summary><code>rosmsg info nav_msgs/Odometry</code></summary><p><pre><code class=language-bash>root@dynamics:~/roomba_hack# rosmsg info nav_msgs/Odometry
+</code></pre></p></details></p><p><a href=http://docs.ros.org/en/noetic/api/nav_msgs/html/msg/Odometry.html target=_blank rel=noopener>nav_msgs/Odometry型のドキュメント</a>を確認すると，このメッセージは<code>pose</code>と<code>twist</code>で構成されていることがわかります．</p><ul><li><p><code>pose</code>は（<code>child_frame</code>から見た）ロボットの推定姿勢（位置と回転角）を表していて，<code>covariance</code>にはその不確かさを表す共分散が記録されています．</p></li><li><p>一方，<code>twist</code>は（<code>child_frame</code>から見た）ロボットの速度を表していて，<code>pose</code>と同様に<code>covariance</code>にはその不確かさを表す共分散が記録されています．</p></li></ul><p>なお，メッセージ型の定義は，コマンドで</p><pre><code>$ rosmsg info nav_msgs/Odometry
+</code></pre><p>を実行しても確認できます．
+<details class=spoiler id=spoiler-6><summary><code>$ rosmsg info nav_msgs/Odometry</code></summary><p><pre><code class=language-bash>root@dynamics:~/roomba_hack# rosmsg info nav_msgs/Odometry
 std_msgs/Header header
   uint32 seq
   time stamp
@@ -72,12 +87,18 @@ geometry_msgs/TwistWithCovariance twist
       float64 y
       float64 z
   float64[36] covariance
-</code></pre></p></details></p><h4 id=クォータニオンquaternion>クォータニオン(quaternion)</h4><p>さて，<code>/odom</code>のトピックでは，ロボットの回転角は<mark>クォータニオン（quaternion）</mark>で記述されています．</p><p>クォータニオンは，日本語では四元数と呼ばれ，3次元空間上での回転角を表現する方法の一つで，4つの要素を持つベクトルで表現されます．</p><p>クォータニオンによる3次元回転の表現は，角度を連続的にかつ簡潔に表現できるためROSではよく用いられます（その他には，オイラー角による表現や回転行列による表現があります）．</p><p>それぞれの回転角に関する表現のメリット・デメリットを調べてみましょう（「ジンバルロック」などのキーワードで調べるとよりよく理解できると思います）．</p><p>クォータニオンからオイラー角へは，<code>tf</code>パッケージの<code>tf.transformations.euler_from_quaternion</code>を使うことで変換できます（<a href=http://docs.ros.org/en/jade/api/tf/html/python/transformations.html#tf.transformations.euler_from_quaternion target=_blank rel=noopener>ドキュメント</a>）．</p><h4 id=サブスクライバsubscriberの仕組みを知ろう>サブスクライバ（subscriber)の仕組みを知ろう</h4><p>それでは，オドメトリ<code>/odom</code>の情報を使った制御の実装の例として<code>navigation_tutorial</code>パッケージの中の<code>simple_control2.py</code>を見てみましょう（<a href=https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/simple_control2.py target=_blank rel=noopener>github</a>）．</p><p>前回までに強調されてきた通り，ROSは非同期分散のシステムを簡単に作ることができるのが特徴です．
-そのため，ロボットから非同期に送られてくる<code>/odom</code>の情報をうまく扱うことが重要です．</p><p>実装例にあるように，Pythonによるノードの実装では，クラスとして定義するのがわかりやすい方法でしょう．</p><p>実装例では，<code>SimpleControlller</code>クラスとして，<code>simple_controller</code>というノードを定義しています．
-以下のように，ノードを初期化する際に，コマンドを<code>/cmd_vel</code>トピックに送信するパブリッシャ（publisher)と，<code>/odom</code>を受信するサブスクライバ(subscriber)を作成しています．</p><pre><code class=language-python>class SimpleController:
+</code></pre></p></details></p><h4 id=クォータニオンquaternion>クォータニオン(quaternion)</h4><p>さて，<code>/odom</code>のトピックでは，ロボットの回転角は<mark>クォータニオン（quaternion）</mark>で記述されています．</p><p>クォータニオンは，日本語では四元数と呼ばれ，3次元空間上での回転角を表現する方法の一つで，4つの要素を持つベクトルで表現されます．</p><p>クォータニオンによる3次元回転の表現は，角度を連続的にかつ簡潔に表現できるためROSではよく用いられます（その他には，オイラー角による表現や回転行列による表現があります）．</p><p>それぞれの回転角に関する表現のメリット・デメリットを調べてみましょう（「ジンバルロック」などのキーワードで調べるとよりよく理解できると思います）．</p><p>クォータニオンからオイラー角へは，<code>tf</code>パッケージの<code>tf.transformations.euler_from_quaternion</code>を使うことで変換できます（<a href=http://docs.ros.org/en/jade/api/tf/html/python/transformations.html#tf.transformations.euler_from_quaternion target=_blank rel=noopener>ドキュメント</a>）．</p><h4 id=実装の例を見てみる>実装の例を見てみる</h4><p>それでは，オドメトリ<code>/odom</code>の情報を使った制御の実装の例として<code>navigation_tutorial</code>パッケージの中の<code>simple_control2.py</code>を見てみましょう（<a href=https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/simple_control2.py target=_blank rel=noopener>github</a>）．</p><h3 id=ソースコードを読んでみよう>ソースコードを読んでみよう</h3><p>画面にウィンドウを2つ並べるなど，<a href=https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/simple_control2.py target=_blank rel=noopener>githubのソースコード</a>をみながら以下の解説を読むことをお勧めします．</p><details class=spoiler id=spoiler-8><summary>simple_control2.py</summary><p><pre><code class=language-python>#!/usr/bin/env python3
+import numpy as np
+
+import rospy
+import tf
+from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
+
+class SimpleController:
     def __init__(self):
         rospy.init_node('simple_controller', anonymous=True)
-        
+
         # Publisher
         self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
 
@@ -89,44 +110,183 @@ geometry_msgs/TwistWithCovariance twist
         self.yaw = None
         while self.x is None:
             rospy.sleep(0.1)
-</code></pre><p>パブリッシャの使い方は前回の<code>simple_control.py</code>の<a href=https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/simple_control.py target=_blank rel=noopener>実装</a>を確認してください．</p><p>パブリッシャと同様に，サブスクライバは<code>rospy</code>の<code>Subscriber</code>を用いて作成できます．
-サブスクライバの特徴として，メッセージを受信した時の処理である<mark>コールバック（callback）</mark>を定義できます．</p><p>この実装例では，<code>self.callback_odom</code>として定義されており，インスタンスの属性（<code>self.x</code>, <code>self.y</code>, <code>self.yaw</code>）を，受信したメッセージで変更するようなプログラムになっています．</p><pre><code class=language-python>    def callback_odom(self, data):
+
+    def callback_odom(self, data):
         self.x = data.pose.pose.position.x
         self.y = data.pose.pose.position.y
         self.yaw = self.get_yaw_from_quaternion(data.pose.pose.orientation)
-</code></pre><p>つまり，<code>self.x</code>には<code>/odom</code>から受信した位置のx座標，<code>self.y</code>には位置のy座標，<code>self.yaw</code>には，回転角のyawを格納しています．</p><p>クォータニオンとして受信した姿勢の回転角のyaw成分を取り出すための<code>self.get_yaw_from_quaternion</code>は以下のようになっています（オイラー角はroll, pitch, yawの順で返ってくるので<code>e[2]</code>でyawを取得しています）．</p><pre><code class=language-python>    def get_yaw_from_quaternion(self, quaternion):
+
+    def go_straight(self, dis, velocity=0.3):
+        vel = Twist()
+        x0 = self.x
+        y0 = self.y
+        while(np.sqrt((self.x-x0)**2+(self.y-y0)**2)&lt;dis):
+            vel.linear.x = velocity
+            vel.angular.z = 0.0
+            self.cmd_vel_pub.publish(vel)
+            rospy.sleep(0.1)
+        self.stop()
+
+    def turn_right(self, yaw, yawrate=-0.5):
+        vel = Twist()
+        yaw0 = self.yaw
+        while(abs(self.yaw-yaw0)&lt;np.deg2rad(yaw)):
+            vel.linear.x = 0.0
+            vel.angular.z = yawrate
+            self.cmd_vel_pub.publish(vel)
+            rospy.sleep(0.1)
+        self.stop()
+
+    def turn_left(self, yaw, yawrate=0.5):
+        vel = Twist()
+        yaw0 = self.yaw
+        while(abs(self.yaw-yaw0)&lt;np.deg2rad(yaw)):
+            vel.linear.x = 0.0
+            vel.angular.z = yawrate
+            self.cmd_vel_pub.publish(vel)
+            rospy.sleep(0.1)
+        self.stop()
+
+    def stop(self):
+        vel = Twist()
+        vel.linear.x = 0.0
+        vel.angular.z = 0.0
+        self.cmd_vel_pub.publish(vel)
+
+    def get_yaw_from_quaternion(self, quaternion):
         e = tf.transformations.euler_from_quaternion(
                 (quaternion.x, quaternion.y, quaternion.z, quaternion.w))
         return e[2]
-</code></pre><p>これらのセンサの値を使うことで，以下のように，指定した距離ロボットが移動するまで直進させ続けたり，指定した角度までロボットが回転するまで回転させ続けることができるようになります．</p><p>直進</p><pre><code class=language-python>   def go_straight(self, dis, velocity=0.3):
-       vel = Twist()
-       x0 = self.x
-       y0 = self.y
-       while(np.sqrt((self.x-x0)**2+(self.y-y0)**2)&lt;dis):
-           vel.linear.x = velocity
-           vel.angular.z = 0.0
-           self.cmd_vel_pub.publish(vel)
-           rospy.sleep(0.1)
-       self.stop()
-</code></pre><p>右回転</p><pre><code class=language-python>    def turn_right(self, yaw, yawrate=-0.5):
+
+if __name__=='__main__':
+    simple_controller = SimpleController()
+    try:
+        simple_controller.go_straight(1.0)
+        simple_controller.turn_left(90)
+        simple_controller.turn_right(90)
+    except rospy.ROSInitException:
+        pass
+</code></pre></p></details><h4 id=かんたんな説明>かんたんな説明</h4><p>上記ソースコードの大枠のみを抜き出すと，以下のようになっています．
+<details class=spoiler id=spoiler-9><summary>simple_control2.pyの大枠</summary><p><pre><code class=language-python>#!/usr/bin/env python3  # 1
+import ~  # 2
+
+class SimpleController:  # 3
+    def __init__(self):  # 4
+        pass
+    def callback_odom(self, data):  # 5
+        pass
+    def go_straight(self, dis, velocity=0.3):
+        pass
+    def turn_right(self, yaw, yawrate=-0.5):
+        pass
+    def turn_left(self, yaw, yawrate=0.5):
+        pass
+    def stop(self):
+        pass
+    def get_yaw_from_quaternion(self, quaternion):
+        pass
+
+if __name__=='__main__':  # 6
+    simple_controller = SimpleController()  # 7
+    pass
+</code></pre></p></details></p><p>それぞれについて簡潔に解説します．</p><details class=spoiler id=spoiler-10><summary>#1 shebang</summary><p>shebang(シバン)と呼ばれるもので，このファイルを実行する際に，どのプログラムを使って実行するかを指定する．
+<code>#!/usr/bin/env python3</code> と書いてあるので，このファイルはpython3で実行するのだとコンピュータに教えている．</p></details><details class=spoiler id=spoiler-11><summary>#2 import</summary><p><pre><code class=language-python>import numpy as np
+
+import rospy
+import tf
+from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
+</code></pre><ul><li>pythonの標準の関数(printなど)だけでは機能が足りないので，別のモジュールをインポートしている．</li><li>このソースコードでは，numpy, rospy, tf というモジュールをインポートしている．<ul><li>rospyというのが，pythonでrosを使うためのモジュール．</li></ul></li><li>また，geometry_msgs.msgというモジュールからTwistというデータ型, nav_msgs.msgというモジュールからOdometoryというデータ型をそれぞれインポートしている．</li></ul></p></details><details class=spoiler id=spoiler-12><summary>#3 class</summary><p><ul><li>SimpleControllerという名前のクラスを定義している．</li><li>クラスはオブジェクトの設計図のようなもの．<ul><li>オブジェクトとは，データとそのデータの振る舞いをまとめたもの．</li></ul></li></ul><details class=spoiler id=spoiler-0><summary>classの例1</summary><p><p>以下のようなクラスを定義したとする．</p><pre><code class=language-python>class Car:
+def __init__(self, color, speed):
+    self.color = color
+    self.speed = speed
+    self.fuel = 100
+<p>def drive(self):
+self.fuel -= 20
+print(&lsquo;drove!')
+print(f&rsquo;残りの燃料は{self.fuel}リットルです&rsquo;)</p>
+<p>def charge(self):
+self.fuel = 100
+print(&lsquo;charged!')
+print(f&rsquo;残りの燃料は{self.fuel}リットルです&rsquo;)</p>
+<p>def info(self):
+print(f&rsquo;色は{self.color}です')
+print(f&rsquo;速度は{self.speed}km/hです')
+print(f&rsquo;残りの燃料は{self.fuel}リットルです')
+</code></pre></p><p>以下のように使える．</p><pre><code class=language-python>mycar = Car('red', 200)
+<p>mycar.drive()
+#drove!
+#残りの燃料は80リットルです</p>
+<p>mycar.drive()
+#drove!
+#残りの燃料は60リットルです</p>
+<p>mycar.charge()
+#charged!
+#残りの燃料は100リットルです</p>
+<p>mycar.info()
+#色はredです
+#速度は200km/hです
+#残りの燃料は100リットルです
+</code></pre></p></p></details><details class=spoiler id=spoiler-1><summary>classの例2</summary><p><p>pythonのstring型や，int型，list型も，実はオブジェクトである．</p><pre><code class=language-python>people = ['Alice', 'Bob', 'Charlie']
+people.append('Dave')
+<p>print(people)
+#[&lsquo;Alice&rsquo;, &lsquo;Bob&rsquo;, &lsquo;Charlie&rsquo;, &lsquo;Dave&rsquo;]
+</code></pre></p><p>上の例では，list型のオブジェクトpeopleに対して，appendというメソッド(そのオブジェクトが持つ関数)を呼び出し，新しい要素を追加している．</p></p></details></p></details><details class=spoiler id=spoiler-13><summary>#4 コンストラクタ</summary><p><ul><li>コンストラクタ__init__()とは，オブジェクト生成時に呼び出される関数のこと．</li><li>初期化のための関数というイメージ．</li></ul></p></details><details class=spoiler id=spoiler-14><summary>#5 メソッドの定義</summary><p><ul><li>メソッドとは，オブジェクトが持つ関数のこと．</li><li>classの定義の中では，<code>self.method_name(引数1, 引数2)</code>という形で呼び出すことができる．</li><li>オブジェクトの外から使用するときには，上のCarの例のように，<code>object_name.method_name(引数1, 引数2)</code>という形で呼び出すことができる．</li><li>定義の第一引数には，必ず<code>self</code>を指定する．これは，そのオブジェクト自身を指す．<ul><li>呼び出すときには<code>self</code>は省略する．</li></ul></li></ul></p></details><details class=spoiler id=spoiler-15><summary>#6 ファイル実行時の処理</summary><p><ul><li>このif文の中の処理は，ファイルを直接実行したときにのみ実行される．</li><li><code>__name__</code>は特殊な変数で，ファイルを直接実行したときには<code>'__main__'</code>という値を持つ．<ul><li>importされたときには<code>__name__</code>にはファイル名が入るため，このif文の中の処理は実行されない．<pre><code class=language-python>#!/usr/bin/env python3
+print(__name__)
+</code></pre><p>とだけ記述したファイルを実行してみると，ふるまいが理解しやすいかもしれない．</p></li></ul></li></ul></p></details><h4 id=より詳細な理解>より詳細な理解</h4><p>simple_control2.pyについてより詳細に解説します．</p><details class=spoiler id=spoiler-16><summary>コンストラクタ</summary><p><pre><code class=language-python>    def __init__(self):
+        rospy.init_node('simple_controller', anonymous=True)
+
+        # Publisher
+        self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+
+        # Subscriber
+        odom_sub = rospy.Subscriber('/odom', Odometry, self.callback_odom)
+
+        self.x = None
+        self.y = None
+        self.yaw = None
+        while self.x is None:
+            rospy.sleep(0.1)
+</code></pre><p>上にも述べた通り，<code>__init__</code>はコンストラクタと呼ばれ，オブジェクト生成時に自動で呼び出される関数です．
+各行について順番に見ていきます．</p><pre><code class=language-python>        rospy.init_node('simple_controller', anonymous=True)
+</code></pre><ul><li><code>simple_controller</code>という名前のノードを作成しています．</li></ul><pre><code class=language-python>        self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+</code></pre><ul><li><code>rospy.Publisher()</code>によって，上で作成したノードがpublisherとして機能することを宣言しています．</li><li>このノードは，<code>/cmd_vel</code>というトピックに対して，<code>Twist</code>というデータ型のメッセージを送信しています．<ul><li><code>Twist</code>の情報は，<a href=http://wiki.ros.org/geometry_msgs>geometry_msgsのドキュメント</a>より確認できます．</li><li><code>Twist</code>は速度３成分と角速度３成分を格納するデータ型です．</li></ul></li><li>第２引数のqueue_sizeは，メッセージを送信する命令が，許容できる周期より短い場合に，メッセージをキューにためておく数を指定します．<ul><li>ここでは，10個までキューにためておくことを指定しています．</li><li>たまった数が10個より少ない場合には，古い順にメッセージをパブリッシュしていきます．</li><li>たまった数が10個に達した場合には，最も古いメッセージを破棄します．</li></ul></li></ul><pre><code class=language-python>        odom_sub = rospy.Subscriber('/odom', Odometry, self.callback_odom)
+</code></pre><ul><li><code>rospy.Subscriber()</code>によって，作成したノードがsubscriberとして機能することを宣言しています．</li><li>このノードは，<code>/odom</code>というトピックから，<code>Odometry</code>というデータ型のメッセージを受信しています．<ul><li><code>Odometry</code>の情報は，<a href=http://wiki.ros.org/nav_msgs>nav_msgsのドキュメント</a>より確認できます．</li><li><code>Odometry</code>は，位置と姿勢，及び速度と角速度を格納するデータ型です．</li><li>ここでは，<code>Odometry</code>には，ルンバの現在の位置や運動の様子が格納されており，それを受信しています．</li></ul></li><li>rospy.Subscriber()の第三引数として，<code>self.callback_odom</code>というコールバック関数を指定しています．<ul><li>subscriberにはコールバック関数を指定する必要があります．</li><li>コールバック関数とは，subscriberがメッセージを受信したときに実行される関数のことです．<ul><li>コールバック関数は，メッセージを引数として実行します．</li></ul></li><li>コールバック関数の中身は，後述します．</li></ul></li></ul><pre><code class=language-python>        self.x = None
+        self.y = None
+        self.yaw = None
+</code></pre><ul><li>アトリビュートを定義しています．</li><li>クラスの定義の中で<code>self.&lt;name></code>の形式で表される変数は，そのクラスのオブジェクトが持つ"attribute(アトリビュート)&ldquo;と呼ばれます．<ul><li>アトリビュートには，そのclassの定義の中であればどこからでもアクセスできます．</li></ul></li><li>ここでは，<code>self.x</code>, <code>self.y</code>, <code>self.yaw</code>というアトリビュートを定義しています．<ul><li>これらのアトリビュートは，後述するコールバック関数の中で値が更新されます．</li><li>このアトリビュートには，ロボットの現在の位置や姿勢が格納されます．</li></ul></li></ul><pre><code class=language-python>        while self.x is None:
+            rospy.sleep(0.1)
+</code></pre><ul><li><code>self.x</code>がNoneである間，0.1秒間隔で待機し続けます．</li></ul></p></details><details class=spoiler id=spoiler-17><summary>コールバック関数</summary><p><pre><code class=language-python>    def callback_odom(self, data):
+        self.x = data.pose.pose.position.x
+        self.y = data.pose.pose.position.y
+        self.yaw = self.get_yaw_from_quaternion(data.pose.pose.orientation)
+</code></pre><ul><li>コンストラクタの項目で説明した通り，subscriberを定義する際にはコールバック関数を指定する必要があります．</li><li>コールバック関数はsubscriberがメッセージを受信した際，そのメッセージを引数として実行する関数でした．</li><li>上のコールバック関数では，引数<code>data</code>には，<code>Odometry</code>型のメッセージが格納されます．<ul><li><code>data.pose.pose.position</code>という書き方によって，Odometry型の中の，位置を表すpositionという要素にアクセスしています．</li><li>同様に，<code>data.pose.pose.orientation</code>という書き方によって，Odometry型の中の，姿勢を表すorientationという要素にアクセスしています．</li></ul></li><li>コンストラクタで定義していたアトリビュート<code>self.x</code>, <code>self.y</code>, <code>self.yaw</code>に，メッセージから得られた位置と姿勢を格納しています．<ul><li><code>self.yaw</code>に値を格納する時に使用している関数<code>get_yaw_from_quaternion()</code>については，後述します．</li></ul></li><li>このコールバック関数が一度でも呼ばれると，<code>self.x</code>に入っているNoneの値が上書きされ，コンストラクタの中のwhile文が終了します．</li></ul></p></details><details class=spoiler id=spoiler-18><summary>get_yaw_from_quaternion関数</summary><p><p>go_straight関数やturn_right関数とは順番が前後しますが，先にget_yaw_from_quaternion関数について説明します．</p><pre><code class=language-python>    def get_yaw_from_quaternion(self, quaternion):
+        e = tf.transformations.euler_from_quaternion(
+                (quaternion.x, quaternion.y, quaternion.z, quaternion.w))
+        return e[2]
+</code></pre><ul><li>tfモジュールのeuler_from_quaternion関数を利用しています．<ul><li>euler_from_quaternion()は，クォータニオン(4要素)を引数として，オイラー角(3要素)を返す関数です．</li><li>クォータニオンについてはLearn/オドメトリのセンサ情報を用いた制御/クォータニオンの項目で説明しました．</li></ul></li><li><code>Odometry</code>型のメッセージのうち，姿勢を表すorientationという要素は，クォータニオンで表されているため，オイラー角で制御したい場合には，この関数を用いてオイラー角に変換する必要があります．</li><li>ルンバはxy平面上を動くため，z軸周りのオイラー角さえわかれば十分です．そのため，このget_yaw_from_quaternion関数ではオイラー角のz軸成分(第2成分)のみを返しています．</li></ul></p></details><details class=spoiler id=spoiler-19><summary>go_straight関数</summary><p><pre><code class=language-python>    def go_straight(self, dis, velocity=0.3):
         vel = Twist()
-        yaw0 = self.yaw
-        while(abs(self.yaw-yaw0)&lt;np.deg2rad(yaw)):
-            vel.linear.x = 0.0
-            vel.angular.z = yawrate
+        x0 = self.x
+        y0 = self.y
+        while(np.sqrt((self.x-x0)**2+(self.y-y0)**2)&lt;dis):
+            vel.linear.x = velocity
+            vel.angular.z = 0.0
             self.cmd_vel_pub.publish(vel)
             rospy.sleep(0.1)
         self.stop()
-</code></pre><p>左回転</p><pre><code class=language-python>    def turn_left(self, yaw, yawrate=0.5):
-        vel = Twist()
-        yaw0 = self.yaw
-        while(abs(self.yaw-yaw0)&lt;np.deg2rad(yaw)):
-            vel.linear.x = 0.0
-            vel.angular.z = yawrate
+</code></pre><p>ロボットを直進させる関数です．順に説明します</p><pre><code>        vel = Twist()
+</code></pre><ul><li><code>Twist</code>型のオブジェクトを生成しています．</li></ul><pre><code class=language-python>        x0 = self.x
+        y0 = self.y
+</code></pre><ul><li>self.x, self.yには，コールバック関数で更新された(直前の)ルンバの位置が格納されています．それをx0, y0に代入しています．</li></ul><pre><code class=language-python>        while(np.sqrt((self.x-x0)**2+(self.y-y0)**2)&lt;dis):
+            vel.linear.x = velocity
+            vel.angular.z = 0.0
             self.cmd_vel_pub.publish(vel)
             rospy.sleep(0.1)
-        self.stop()
-</code></pre><p>それでは，オドメトリを使って実際にロボットを制御してみましょう．</p><h2 id=演習>演習</h2><details class=spoiler id=spoiler-7><summary>【jetson・開発マシン】それぞれdockerコンテナを起動</summary><p><p>．
+</code></pre><ul><li>点(self.x, self.y)と点(x0, y0)の距離が指定したdisより小さい間，while以下の処理を繰り返します．<ul><li>velの並進成分のx成分に，引数で指定したvelocityの値を格納します．</li><li>velの回転成分のz成分(z軸周りの角速度)に，0を格納します．</li><li>コンストラクタの中で定義したpublisherである<code>self.cmd_vel_pub</code>の.publish()関数を用いて，publishを行います．<ul><li>引数にvelを指定しているので，確かにTwist型のメッセージをパブリッシュしています．</li></ul></li><li><code>rospy.sleep(0.1)</code>で0.1秒待ち，次のループに入ります．</li></ul></li></ul><pre><code class=language-python>        self.stop()
+</code></pre><ul><li>while文が終了したら，ロボットを停止させます．<ul><li>stop関数については，説明を省略します．</li></ul></li><li>turn_right, turn_left関数についても，go_straight関数の説明と同様なので省略します．</li></ul></p></details><p>単純に &ldquo;(角)速度 * 時間&rdquo; によって移動の姿勢を指定しているのではなく，オドメトリのセンサ情報を使いながら，
+目標の姿勢に到達するように制御していることを再度強調しておきます．</p><p>pythonのコードの読み方についての基本的な説明は上の説明で尽きているので，
+余力があれば（なくても）各自<a href=https://github.com/matsuolab/roomba_hack target=_blank rel=noopener>roomba_hackリポジトリ</a>
+上の気になったコードを読んでみましょう．</p><h2 id=演習>演習</h2><details class=spoiler id=spoiler-20><summary>【jetson・開発マシン】それぞれdockerコンテナを起動</summary><p><p>．
 jetsonでdockerコンテナを起動</p><pre><code class=language-shell>(開発PC):~$ ssh roomba_dev1
 (jetson):~$ cd ~/group_a/roomba_hack
 (jetson):~/group_a/roomba_hack ./RUN-DOCKER-CONTAINER.sh
@@ -134,12 +294,12 @@ jetsonでdockerコンテナを起動</p><pre><code class=language-shell>(開発P
 </code></pre><p>開発PCでdockerコンテナを起動</p><pre><code class=language-shell>(開発PC):~$ cd ~/group_a/roomba_hack
 (開発PC):~/group_a/roomba_hack ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
 (開発PC)(docker):~/roomba_hack#
-</code></pre></p></details><details class=spoiler id=spoiler-8><summary>【jetson】ROSマスタ、各種ノードを起動</summary><p><pre><code class=language-shell>(jetson)(docker):~/roomba_hack# roslaunch roomba_bringup bringup.launch
-</code></pre></p></details><h3 id=rosメッセージの可視化>ROSメッセージの可視化</h3><details class=spoiler id=spoiler-9><summary>【開発PC】topicの確認</summary><p><p><code>/odom</code>の型を確認</p><pre><code class=language-shell>(開発PC)(docker):~/roomba_hack# rostopic type /odom
+</code></pre></p></details><details class=spoiler id=spoiler-21><summary>【jetson】ROSマスタ，各種ノードを起動</summary><p><pre><code class=language-shell>(jetson)(docker):~/roomba_hack# roslaunch roomba_bringup bringup.launch
+</code></pre></p></details><h3 id=rosメッセージの可視化>ROSメッセージの可視化</h3><details class=spoiler id=spoiler-22><summary>【開発PC】topicの確認</summary><p><p><code>/odom</code>の型を確認</p><pre><code class=language-shell>(開発PC)(docker):~/roomba_hack# rostopic type /odom
 </code></pre><p><code>/odom</code>の中身を確認</p><pre><code class=language-shell>(開発PC)(docker):~/roomba_hack# rostopic echo /odom
-</code></pre></p></details><details class=spoiler id=spoiler-10><summary>オドメトリを使ったフィードバック制御</summary><p><p><code>simple_control2.py</code>を実行してみよう．</p><p>開発PCでteleopのコードを実行しましょう</p><pre><code class=language-shell>(開発PC)(docker):~/roomba_hack# roslaunch roomba_teleop teleop.launch
+</code></pre></p></details><details class=spoiler id=spoiler-23><summary>オドメトリを使ったフィードバック制御</summary><p><p><code>simple_control2.py</code>を実行してみよう．</p><p>開発PCでteleopのコードを実行しましょう</p><pre><code class=language-shell>(開発PC)(docker):~/roomba_hack# roslaunch roomba_teleop teleop.launch
 </code></pre><p>このプログラムを動かすときには，コントローラの<code>Y</code>ボタンを押してから<code>B</code>ボタンを押して<code>auto</code>モードにしておきましょう．</p><p>1メートルほど前に進んだあと，左に90度程度旋回し，右に90度程度旋回したら成功です．</p><pre><code class=language-shell>(開発PC)(docker):~/roomba_hack# rosrun navigation_tutorial simple_control2.py
-</code></pre><p>try it! <code>simple_control2.py</code>の中身を読んでコードを変更してみよう</p></p></details></div><div class=article-widget><div class=post-nav><div class=post-nav-item><div class=meta-nav>Next</div><a href=/roomba_hack_course/course/chap3/sensing3/ rel=prev>ロボットシステムにおけるセンシング・アクチュエーション・通信③</a></div></div></div></div><div class=body-footer><p>Last updated on 2022/4/5</p><p class=edit-page><a href=https://github.com/matsuolab/roomba_hack/edit/master/content/course/chap3/sensing2.md><i class="fas fa-pen pr-2"></i>Edit this page</a></p></div></article><footer class=site-footer><p class=powered-by>© 2023 Tokyo Robot And Intelligence Lab (TRAIL)</p><p class=powered-by>Published with <a href="https://wowchemy.com/?utm_campaign=poweredby" target=_blank rel=noopener>Wowchemy</a> — the free, <a href=https://github.com/wowchemy/wowchemy-hugo-modules target=_blank rel=noopener>open source</a> website builder that empowers creators.</p></footer></main></div></div></div><div class=page-footer></div><div id=modal class="modal fade" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><h5 class=modal-title>Cite</h5><button type=button class=close data-dismiss=modal aria-label=Close>
+</code></pre><p>try it! <code>simple_control2.py</code>の中身を読んでコードを変更してみよう</p></p></details></div><div class=article-widget><div class=post-nav><div class=post-nav-item><div class=meta-nav>Next</div><a href=/roomba_hack_course/course/chap3/sensing3/ rel=prev>ロボットシステムにおけるセンシング・アクチュエーション・通信③</a></div></div></div></div><div class=body-footer><p>Last updated on 2023/6/22</p><p class=edit-page><a href=https://github.com/matsuolab/roomba_hack/edit/master/content/course/chap3/sensing2.md><i class="fas fa-pen pr-2"></i>Edit this page</a></p></div></article><footer class=site-footer><p class=powered-by>© 2023 Tokyo Robot And Intelligence Lab (TRAIL)</p><p class=powered-by>Published with <a href="https://wowchemy.com/?utm_campaign=poweredby" target=_blank rel=noopener>Wowchemy</a> — the free, <a href=https://github.com/wowchemy/wowchemy-hugo-modules target=_blank rel=noopener>open source</a> website builder that empowers creators.</p></footer></main></div></div></div><div class=page-footer></div><div id=modal class="modal fade" role=dialog><div class=modal-dialog><div class=modal-content><div class=modal-header><h5 class=modal-title>Cite</h5><button type=button class=close data-dismiss=modal aria-label=Close>
 <span aria-hidden=true>&#215;</span></button></div><div class=modal-body><pre><code class="tex hljs"></code></pre></div><div class=modal-footer><a class="btn btn-outline-primary my-1 js-copy-cite" href=# target=_blank><i class="fas fa-copy"></i> Copy</a>
 <a class="btn btn-outline-primary my-1 js-download-cite" href=# target=_blank><i class="fas fa-download"></i> Download</a><div id=modal-error></div></div></div></div></div><script src=https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin=anonymous></script><script src=https://cdnjs.cloudflare.com/ajax/libs/instant.page/5.1.0/instantpage.min.js integrity="sha512-1+qUtKoh9XZW7j+6LhRMAyOrgSQKenQ4mluTR+cvxXjP1Z54RxZuzstR/H9kgPXQsVB8IW7DMDFUJpzLjvhGSQ==" crossorigin=anonymous></script><script src=https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js integrity="sha256-lqvxZrPLtfffUl2G/e7szqSvPBILGbwmsGE1MKlOi0Q=" crossorigin=anonymous></script><script src=https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.6/isotope.pkgd.min.js integrity="sha256-CBrpuqrMhXwcLLUd5tvQ4euBHCdh7wGlDfNz8vbu/iI=" crossorigin=anonymous></script><script src=https://cdnjs.cloudflare.com/ajax/libs/mermaid/8.8.4/mermaid.min.js integrity="sha512-as1BF4+iHZ3BVO6LLDQ7zrbvTXM+c/1iZ1qII/c3c4L8Rn5tHLpFUtpaEtBNS92f+xGsCzsD7b62XP3XYap6oA==" crossorigin=anonymous title=mermaid></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.0/highlight.min.js integrity="sha512-TDKKr+IvoqZnPzc3l35hdjpHD0m+b2EC2SrLEgKDRWpxf2rFCxemkgvJ5kfU48ip+Y+m2XVKyOCD85ybtlZDmw==" crossorigin=anonymous></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.0/languages/shell.min.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.0/languages/bash.min.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.0/languages/python.min.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.0/languages/cpp.min.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.2.0/languages/makefile.min.js></script><script src=https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.2.2/anchor.min.js integrity="sha512-I7w3ZdSFzw5j3jU3ZkNikBNeIrl3i+hEuEdwNmqUJvwNcaBUNcijnP2gd9DtGlgVYDplfjGoD8vTNsID+lCjqg==" crossorigin=anonymous></script><script>anchors.add()</script><script id=search-hit-fuse-template type=text/x-template>
         <div class="search-hit" id="summary-{{key}}">

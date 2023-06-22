@@ -1,15 +1,38 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Chapter 3 | ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap3/</link><atom:link href="https://matsuolab.github.io/roomba_hack_course/course/chap3/index.xml" rel="self" type="application/rss+xml"/><description>Chapter 3</description><generator>Wowchemy (https://wowchemy.com)</generator><language>ja</language><copyright>© 2023 Tokyo Robot And Intelligence Lab (TRAIL)</copyright><lastBuildDate>Sun, 09 Sep 2018 00:00:00 +0000</lastBuildDate><image><url>https://matsuolab.github.io/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png</url><title>Chapter 3</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap3/</link></image><item><title>ロボットシステムにおけるセンシング・アクチュエーション・通信②</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/</link><pubDate>Tue, 05 Apr 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/</guid><description>&lt;p>複数のセンサを組み合わせてよりかしこくロボットを動かしてみよう&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Chapter 3 | ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap3/</link><atom:link href="https://matsuolab.github.io/roomba_hack_course/course/chap3/index.xml" rel="self" type="application/rss+xml"/><description>Chapter 3</description><generator>Wowchemy (https://wowchemy.com)</generator><language>ja</language><copyright>© 2023 Tokyo Robot And Intelligence Lab (TRAIL)</copyright><lastBuildDate>Sun, 09 Sep 2018 00:00:00 +0000</lastBuildDate><image><url>https://matsuolab.github.io/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png</url><title>Chapter 3</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap3/</link></image><item><title>ロボットシステムにおけるセンシング・アクチュエーション・通信②</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/</link><pubDate>Thu, 22 Jun 2023 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/</guid><description>&lt;p>複数のセンサを組み合わせてよりかしこくロボットを動かしてみよう&lt;/p>
 &lt;h2 id="learn">Learn&lt;/h2>
-&lt;p>&lt;a href="../../chap2/sensing1/#%e6%bc%94%e7%bf%92">前回の演習&lt;/a>では，速度と時間の指令を使ってロボットを制御しました．&lt;/p>
-&lt;p>周囲に障害物が何もない状況や，ロボットの滑りがない環境では，速度と時間のコマンドを使って思った通りにロボットを動かすことができるかもしれませんが，実環境では，ロボットの周囲には障害物が存在しますし，移動距離で制御する方が直感的です．&lt;/p>
-&lt;p>前回の演習のようにロボットに速度と時間を一回与えて，その通りに動かすようなフィードフォワード制御ではなく，今回は，ロボットが逐次的にセンサの情報を反映して振る舞いを変える&lt;mark>フィードバック制御&lt;/mark>を行なってみましょう．&lt;/p>
-&lt;h3 id="オドメトリのセンサ情報を使ってロボットを動かしてみよう">オドメトリのセンサ情報を使ってロボットを動かしてみよう&lt;/h3>
+&lt;p>前回使用した&lt;a href="https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/simple_control.py" target="_blank" rel="noopener">simple_control.py&lt;/a>
+では，速度，角速度，時間を指定し，
+&amp;ldquo;速度 * 時間&amp;rdquo; あるいは &amp;ldquo;角速度 * 時間&amp;rdquo; という演算を行うことで，
+ロボットを意図した場所へ移動させる命令を与えていました．&lt;/p>
+&lt;p>しかし，この制御の仕方には，いくつかの問題があります．&lt;/p>
+&lt;ul>
+&lt;li>ホイールと地面との間に滑りがあった場合，ロボットは指定した距離より小さい距離しか移動しない可能性がある．&lt;/li>
+&lt;li>ロボット本体の問題で，指定した速度よりも実際の速度が大きいまたは小さい場合，
+ロボットは指定した位置には移動しない可能性がある．&lt;/li>
+&lt;/ul>
+&lt;p>これらは，動作の結果を考慮せず，はじめに指定した速度と時間にのみ従って動く，という制御の仕方のために起こります．&lt;/p>
+&lt;p>このように，あらかじめ指定された制御信号にのみ基づいて制御を行い，
+その結果（フィードバック情報）を考慮しない制御の仕方を
+&lt;mark>フィードフォワード制御&lt;/mark>（開ループ制御）と呼びます．
+フィードフォワード制御は，制御対象が予測可能で外乱が少ない場合や，
+システムが簡潔である場合に使用されることがあります．&lt;/p>
+&lt;p>一方で，センサーからのフィードバック情報を利用して制御信号を修正する制御の仕方を
+&lt;mark>フィードバック制御&lt;/mark>（閉ループ制御）と呼びます．
+フィードバック制御は，制御対象の予測が難しく，外乱が大きい場合に有効です．&lt;/p>
+&lt;p>今回は，ロボットのセンサ情報を用いるフィードバック制御
+によってロボットをより柔軟に動かしてみましょう．
+オドメトリとLiDARという2種類のセンサの情報を用います．&lt;/p>
+&lt;!--
+前回の演習のようにロボットに速度と時間を一回与えて，その通りに動かすようなフィードフォワード制御ではなく，今回は，ロボットが逐次的にセンサの情報を反映して振る舞いを変える&lt;mark>フィードバック制御&lt;/mark>を行なってみましょう．-->
+&lt;h3 id="オドメトリのセンサ情報を用いた制御">オドメトリのセンサ情報を用いた制御&lt;/h3>
 &lt;p>まずは，ロボットのタイヤの回転量から計算される移動距離である&lt;mark>（ホイール）オドメトリ（odometry）&lt;/mark>を使った制御をしてみましょう．&lt;/p>
 &lt;h4 id="オドメトリのメッセージodomの中身を見てみよう">オドメトリのメッセージ（&lt;code>/odom&lt;/code>）の中身を見てみよう&lt;/h4>
 &lt;p>roombaのオドメトリの情報は，&lt;code>/odom&lt;/code>トピックにpublishされています．&lt;/p>
-&lt;p>&lt;code>rostopic echo /odom&lt;/code>をしてみるとメッセージとしてどんな情報が流れているかわかります．
-&lt;details class="spoiler " id="spoiler-2">
-&lt;summary>&lt;code>rostopic echo -n 1 /odom&lt;/code>&lt;/summary>
+&lt;pre>&lt;code>$ rostopic echo /odom
+&lt;/code>&lt;/pre>
+&lt;p>を実行するとメッセージとしてどのような情報が流れているかがわかります．
+&lt;details class="spoiler " id="spoiler-4">
+&lt;summary>&lt;code>$ rostopic echo -n 1 /odom&lt;/code>&lt;/summary>
 &lt;p>&lt;pre>&lt;code class="language-bash">root@dynamics:~/roomba_hack# rostopic echo -n 1 /odom
 header:
 seq: 2115
@@ -45,20 +68,32 @@ covariance: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.
 &lt;/code>&lt;/pre>
 &lt;/p>
 &lt;/details>&lt;/p>
-&lt;p>&lt;code>rostopic type /odom&lt;/code>をしてみると，メッセージとして，&lt;code>nav_msgs/Odometry&lt;/code>型が使われていることがわかります．
-&lt;details class="spoiler " id="spoiler-3">
-&lt;summary>&lt;code>rostopic type /odom&lt;/code>&lt;/summary>
+&lt;p>また，&lt;/p>
+&lt;pre>&lt;code>$ rostopic type /odom
+&lt;/code>&lt;/pre>
+&lt;p>を実行すると，メッセージとして，&lt;code>nav_msgs/Odometry&lt;/code>型が使われていることがわかります．
+&lt;details class="spoiler " id="spoiler-5">
+&lt;summary>&lt;code>$ rostopic type /odom&lt;/code>&lt;/summary>
 &lt;p>&lt;pre>&lt;code class="language-bash">root@dynamics:~/roomba_hack# rostopic type /odom
 nav_msgs/Odometry
 &lt;/code>&lt;/pre>
 &lt;/p>
 &lt;/details>&lt;/p>
-&lt;p>&lt;code>nav_msgs/Odometry&lt;/code>型の&lt;a href="http://docs.ros.org/en/noetic/api/nav_msgs/html/msg/Odometry.html" target="_blank" rel="noopener">ドキュメント&lt;/a>を確認してみると，このメッセージは&lt;code>pose&lt;/code>と&lt;code>twist&lt;/code>で構成されていることがわかります．&lt;/p>
-&lt;p>&lt;code>pose&lt;/code>は．（&lt;code>child_frame&lt;/code>から見た）ロボットの推定姿勢（位置と回転角）を表していて，&lt;code>covariance&lt;/code>にはその不確かさを表す共分散が記録されています．&lt;/p>
-&lt;p>一方，&lt;code>twist&lt;/code>は，（&lt;code>child_frame&lt;/code>から見た）ロボットの速度を表していて，&lt;code>pose&lt;/code>と同様に&lt;code>covariance&lt;/code>にはその不確かさを表す共分散が記録されています．&lt;/p>
-&lt;p>なお，メッセージ型の定義は，&lt;code>rosmsg info nav_msgs/Odometry&lt;/code>することでもコマンドから確認できます．
-&lt;details class="spoiler " id="spoiler-4">
-&lt;summary>&lt;code>rosmsg info nav_msgs/Odometry&lt;/code>&lt;/summary>
+&lt;p>&lt;a href="http://docs.ros.org/en/noetic/api/nav_msgs/html/msg/Odometry.html" target="_blank" rel="noopener">nav_msgs/Odometry型のドキュメント&lt;/a>を確認すると，このメッセージは&lt;code>pose&lt;/code>と&lt;code>twist&lt;/code>で構成されていることがわかります．&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>&lt;code>pose&lt;/code>は（&lt;code>child_frame&lt;/code>から見た）ロボットの推定姿勢（位置と回転角）を表していて，&lt;code>covariance&lt;/code>にはその不確かさを表す共分散が記録されています．&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>一方，&lt;code>twist&lt;/code>は（&lt;code>child_frame&lt;/code>から見た）ロボットの速度を表していて，&lt;code>pose&lt;/code>と同様に&lt;code>covariance&lt;/code>にはその不確かさを表す共分散が記録されています．&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>なお，メッセージ型の定義は，コマンドで&lt;/p>
+&lt;pre>&lt;code>$ rosmsg info nav_msgs/Odometry
+&lt;/code>&lt;/pre>
+&lt;p>を実行しても確認できます．
+&lt;details class="spoiler " id="spoiler-6">
+&lt;summary>&lt;code>$ rosmsg info nav_msgs/Odometry&lt;/code>&lt;/summary>
 &lt;p>&lt;pre>&lt;code class="language-bash">root@dynamics:~/roomba_hack# rosmsg info nav_msgs/Odometry
 std_msgs/Header header
 uint32 seq
@@ -97,14 +132,19 @@ float64[36] covariance
 &lt;p>クォータニオンによる3次元回転の表現は，角度を連続的にかつ簡潔に表現できるためROSではよく用いられます（その他には，オイラー角による表現や回転行列による表現があります）．&lt;/p>
 &lt;p>それぞれの回転角に関する表現のメリット・デメリットを調べてみましょう（「ジンバルロック」などのキーワードで調べるとよりよく理解できると思います）．&lt;/p>
 &lt;p>クォータニオンからオイラー角へは，&lt;code>tf&lt;/code>パッケージの&lt;code>tf.transformations.euler_from_quaternion&lt;/code>を使うことで変換できます（&lt;a href="http://docs.ros.org/en/jade/api/tf/html/python/transformations.html#tf.transformations.euler_from_quaternion" target="_blank" rel="noopener">ドキュメント&lt;/a>）．&lt;/p>
-&lt;h4 id="サブスクライバsubscriberの仕組みを知ろう">サブスクライバ（subscriber)の仕組みを知ろう&lt;/h4>
+&lt;h4 id="実装の例を見てみる">実装の例を見てみる&lt;/h4>
 &lt;p>それでは，オドメトリ&lt;code>/odom&lt;/code>の情報を使った制御の実装の例として&lt;code>navigation_tutorial&lt;/code>パッケージの中の&lt;code>simple_control2.py&lt;/code>を見てみましょう（&lt;a href="https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/simple_control2.py" target="_blank" rel="noopener">github&lt;/a>）．&lt;/p>
-&lt;p>前回までに強調されてきた通り，ROSは非同期分散のシステムを簡単に作ることができるのが特徴です．
-そのため，ロボットから非同期に送られてくる&lt;code>/odom&lt;/code>の情報をうまく扱うことが重要です．&lt;/p>
-&lt;p>実装例にあるように，Pythonによるノードの実装では，クラスとして定義するのがわかりやすい方法でしょう．&lt;/p>
-&lt;p>実装例では，&lt;code>SimpleControlller&lt;/code>クラスとして，&lt;code>simple_controller&lt;/code>というノードを定義しています．
-以下のように，ノードを初期化する際に，コマンドを&lt;code>/cmd_vel&lt;/code>トピックに送信するパブリッシャ（publisher)と，&lt;code>/odom&lt;/code>を受信するサブスクライバ(subscriber)を作成しています．&lt;/p>
-&lt;pre>&lt;code class="language-python">class SimpleController:
+&lt;h3 id="ソースコードを読んでみよう">ソースコードを読んでみよう&lt;/h3>
+&lt;p>画面にウィンドウを2つ並べるなど，&lt;a href="https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/simple_control2.py" target="_blank" rel="noopener">githubのソースコード&lt;/a>をみながら以下の解説を読むことをお勧めします．&lt;/p>
+&lt;details class="spoiler " id="spoiler-8">
+&lt;summary>simple_control2.py&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-python">#!/usr/bin/env python3
+import numpy as np
+import rospy
+import tf
+from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
+class SimpleController:
 def __init__(self):
 rospy.init_node('simple_controller', anonymous=True)
 # Publisher
@@ -116,26 +156,349 @@ self.y = None
 self.yaw = None
 while self.x is None:
 rospy.sleep(0.1)
+def callback_odom(self, data):
+self.x = data.pose.pose.position.x
+self.y = data.pose.pose.position.y
+self.yaw = self.get_yaw_from_quaternion(data.pose.pose.orientation)
+def go_straight(self, dis, velocity=0.3):
+vel = Twist()
+x0 = self.x
+y0 = self.y
+while(np.sqrt((self.x-x0)**2+(self.y-y0)**2)&amp;lt;dis):
+vel.linear.x = velocity
+vel.angular.z = 0.0
+self.cmd_vel_pub.publish(vel)
+rospy.sleep(0.1)
+self.stop()
+def turn_right(self, yaw, yawrate=-0.5):
+vel = Twist()
+yaw0 = self.yaw
+while(abs(self.yaw-yaw0)&amp;lt;np.deg2rad(yaw)):
+vel.linear.x = 0.0
+vel.angular.z = yawrate
+self.cmd_vel_pub.publish(vel)
+rospy.sleep(0.1)
+self.stop()
+def turn_left(self, yaw, yawrate=0.5):
+vel = Twist()
+yaw0 = self.yaw
+while(abs(self.yaw-yaw0)&amp;lt;np.deg2rad(yaw)):
+vel.linear.x = 0.0
+vel.angular.z = yawrate
+self.cmd_vel_pub.publish(vel)
+rospy.sleep(0.1)
+self.stop()
+def stop(self):
+vel = Twist()
+vel.linear.x = 0.0
+vel.angular.z = 0.0
+self.cmd_vel_pub.publish(vel)
+def get_yaw_from_quaternion(self, quaternion):
+e = tf.transformations.euler_from_quaternion(
+(quaternion.x, quaternion.y, quaternion.z, quaternion.w))
+return e[2]
+if __name__=='__main__':
+simple_controller = SimpleController()
+try:
+simple_controller.go_straight(1.0)
+simple_controller.turn_left(90)
+simple_controller.turn_right(90)
+except rospy.ROSInitException:
+pass
 &lt;/code>&lt;/pre>
-&lt;p>パブリッシャの使い方は前回の&lt;code>simple_control.py&lt;/code>の&lt;a href="https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/simple_control.py" target="_blank" rel="noopener">実装&lt;/a>を確認してください．&lt;/p>
-&lt;p>パブリッシャと同様に，サブスクライバは&lt;code>rospy&lt;/code>の&lt;code>Subscriber&lt;/code>を用いて作成できます．
-サブスクライバの特徴として，メッセージを受信した時の処理である&lt;mark>コールバック（callback）&lt;/mark>を定義できます．&lt;/p>
-&lt;p>この実装例では，&lt;code>self.callback_odom&lt;/code>として定義されており，インスタンスの属性（&lt;code>self.x&lt;/code>, &lt;code>self.y&lt;/code>, &lt;code>self.yaw&lt;/code>）を，受信したメッセージで変更するようなプログラムになっています．&lt;/p>
-&lt;pre>&lt;code class="language-python"> def callback_odom(self, data):
+&lt;/p>
+&lt;/details>
+&lt;h4 id="かんたんな説明">かんたんな説明&lt;/h4>
+&lt;p>上記ソースコードの大枠のみを抜き出すと，以下のようになっています．
+&lt;details class="spoiler " id="spoiler-9">
+&lt;summary>simple_control2.pyの大枠&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-python">#!/usr/bin/env python3 # 1
+import ~ # 2
+class SimpleController: # 3
+def __init__(self): # 4
+pass
+def callback_odom(self, data): # 5
+pass
+def go_straight(self, dis, velocity=0.3):
+pass
+def turn_right(self, yaw, yawrate=-0.5):
+pass
+def turn_left(self, yaw, yawrate=0.5):
+pass
+def stop(self):
+pass
+def get_yaw_from_quaternion(self, quaternion):
+pass
+if __name__=='__main__': # 6
+simple_controller = SimpleController() # 7
+pass
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>&lt;/p>
+&lt;p>それぞれについて簡潔に解説します．&lt;/p>
+&lt;details class="spoiler " id="spoiler-10">
+&lt;summary>#1 shebang&lt;/summary>
+&lt;p>shebang(シバン)と呼ばれるもので，このファイルを実行する際に，どのプログラムを使って実行するかを指定する．
+&lt;code>#!/usr/bin/env python3&lt;/code> と書いてあるので，このファイルはpython3で実行するのだとコンピュータに教えている．&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-11">
+&lt;summary>#2 import&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-python">import numpy as np
+import rospy
+import tf
+from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>pythonの標準の関数(printなど)だけでは機能が足りないので，別のモジュールをインポートしている．&lt;/li>
+&lt;li>このソースコードでは，numpy, rospy, tf というモジュールをインポートしている．
+&lt;ul>
+&lt;li>rospyというのが，pythonでrosを使うためのモジュール．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>また，geometry_msgs.msgというモジュールからTwistというデータ型, nav_msgs.msgというモジュールからOdometoryというデータ型をそれぞれインポートしている．&lt;/li>
+&lt;/ul>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-12">
+&lt;summary>#3 class&lt;/summary>
+&lt;p>&lt;ul>
+&lt;li>SimpleControllerという名前のクラスを定義している．&lt;/li>
+&lt;li>クラスはオブジェクトの設計図のようなもの．
+&lt;ul>
+&lt;li>オブジェクトとは，データとそのデータの振る舞いをまとめたもの．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;details class="spoiler " id="spoiler-0">
+&lt;summary>classの例1&lt;/summary>
+&lt;p>&lt;p>以下のようなクラスを定義したとする．&lt;/p>
+&lt;pre>&lt;code class="language-python">class Car:
+def __init__(self, color, speed):
+self.color = color
+self.speed = speed
+self.fuel = 100
+&lt;p>def drive(self):
+self.fuel -= 20
+print(&amp;lsquo;drove!')
+print(f&amp;rsquo;残りの燃料は{self.fuel}リットルです&amp;rsquo;)&lt;/p>
+&lt;p>def charge(self):
+self.fuel = 100
+print(&amp;lsquo;charged!')
+print(f&amp;rsquo;残りの燃料は{self.fuel}リットルです&amp;rsquo;)&lt;/p>
+&lt;p>def info(self):
+print(f&amp;rsquo;色は{self.color}です')
+print(f&amp;rsquo;速度は{self.speed}km/hです')
+print(f&amp;rsquo;残りの燃料は{self.fuel}リットルです')
+&lt;/code>&lt;/pre>&lt;/p>
+&lt;p>以下のように使える．&lt;/p>
+&lt;pre>&lt;code class="language-python">mycar = Car('red', 200)
+&lt;p>mycar.drive()
+#drove!
+#残りの燃料は80リットルです&lt;/p>
+&lt;p>mycar.drive()
+#drove!
+#残りの燃料は60リットルです&lt;/p>
+&lt;p>mycar.charge()
+#charged!
+#残りの燃料は100リットルです&lt;/p>
+&lt;p>mycar.info()
+#色はredです
+#速度は200km/hです
+#残りの燃料は100リットルです
+&lt;/code>&lt;/pre>&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-1">
+&lt;summary>classの例2&lt;/summary>
+&lt;p>&lt;p>pythonのstring型や，int型，list型も，実はオブジェクトである．&lt;/p>
+&lt;pre>&lt;code class="language-python">people = ['Alice', 'Bob', 'Charlie']
+people.append('Dave')
+&lt;p>print(people)
+#[&amp;lsquo;Alice&amp;rsquo;, &amp;lsquo;Bob&amp;rsquo;, &amp;lsquo;Charlie&amp;rsquo;, &amp;lsquo;Dave&amp;rsquo;]
+&lt;/code>&lt;/pre>&lt;/p>
+&lt;p>上の例では，list型のオブジェクトpeopleに対して，appendというメソッド(そのオブジェクトが持つ関数)を呼び出し，新しい要素を追加している．&lt;/p>
+&lt;/p>
+&lt;/details>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-13">
+&lt;summary>#4 コンストラクタ&lt;/summary>
+&lt;p>&lt;ul>
+&lt;li>コンストラクタ__init__()とは，オブジェクト生成時に呼び出される関数のこと．&lt;/li>
+&lt;li>初期化のための関数というイメージ．&lt;/li>
+&lt;/ul>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-14">
+&lt;summary>#5 メソッドの定義&lt;/summary>
+&lt;p>&lt;ul>
+&lt;li>メソッドとは，オブジェクトが持つ関数のこと．&lt;/li>
+&lt;li>classの定義の中では，&lt;code>self.method_name(引数1, 引数2)&lt;/code>という形で呼び出すことができる．&lt;/li>
+&lt;li>オブジェクトの外から使用するときには，上のCarの例のように，&lt;code>object_name.method_name(引数1, 引数2)&lt;/code>という形で呼び出すことができる．&lt;/li>
+&lt;li>定義の第一引数には，必ず&lt;code>self&lt;/code>を指定する．これは，そのオブジェクト自身を指す．
+&lt;ul>
+&lt;li>呼び出すときには&lt;code>self&lt;/code>は省略する．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-15">
+&lt;summary>#6 ファイル実行時の処理&lt;/summary>
+&lt;p>&lt;ul>
+&lt;li>このif文の中の処理は，ファイルを直接実行したときにのみ実行される．&lt;/li>
+&lt;li>&lt;code>__name__&lt;/code>は特殊な変数で，ファイルを直接実行したときには&lt;code>'__main__'&lt;/code>という値を持つ．
+&lt;ul>
+&lt;li>importされたときには&lt;code>__name__&lt;/code>にはファイル名が入るため，このif文の中の処理は実行されない．
+&lt;pre>&lt;code class="language-python">#!/usr/bin/env python3
+print(__name__)
+&lt;/code>&lt;/pre>
+&lt;p>とだけ記述したファイルを実行してみると，ふるまいが理解しやすいかもしれない．&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/p>
+&lt;/details>
+&lt;h4 id="より詳細な理解">より詳細な理解&lt;/h4>
+&lt;p>simple_control2.pyについてより詳細に解説します．&lt;/p>
+&lt;details class="spoiler " id="spoiler-16">
+&lt;summary>コンストラクタ&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-python"> def __init__(self):
+rospy.init_node('simple_controller', anonymous=True)
+# Publisher
+self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+# Subscriber
+odom_sub = rospy.Subscriber('/odom', Odometry, self.callback_odom)
+self.x = None
+self.y = None
+self.yaw = None
+while self.x is None:
+rospy.sleep(0.1)
+&lt;/code>&lt;/pre>
+&lt;p>上にも述べた通り，&lt;code>__init__&lt;/code>はコンストラクタと呼ばれ，オブジェクト生成時に自動で呼び出される関数です．
+各行について順番に見ていきます．&lt;/p>
+&lt;pre>&lt;code class="language-python"> rospy.init_node('simple_controller', anonymous=True)
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>&lt;code>simple_controller&lt;/code>という名前のノードを作成しています．&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-python"> self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>&lt;code>rospy.Publisher()&lt;/code>によって，上で作成したノードがpublisherとして機能することを宣言しています．&lt;/li>
+&lt;li>このノードは，&lt;code>/cmd_vel&lt;/code>というトピックに対して，&lt;code>Twist&lt;/code>というデータ型のメッセージを送信しています．
+&lt;ul>
+&lt;li>&lt;code>Twist&lt;/code>の情報は，&lt;a href="http://wiki.ros.org/geometry_msgs">geometry_msgsのドキュメント&lt;/a>より確認できます．&lt;/li>
+&lt;li>&lt;code>Twist&lt;/code>は速度３成分と角速度３成分を格納するデータ型です．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>第２引数のqueue_sizeは，メッセージを送信する命令が，許容できる周期より短い場合に，メッセージをキューにためておく数を指定します．
+&lt;ul>
+&lt;li>ここでは，10個までキューにためておくことを指定しています．&lt;/li>
+&lt;li>たまった数が10個より少ない場合には，古い順にメッセージをパブリッシュしていきます．&lt;/li>
+&lt;li>たまった数が10個に達した場合には，最も古いメッセージを破棄します．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-python"> odom_sub = rospy.Subscriber('/odom', Odometry, self.callback_odom)
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>&lt;code>rospy.Subscriber()&lt;/code>によって，作成したノードがsubscriberとして機能することを宣言しています．&lt;/li>
+&lt;li>このノードは，&lt;code>/odom&lt;/code>というトピックから，&lt;code>Odometry&lt;/code>というデータ型のメッセージを受信しています．
+&lt;ul>
+&lt;li>&lt;code>Odometry&lt;/code>の情報は，&lt;a href="http://wiki.ros.org/nav_msgs">nav_msgsのドキュメント&lt;/a>より確認できます．&lt;/li>
+&lt;li>&lt;code>Odometry&lt;/code>は，位置と姿勢，及び速度と角速度を格納するデータ型です．&lt;/li>
+&lt;li>ここでは，&lt;code>Odometry&lt;/code>には，ルンバの現在の位置や運動の様子が格納されており，それを受信しています．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>rospy.Subscriber()の第三引数として，&lt;code>self.callback_odom&lt;/code>というコールバック関数を指定しています．
+&lt;ul>
+&lt;li>subscriberにはコールバック関数を指定する必要があります．&lt;/li>
+&lt;li>コールバック関数とは，subscriberがメッセージを受信したときに実行される関数のことです．
+&lt;ul>
+&lt;li>コールバック関数は，メッセージを引数として実行します．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>コールバック関数の中身は，後述します．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-python"> self.x = None
+self.y = None
+self.yaw = None
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>アトリビュートを定義しています．&lt;/li>
+&lt;li>クラスの定義の中で&lt;code>self.&amp;lt;name&amp;gt;&lt;/code>の形式で表される変数は，そのクラスのオブジェクトが持つ&amp;quot;attribute(アトリビュート)&amp;ldquo;と呼ばれます．
+&lt;ul>
+&lt;li>アトリビュートには，そのclassの定義の中であればどこからでもアクセスできます．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>ここでは，&lt;code>self.x&lt;/code>, &lt;code>self.y&lt;/code>, &lt;code>self.yaw&lt;/code>というアトリビュートを定義しています．
+&lt;ul>
+&lt;li>これらのアトリビュートは，後述するコールバック関数の中で値が更新されます．&lt;/li>
+&lt;li>このアトリビュートには，ロボットの現在の位置や姿勢が格納されます．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-python"> while self.x is None:
+rospy.sleep(0.1)
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>&lt;code>self.x&lt;/code>がNoneである間，0.1秒間隔で待機し続けます．&lt;/li>
+&lt;/ul>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-17">
+&lt;summary>コールバック関数&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-python"> def callback_odom(self, data):
 self.x = data.pose.pose.position.x
 self.y = data.pose.pose.position.y
 self.yaw = self.get_yaw_from_quaternion(data.pose.pose.orientation)
 &lt;/code>&lt;/pre>
-&lt;p>つまり，&lt;code>self.x&lt;/code>には&lt;code>/odom&lt;/code>から受信した位置のx座標，&lt;code>self.y&lt;/code>には位置のy座標，&lt;code>self.yaw&lt;/code>には，回転角のyawを格納しています．&lt;/p>
-&lt;p>クォータニオンとして受信した姿勢の回転角のyaw成分を取り出すための&lt;code>self.get_yaw_from_quaternion&lt;/code>は以下のようになっています（オイラー角はroll, pitch, yawの順で返ってくるので&lt;code>e[2]&lt;/code>でyawを取得しています）．&lt;/p>
+&lt;ul>
+&lt;li>コンストラクタの項目で説明した通り，subscriberを定義する際にはコールバック関数を指定する必要があります．&lt;/li>
+&lt;li>コールバック関数はsubscriberがメッセージを受信した際，そのメッセージを引数として実行する関数でした．&lt;/li>
+&lt;li>上のコールバック関数では，引数&lt;code>data&lt;/code>には，&lt;code>Odometry&lt;/code>型のメッセージが格納されます．
+&lt;ul>
+&lt;li>&lt;code>data.pose.pose.position&lt;/code>という書き方によって，Odometry型の中の，位置を表すpositionという要素にアクセスしています．&lt;/li>
+&lt;li>同様に，&lt;code>data.pose.pose.orientation&lt;/code>という書き方によって，Odometry型の中の，姿勢を表すorientationという要素にアクセスしています．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>コンストラクタで定義していたアトリビュート&lt;code>self.x&lt;/code>, &lt;code>self.y&lt;/code>, &lt;code>self.yaw&lt;/code>に，メッセージから得られた位置と姿勢を格納しています．
+&lt;ul>
+&lt;li>&lt;code>self.yaw&lt;/code>に値を格納する時に使用している関数&lt;code>get_yaw_from_quaternion()&lt;/code>については，後述します．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>このコールバック関数が一度でも呼ばれると，&lt;code>self.x&lt;/code>に入っているNoneの値が上書きされ，コンストラクタの中のwhile文が終了します．&lt;/li>
+&lt;/ul>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-18">
+&lt;summary>get_yaw_from_quaternion関数&lt;/summary>
+&lt;p>&lt;p>go_straight関数やturn_right関数とは順番が前後しますが，先にget_yaw_from_quaternion関数について説明します．&lt;/p>
 &lt;pre>&lt;code class="language-python"> def get_yaw_from_quaternion(self, quaternion):
 e = tf.transformations.euler_from_quaternion(
 (quaternion.x, quaternion.y, quaternion.z, quaternion.w))
 return e[2]
 &lt;/code>&lt;/pre>
-&lt;p>これらのセンサの値を使うことで，以下のように，指定した距離ロボットが移動するまで直進させ続けたり，指定した角度までロボットが回転するまで回転させ続けることができるようになります．&lt;/p>
-&lt;p>直進&lt;/p>
-&lt;pre>&lt;code class="language-python"> def go_straight(self, dis, velocity=0.3):
+&lt;ul>
+&lt;li>tfモジュールのeuler_from_quaternion関数を利用しています．
+&lt;ul>
+&lt;li>euler_from_quaternion()は，クォータニオン(4要素)を引数として，オイラー角(3要素)を返す関数です．&lt;/li>
+&lt;li>クォータニオンについてはLearn/オドメトリのセンサ情報を用いた制御/クォータニオンの項目で説明しました．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>Odometry&lt;/code>型のメッセージのうち，姿勢を表すorientationという要素は，クォータニオンで表されているため，オイラー角で制御したい場合には，この関数を用いてオイラー角に変換する必要があります．&lt;/li>
+&lt;li>ルンバはxy平面上を動くため，z軸周りのオイラー角さえわかれば十分です．そのため，このget_yaw_from_quaternion関数ではオイラー角のz軸成分(第2成分)のみを返しています．&lt;/li>
+&lt;/ul>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-19">
+&lt;summary>go_straight関数&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-python"> def go_straight(self, dis, velocity=0.3):
 vel = Twist()
 x0 = self.x
 y0 = self.y
@@ -146,31 +509,57 @@ self.cmd_vel_pub.publish(vel)
 rospy.sleep(0.1)
 self.stop()
 &lt;/code>&lt;/pre>
-&lt;p>右回転&lt;/p>
-&lt;pre>&lt;code class="language-python"> def turn_right(self, yaw, yawrate=-0.5):
-vel = Twist()
-yaw0 = self.yaw
-while(abs(self.yaw-yaw0)&amp;lt;np.deg2rad(yaw)):
-vel.linear.x = 0.0
-vel.angular.z = yawrate
+&lt;p>ロボットを直進させる関数です．順に説明します&lt;/p>
+&lt;pre>&lt;code> vel = Twist()
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>&lt;code>Twist&lt;/code>型のオブジェクトを生成しています．&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-python"> x0 = self.x
+y0 = self.y
+&lt;/code>&lt;/pre>
+&lt;ul>
+&lt;li>self.x, self.yには，コールバック関数で更新された(直前の)ルンバの位置が格納されています．それをx0, y0に代入しています．&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-python"> while(np.sqrt((self.x-x0)**2+(self.y-y0)**2)&amp;lt;dis):
+vel.linear.x = velocity
+vel.angular.z = 0.0
 self.cmd_vel_pub.publish(vel)
 rospy.sleep(0.1)
-self.stop()
 &lt;/code>&lt;/pre>
-&lt;p>左回転&lt;/p>
-&lt;pre>&lt;code class="language-python"> def turn_left(self, yaw, yawrate=0.5):
-vel = Twist()
-yaw0 = self.yaw
-while(abs(self.yaw-yaw0)&amp;lt;np.deg2rad(yaw)):
-vel.linear.x = 0.0
-vel.angular.z = yawrate
-self.cmd_vel_pub.publish(vel)
-rospy.sleep(0.1)
-self.stop()
+&lt;ul>
+&lt;li>点(self.x, self.y)と点(x0, y0)の距離が指定したdisより小さい間，while以下の処理を繰り返します．
+&lt;ul>
+&lt;li>velの並進成分のx成分に，引数で指定したvelocityの値を格納します．&lt;/li>
+&lt;li>velの回転成分のz成分(z軸周りの角速度)に，0を格納します．&lt;/li>
+&lt;li>コンストラクタの中で定義したpublisherである&lt;code>self.cmd_vel_pub&lt;/code>の.publish()関数を用いて，publishを行います．
+&lt;ul>
+&lt;li>引数にvelを指定しているので，確かにTwist型のメッセージをパブリッシュしています．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>&lt;code>rospy.sleep(0.1)&lt;/code>で0.1秒待ち，次のループに入ります．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;pre>&lt;code class="language-python"> self.stop()
 &lt;/code>&lt;/pre>
-&lt;p>それでは，オドメトリを使って実際にロボットを制御してみましょう．&lt;/p>
+&lt;ul>
+&lt;li>while文が終了したら，ロボットを停止させます．
+&lt;ul>
+&lt;li>stop関数については，説明を省略します．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>turn_right, turn_left関数についても，go_straight関数の説明と同様なので省略します．&lt;/li>
+&lt;/ul>
+&lt;/p>
+&lt;/details>
+&lt;p>単純に &amp;ldquo;(角)速度 * 時間&amp;rdquo; によって移動の姿勢を指定しているのではなく，オドメトリのセンサ情報を使いながら，
+目標の姿勢に到達するように制御していることを再度強調しておきます．&lt;/p>
+&lt;p>pythonのコードの読み方についての基本的な説明は上の説明で尽きているので，
+余力があれば（なくても）各自&lt;a href="https://github.com/matsuolab/roomba_hack" target="_blank" rel="noopener">roomba_hackリポジトリ&lt;/a>
+上の気になったコードを読んでみましょう．&lt;/p>
 &lt;h2 id="演習">演習&lt;/h2>
-&lt;details class="spoiler " id="spoiler-7">
+&lt;details class="spoiler " id="spoiler-20">
 &lt;summary>【jetson・開発マシン】それぞれdockerコンテナを起動&lt;/summary>
 &lt;p>&lt;p>．
 jetsonでdockerコンテナを起動&lt;/p>
@@ -186,14 +575,14 @@ jetsonでdockerコンテナを起動&lt;/p>
 &lt;/code>&lt;/pre>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-8">
-&lt;summary>【jetson】ROSマスタ、各種ノードを起動&lt;/summary>
+&lt;details class="spoiler " id="spoiler-21">
+&lt;summary>【jetson】ROSマスタ，各種ノードを起動&lt;/summary>
 &lt;p>&lt;pre>&lt;code class="language-shell">(jetson)(docker):~/roomba_hack# roslaunch roomba_bringup bringup.launch
 &lt;/code>&lt;/pre>
 &lt;/p>
 &lt;/details>
 &lt;h3 id="rosメッセージの可視化">ROSメッセージの可視化&lt;/h3>
-&lt;details class="spoiler " id="spoiler-9">
+&lt;details class="spoiler " id="spoiler-22">
 &lt;summary>【開発PC】topicの確認&lt;/summary>
 &lt;p>&lt;p>&lt;code>/odom&lt;/code>の型を確認&lt;/p>
 &lt;pre>&lt;code class="language-shell">(開発PC)(docker):~/roomba_hack# rostopic type /odom
@@ -203,7 +592,7 @@ jetsonでdockerコンテナを起動&lt;/p>
 &lt;/code>&lt;/pre>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-10">
+&lt;details class="spoiler " id="spoiler-23">
 &lt;summary>オドメトリを使ったフィードバック制御&lt;/summary>
 &lt;p>&lt;p>&lt;code>simple_control2.py&lt;/code>を実行してみよう．&lt;/p>
 &lt;p>開発PCでteleopのコードを実行しましょう&lt;/p>
@@ -215,7 +604,7 @@ jetsonでdockerコンテナを起動&lt;/p>
 &lt;/code>&lt;/pre>
 &lt;p>try it! &lt;code>simple_control2.py&lt;/code>の中身を読んでコードを変更してみよう&lt;/p>
 &lt;/p>
-&lt;/details></description></item><item><title>ロボットシステムにおけるセンシング・アクチュエーション・通信③</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing3/</link><pubDate>Tue, 05 Apr 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing3/</guid><description>&lt;p>複数のセンサを組み合わせてよりかしこくロボットを動かしてみよう&lt;/p>
+&lt;/details></description></item><item><title>ロボットシステムにおけるセンシング・アクチュエーション・通信③</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing3/</link><pubDate>Thu, 22 Jun 2023 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing3/</guid><description>&lt;p>複数のセンサを組み合わせてよりかしこくロボットを動かしてみよう&lt;/p>
 &lt;h2 id="learn">Learn&lt;/h2>
 &lt;h3 id="lidarのスキャンデータを使って障害物を回避してみよう">LiDARのスキャンデータを使って，障害物を回避してみよう&lt;/h3>
 &lt;p>次に，LiDARでスキャンしたデータを使って，障害物を回避するようなプログラムを作ってみましょう．&lt;/p>
@@ -265,7 +654,63 @@ float32[] intensities
 LiDARスキャンをrvizで可視化
 &lt;/figcaption>&lt;/figure>
 &lt;h4 id="lidarを使って障害物を回避しよう">LiDARを使って障害物を回避しよう&lt;/h4>
-&lt;p>それでは，LiDARスキャン&lt;code>/scan&lt;/code>の情報を使った制御の実装の例として&lt;code>navigation_tutorial&lt;/code>パッケージの中の&lt;code>avoidance.py&lt;/code>を見てみましょう（&lt;a href="https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/avoidance.py" target="_blank" rel="noopener">github&lt;/a>）．&lt;/p>
+&lt;p>それでは，LiDARスキャン&lt;code>/scan&lt;/code>の情報を使った制御の実装の例として&lt;code>navigation_tutorial&lt;/code>パッケージの中の&lt;a href="https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/avoidance.py" target="_blank" rel="noopener">avoidance.py&lt;/a>をみてみましょう．&lt;/p>
+&lt;details class="spoiler " id="spoiler-3">
+&lt;summary>avoidance.py&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-python">#!/usr/bin/env python3
+import numpy as np
+import rospy
+from geometry_msgs.msg import Twist
+from sensor_msgs.msg import LaserScan
+class Avoidance:
+def __init__(self):
+rospy.init_node('avoidance', anonymous=True)
+# Publisher
+self.cmd_vel_pub = rospy.Publisher('/planner/cmd_vel', Twist, queue_size=10)
+# Subscriber
+scan_sub = rospy.Subscriber('/scan', LaserScan, self.callback_scan)
+self.min_range = None
+def callback_scan(self, data):
+fov = np.deg2rad(60)
+min_range = data.range_max
+min_idx = -1
+angle = data.angle_min
+for idx, r in enumerate(data.ranges):
+angle += data.angle_increment
+if -fov&amp;lt;angle&amp;lt;fov:
+if r&amp;lt;min_range:
+min_range = r
+min_idx = idx
+if min_idx &amp;lt; len(data.ranges)/2.0:
+self.direction = &amp;quot;RIGHT&amp;quot;
+else:
+self.direction = &amp;quot;LEFT&amp;quot;
+self.min_range = min_range
+def process(self):
+r = rospy.Rate(10)
+while not rospy.is_shutdown():
+vel = Twist()
+if self.min_range is not None:
+if self.min_range &amp;gt;= 0.4:
+vel.linear.x = 0.2
+vel.angular.z = 0.0
+else:
+vel.linear.x = 0.0
+if self.direction == &amp;quot;RIGHT&amp;quot;:
+vel.angular.z = 0.5
+elif self.direction == &amp;quot;LEFT&amp;quot;:
+vel.angular.z = -0.5
+self.cmd_vel_pub.publish(vel)
+r.sleep()
+if __name__=='__main__':
+avoidance = Avoidance()
+try:
+avoidance.process()
+except rospy.ROSInitException:
+pass
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
 &lt;p>このプログラムでは，LiDARを使って進行方向に存在する障害物を見つけ，それを回避しながら進むようにロボットを制御しています．具体的には，&lt;/p>
 &lt;ul>
 &lt;li>ロボットの進行方向に物体がなかったら直進&lt;/li>
@@ -324,8 +769,7 @@ r.sleep()
 &lt;p>&lt;code>process&lt;/code>メソッド内部では，格納された&lt;code>self.min_range&lt;/code>が0.4（メートル）より大きい場合は，ロボットの前に何もないと判断して直進，小さい場合は，&lt;code>self.direction&lt;/code>の値を見て，&lt;code>RIGHT&lt;/code>であれば右に障害物があると判断して左回転，&lt;code>LEFT&lt;/code>であれば左に障害物があると判断して右回転するようなプログラムになっています．&lt;/p>
 &lt;p>それでは，実際にLiDARを使って障害物を回避するプログラムを実行してみましょう．&lt;/p>
 &lt;h2 id="演習">演習&lt;/h2>
-&lt;h3 id="rosメッセージの可視化">ROSメッセージの可視化&lt;/h3>
-&lt;details class="spoiler " id="spoiler-3">
+&lt;details class="spoiler " id="spoiler-4">
 &lt;summary>【開発PC】topicの確認&lt;/summary>
 &lt;p>&lt;p>&lt;code>/scan&lt;/code>の型を確認&lt;/p>
 &lt;pre>&lt;code class="language-shell">(開発PC)(docker):~/roomba_hack# rostopic type /scan
@@ -335,7 +779,7 @@ r.sleep()
 &lt;/code>&lt;/pre>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-4">
+&lt;details class="spoiler " id="spoiler-5">
 &lt;summary>LiDARスキャンを使ったフィードバック制御&lt;/summary>
 &lt;p>&lt;p>&lt;code>avoidance.py&lt;/code>を実行してみよう．&lt;/p>
 &lt;p>このプログラムを動かすときには，コントローラの&lt;code>Y&lt;/code>ボタンを押してから&lt;code>B&lt;/code>ボタンを押して&lt;code>auto&lt;/code>モードにしておきましょう．&lt;/p>
