@@ -730,10 +730,9 @@ https://docs.google.com/presentation/d/1-q6zq3vV91GTj7mw9uqwT4B8LyHDpFHBNVi4lEyC
 &lt;h2 id="learn">Learn&lt;/h2>
 &lt;h3 id="linuxコマンド">Linuxコマンド&lt;/h3>
 &lt;p>コンピュータやロボットの研究・開発では、LinuxというOS(Operating System)がよく使用されます。&lt;br>
-ROSはLinux(とくにUbuntuというディストリビューション)で動かすことを想定されているので、ROSを使うにはある程度Linuxの知識が必要になります。
-Linuxについてあまり知らないという方は、以下のページに目を通しておくと良いと思います。&lt;br>
-&lt;a href="https://kitsune.blog/engineer/linux" target="_blank" rel="noopener">Linuxについてまとまっているページ&lt;/a>&lt;br>
-特に、&lt;a href="https://kitsune.blog/linux-command-summary" target="_blank" rel="noopener">Linuxコマンドについて&lt;/a>軽く知っておくと講義が理解しやすくなると思います。&lt;/p>
+ROSはLinux(とくにUbuntuというディストリビューション)で動作することを想定されているため、ROSを使うにはある程度Linuxの知識が必要になります。
+Linuxについてあまり知らないという方は、前もって調べておくと良いでしょう(&lt;a href="https://kitsune.blog/engineer/linux" target="_blank" rel="noopener">参考&lt;/a>)。
+特に、&lt;a href="https://kitsune.blog/linux-command-summary" target="_blank" rel="noopener">Linuxコマンド&lt;/a>について軽く知っておくとROS自体の理解もスムーズになります。&lt;/p>
 &lt;pre>&lt;code>&amp;quot;&amp;quot;&amp;quot;
 ここではLinuxのコマンドを十分に説明できないので、コマンドの例を挙げることに留めます。
 詳しいサイトに沿って自分で使いながら覚えていくことをお勧めします。
@@ -757,8 +756,8 @@ cat &amp;lt;FileName&amp;gt;
 &lt;/code>&lt;/pre>
 &lt;h3 id="エディタ">エディタ&lt;/h3>
 &lt;p>プログラミング言語でコードを書くときに使用するツールをEditor（エディタ）と呼びます。&lt;br>
-テキストファイルを編集するツールなのでメモ帳でも同じ事ができるのですが、コード編集用のエディタは便利な機能が多く、効率よく書けるようになります。&lt;br>
-研究室のPCでは以下の二つが使えます。&lt;/p>
+テキストファイルを編集するツールなのでメモ帳でも同じ事ができるのですが、エディタには便利な機能が多く、効率よくコードが編集できるようになります。&lt;br>
+研究室のPCでは以下の二つが使用できます。&lt;/p>
 &lt;ul>
 &lt;li>vim
 &lt;ul>
@@ -813,7 +812,7 @@ cat &amp;lt;FileName&amp;gt;
 &lt;p>&lt;a href="https://learn.utcode.net/docs/team-development/git-workflow/" target="_blank" rel="noopener">GitとGitHubを用いたワークフロー&lt;/a>&lt;/p>
 &lt;/li>
 &lt;li>
-&lt;p>このサイトもGitHubを使って開発しています。&lt;a href="https://github.com/matsuolab/roomba_hack_course" target="_blank" rel="noopener">このサイトのリポジトリ&lt;/a>&lt;/p>
+&lt;p>このサイトもGitHubを使って開発しています。(&lt;a href="https://github.com/matsuolab/roomba_hack_course" target="_blank" rel="noopener">このサイトのリポジトリ&lt;/a>)&lt;/p>
 &lt;/li>
 &lt;li>
 &lt;p>公開されているリポジトリの例&lt;/p>
