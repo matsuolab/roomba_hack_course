@@ -9,34 +9,66 @@ weight: 20
 
 ## Learn
 
-今回はRealSenseD435というRGBDカメラを用いて三次元画像処理を行っていきましょう。
+<!--今回はRealSenseD435というRGBDカメラを用いて三次元画像処理を行っていきましょう。-->
+RGBDカメラを用いて三次元画像処理を行いましょう。
 
 
 ### RGBDカメラについて
 
-RGBDカメラとは、カラーの他にデプス(深度)を取得できるカメラのことです。
-複雑な動作を行うロボットを動かす際には三次元空間の把握が重要となり、RGBDカメラはよく用いられます。
-比較的安価でよく利用されるRGBDカメラとして、Intel社製のRealSenseやMicrosoft社製のXtionなどがあります。
+RGBDカメラとは、色(RGB)に加え、深度(Depth)情報を取得できるカメラのことです。
+周りの環境を三次元の空間として認識することで、ロボットはより複雑にふるまうことができます。
+比較的安価でよく利用されるRGBDカメラとして、Intel社製のRealSenseやMicrosoft社製のXtion(エクシオン)などがあります。
 
 ### RealSense
 
 今回はRGBDカメラとしてRealSenseD435を使用します。
 
-ROSで用いる際には標準のラッパー(https://github.com/IntelRealSense/realsense-ros)を使用します。
+ROSで用いる際には[標準のラッパー](https://github.com/IntelRealSense/realsense-ros)を使用します。
 
-`roslaunch realsense2_camera rs_camera.launch`を行うとデフォルトのトピックとして
-RGB画像の`/camera/color/image_raw`、
-デプス画像の`/camera/depth/image_raw`
-が利用できます。これらのトピックはいずれも`sensor_msgs/Image`型です。
+```
+$ roslaunch realsense2_camera rs_camera.launch
+```
+を実行すると、2種類のトピック
 
-RealSenseは物理的にRGB画像モジュールとデプス画像モジュールが離れているため、これら2つのトピックはいずれも画像データではあるものの、ピクセルの位置関係が対応しておらずそのままだとうまく画像処理に用いることができませんが、起動時に`align:=true`を指定すると、デプス画像をRGB画像のピクセルに対応するように変換された`/camera/aligned_depth_to_color/image_raw`トピックを使用できるようになります。
+`/camera/color/image_raw` (RGB画像)  
+`/camera/depth/image_raw` (デプス画像)  
+
+が利用できるようになります。  
+これらのトピックはいずれも`sensor_msgs/Image`型です。
+
+RealSenseはRGB画像モジュールとデプス画像モジュールが物理的に離れています。
+このため、これら2つのトピックはいずれも画像データではあるものの、ピクセルの位置関係が対応しておらず、そのまま画像処理に利用することはできません。 
+
+RealSenseを使用するためのlaunchファイル([rs_camera.launch]())を起動する際に
+"align_depth"パラメータを"true"に指定することで、デプス画像をRGB画像のピクセルに対応するように変換した
+`/camera/aligned_depth_to_color/image_raw`トピックが使用できるようになります。
+
+ただし、roomba_bringupパッケージのbringup.launchファイルの
+```
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch" if="$(arg realsense)">
+        <arg name="align_depth" value="true"/>
+    </include>
+```
+の箇所がこの操作に対応していため、今回は特別な操作をせずとも
+`/camera/aligned_depth_to_color/image_raw`トピックを使用できます。
 
 
 ### 物体検出
 
-まずはRGB画像`/camera/color/image_raw`のみを用いて三次元ではない画像検出を行っていきましょう。
+まずは3次元情報を扱わず、RGB画像`/camera/color/image_raw`のみを用いて画像検出を行ってみましょう。
 
-以下は`/camera/color/image_raw`をSubscribeし、物体検出アルゴリズムであるYOLOv3に入力し、その結果をbounding boxとして描画し、`/detection_result`としてPublishするスクリプトです。
+以下は、
+[three-dementions_tutorial](https://github.com/matsuolab/roomba_hack/tree/master/catkin_ws/src/three-dimensions_tutorial)パッケージの
+[object_detection.py](https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/three-dimensions_tutorial/scripts/object_detection.py)
+です。
+
+1. `/camera/color/image_raw`をsubscribeし、
+1. 物体検出アルゴリズムであるYOLOv3に入力し、
+1. 物体検出の結果をbounding boxとして描画し、
+1. `/detection_result`としてpublish
+
+の処理を行っています。
+
 
 ```
 #!/usr/bin/env python3
@@ -108,29 +140,43 @@ if __name__ == '__main__':
         pass
 ```
 
-コールバック関数で`sensor_msgs/Image`型をnp.ndarray型に変換するために
+画像データを物体検出モデルに入力として渡すためには、その画像データの型がnp.ndarray型である必要があります。
+そのため、コールバック関数で、受け取った`sensor_msgs/Image`型の画像データをnp.ndarray型に変換しています。
 ```
 cv_array = self.bridge.imgmsg_to_cv2(data, 'bgr8')
 cv_array = cv2.cvtColor(cv_array, cv2.COLOR_BGR2RGB)
 ```
-という`sensor_msgs/Image`型特有の処理を行ってますが、Subscriberを作成しコールバック関数でデータを受け取るという基本的な処理の流れは`scan`などの他のセンサと同じです。
+の部分がこの処理に対応します。  
+subscriberを宣言するときにコールバック関数を指定して、
+subscribeしたデータをこの関数に渡すという基本的な処理の流れは、
+`scan`など他のトピックを扱うsubscriberと同じです。
 
-ここで注意してほしいのはYOLOの推論部分をコールバック関数内で行っていないことです。
-一見、新しいデータが入ってくるときのみに推論を回すことは合理的に見えますが、センサの入力に対してコールバック関数内の処理が重いとセンサの入力がどんどん遅れていってしまいます。
-コールバック関数内ではセンサデータの最低限の処理の記述にとどめ、重い処理は分けて書くことを意識しましょう。
+ここで、YOLOの推論部分をコールバック関数内で行っていないことに注意しましょう。
+一見、新しいデータが入ってくるときのみに推論を回すことは合理的に見えますが、
+センサの入力に対してコールバック関数内の処理が重いと処理するデータが最新のものからどんどん遅れてしまいます。
+コールバック関数はセンサデータの最低限の処理にとどめ、重い処理は分けて書くことを意識しましょう。
 
-また、ここでは既存の物体検出モジュールを使用しましたが、PyTorchなどで作成した自作のモデルも同様の枠組みで利用することができます。
+また、ここでは既存の物体検出モジュールを使用しましたが、PyTorchなどで自作したモデルも同様の枠組みで利用することができます。
 
+### 三次元画像処理
 
-続いて、RGB画像に整列されたデプス画像データを統合して物体を検出し、物体までの距離を測定してみましょう。
+次に、RGB画像とデプス画像を統合し、検出した物体までの距離を測定してみましょう。
 
+`/camera/color/image_raw` (RGB画像)
+`/camera/aligned_depth_to_color/image_raw` (整列されたDepth画像)
 
-RGB画像`/camera/color/image_raw`と整列されたデプス画像`/camera/aligned_depth_to_color/image_raw`はそれぞれ独立したトピックであるため、同期を取る必要があります。
+はピクセル同士が対応するように処理されてはいるものの、
+パブリッシュされた時刻は独立しているため、
+併せて使用するには時刻の同期を行う必要があります。
 
-画像の同期にはmessage_filters(http://wiki.ros.org/message_filters)がよく使われます。
+画像の時刻同期には[message_filters](http://wiki.ros.org/message_filters)がよく使われます。
 
-message_filters.ApproximateTimeSynchronizerを使い以下のようにSubscriberを作成します。
-```
+message_filters.ApproximateTimeSynchronizerを使い、以下のようにSubscriberを作成します。
+```python
+import message_filters
+
+# 中略
+
 rgb_sub = message_filters.Subscriber('/camera/color/image_raw', Image)
 depth_sub = message_filters.Subscriber('/camera/aligned_depth_to_color/image_raw', Image)
 message_filters.ApproximateTimeSynchronizer([rgb_sub, depth_sub], 10, 1.0).registerCallback(callback_rgbd)
@@ -144,9 +190,16 @@ def callback_rgbd(data1, data2):
     cv_array = bridge.imgmsg_to_cv2(data2, 'passthrough')
     self.depth_image = cv_array
 ```
-この例では、1.0秒の許容で'/camera/color/image_raw'と'/camera/aligned_depth_to_color/image_raw'のトピックの同期を取ることができれば、コールバック関数callback_rgbdが呼ばれセンサデータが受けとられます。
+この例では、  
+`/camera/color/image_raw`と  
+`/camera/aligned_depth_to_color/image_raw`の  
+トピックを同時(1.0秒までのずれを許容する)に受け取った場合のみ、
+2つの画像データをコールバック関数callback_rgbdに渡します。
 
-それでは、物体を検出し、物体までの距離を測定するスクリプトを見てみましょう。
+それでは、[three-dementions_tutorial](https://github.com/matsuolab/roomba_hack/tree/master/catkin_ws/src/three-dimensions_tutorial)
+パッケージの[detection_distance.py](https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/three-dimensions_tutorial/scripts/detection_distance.py)
+を見てみましょう。  
+物体を検出し、その物体までの距離を測定するスクリプトです。
 
 ```
 #!/usr/bin/env python3
@@ -237,16 +290,20 @@ print(category[cls_pred], self.depth_image[cy][cx]/1000, "m")
 
 ### 点群の作成
 
-上の例ではRGB画像とデプス画像を用いた三次元画像処理を行うことができました。
+上の例ではRGB画像とDepth画像を用いて、物体位置の代表となる点とロボット位置の関係を扱うことができました。
 
-しかし、ロボットの自立移動などより複雑な動作をさせることを考えたとき、深度データを三次元空間にマッピングできたほうが位置関係を統一的に扱うことができ便利なこともあります。
+しかし、代表となる点以外の深度データも三次元空間に直接マッピングできると、
+物体の大きさや形状といった情報も扱うことができ、
+環境情報をより直感的・統一的に扱うことができるように思われます。
 
-それでデプス画像から点群と呼ばれるデータを作成することを考えます。
+そこでDepth画像から点群と呼ばれるデータを作成することを考えます。
 
-点群とは三次元座標値(X,Y,Z)で構成された点の集まりのことです。各点の情報として、三次元座標値に加え色の情報(R,G,B)が加わることもあります。
-デプス画像はカメラの内部パラメータを用いることによって点群データに変換することができます。(https://medium.com/yodayoda/from-depth-map-to-point-cloud-7473721d3f)
+点群とは三次元座標値 (X, Y, Z) で構成された点の集まりのことです。各点の情報として、三次元座標値に加え色の情報 (R, G, B) が加わることもあります。
+デプス画像はカメラの内部パラメータを用いることによって点群データに変換することができます。([参考](https://medium.com/yodayoda/from-depth-map-to-point-cloud-7473721d3f))
 
-今回はdepth_image_procと呼ばれる、デプス画像を点群データに変換するROSの外部パッケージ(http://wiki.ros.org/depth_image_proc) を使用して点群の変換を行います。
+今回は、デプス画像を点群データに変換するためのROSの外部パッケージである
+[depth_image_proc](http://wiki.ros.org/depth_image_proc)
+を使用して点群を作成します。
 
 外部パッケージは`~/catkin_ws/src`等のワークスペースに配置し、ビルドしパスを通すことで簡単に使用できます。
 
@@ -265,12 +322,24 @@ depth_image_procのwikiを参考に以下のようなlaunchファイルを作成
   </node>
 </launch>
 ```
-このlaunchファイルを実行すると`/camera/color/camera_info`と`/camera/aligned_depth_to_color/image_raw`をSubscribeし、`/camera/depth/points`をPublishします。
+このlaunchファイルを実行すると  
+`/camera/color/camera_info`と  
+`/camera/aligned_depth_to_color/image_raw`を  
+subscribeし、  
+`/camera/depth/points`をpublishするノードが作成されます。
 
-`/camera/color/camera_info`は`sensor_msgs/CameraInfo`型のトピックであり、カメラパラメータやフレームid、タイムスタンプなどを保持しており、点群の変換に利用されます。
-`/camera/aligned_depth_to_color/image_raw`はRGB画像に整列されたデプス画像であるため、`/camera/depth/camera_info`ではなく`/camera/color/camera_info`を指定することに注意してください。
+`/camera/color/camera_info`は
+[sensor_msgs/CameraInfo](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/CameraInfo.html)型のトピックです。
+カメラパラメータやフレームid、タイムスタンプなどの情報を保持しており、点群の変換に利用されます。 
 
-`roslaunch three-dimensions_tutorial depth2pc.launch`を行い`/camera/depth/points`トピックをrvizで可視化をすると三次元空間に点群データが表示されているのが確認できます。
+`/camera/aligned_depth_to_color/image_raw`はRGB画像に合わせて整列されたDepth画像であるため、    
+`/camera/{{< hl >}}depth{{</ hl >}}/camera_info`ではなく  
+`/camera/{{< hl >}}color{{</ hl >}}/camera_info`を指定しています。  
+
+```
+$ roslaunch three-dimensions_tutorial depth2pc.launch
+```
+を実行し、`/camera/depth/points`トピックをrvizで可視化をすると三次元空間に点群データが表示されているのが確認できます。
 
 ## 演習
 
@@ -287,7 +356,13 @@ depth_image_procのwikiを参考に以下のようなlaunchファイルを作成
 ```
 (開発PC)(docker) rviz
 ```
-`/camera/color/image_raw`と`/camera/depth/image_raw`と`/camera/aligned_depth_to_color/image_raw`を可視化して違いを確認してみよう。
+rviz上で
+
+- `/camera/color/image_raw` 
+- `/camera/depth/image_raw`
+- `/camera/aligned_depth_to_color/image_raw`  
+
+を可視化して違いを確認してみましょう。
 {{< /spoiler >}}
 
 
@@ -310,7 +385,7 @@ rvizで`/detection_result`を表示し結果を確認してみよう。
 (開発PC)(docker) roslaunch three-dimensions_tutorial depth2pc.launch
 (開発PC)(docker) roslaunch navigation_tutorial navigation.launch
 ```
-rvizで`/camera/depth/points`トピックを追加して確認してみよう。
+rvizで`/camera/depth/points`トピックを追加して確認してみましょう。
 {{< /spoiler >}}
 
 {{< spoiler text="余裕がある人向け" >}}
