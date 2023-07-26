@@ -1,4 +1,117 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack_course/</link><atom:link href="https://matsuolab.github.io/roomba_hack_course/index.xml" rel="self" type="application/rss+xml"/><description>ロボットシステム入門</description><generator>Wowchemy (https://wowchemy.com)</generator><language>ja</language><copyright>© 2023 Tokyo Robot And Intelligence Lab (TRAIL)</copyright><lastBuildDate>Thu, 22 Jun 2023 00:00:00 +0000</lastBuildDate><image><url>https://matsuolab.github.io/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png</url><title>ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack_course/</link></image><item><title>ロボットシステムにおけるセンシング・アクチュエーション・通信②</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/</link><pubDate>Thu, 22 Jun 2023 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/</guid><description>&lt;p>複数のセンサを組み合わせてよりかしこくロボットを動かしてみよう&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack_course/</link><atom:link href="https://matsuolab.github.io/roomba_hack_course/index.xml" rel="self" type="application/rss+xml"/><description>ロボットシステム入門</description><generator>Wowchemy (https://wowchemy.com)</generator><language>ja</language><copyright>© 2023 Tokyo Robot And Intelligence Lab (TRAIL)</copyright><lastBuildDate>Wed, 26 Jul 2023 00:00:00 +0000</lastBuildDate><image><url>https://matsuolab.github.io/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png</url><title>ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack_course/</link></image><item><title>serviceとactionlib</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap6/service-actionlib/</link><pubDate>Wed, 26 Jul 2023 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap6/service-actionlib/</guid><description>&lt;h2 id="learn">Learn&lt;/h2>
+&lt;p>ここまでトピックを使った通信を使ってロボットシステムを構築してきました．
+トピック通信は，メッセージをpublish・subscribeすることで通信する，相手を仮定しない非同期な通信方法でした．&lt;/p>
+&lt;p>しかし，システムを構築する場合には，「相手ノードの処理の結果を呼び出し側のノードで受け取って活用したい」
+といった場合もあります．&lt;/p>
+&lt;p>このような比較的複雑な通信を実現するための通信方式として，ROSではサービス（service）とアクション（actionlib）が用意されています．&lt;/p>
+&lt;h3 id="service">service&lt;/h3>
+&lt;p>これまで利用してきたトピック通信は，通信の相手を仮定しない（相手がいようといまいと関係ない）ため，
+ロボットシステムに特有な非同期通信・処理を簡単に実現することができました．&lt;/p>
+&lt;p>一方で，他のノードに対して「特定の処理の依頼をして，その結果を待ちたい」場合など，同期的・双方向な通信が必要になることがあります．
+例えば，あるノードの設定を変更をして，それが成功したかどうかを知りたい場合などに使えます．
+サービスを使った通信は，「クライアント・サーバ」型の通信（クライアントサーバモデル, client-server model）となり，
+クライアントがサーバにリクエストを送ると，サーバ側で処理を行い，クライアントにレスポンスを返します．&lt;/p>
+&lt;p>pythonでは，rospyモジュールの&lt;code>rospy.Service()&lt;/code>や
+&lt;code>rospy.ServiceProxy()&lt;/code>を使用することで，サーバ・クライアント
+を簡単に実装することができます（&lt;a href="http://wiki.ros.org/ja/ROS/Tutorials/WritingServiceClient%28python%29" target="_blank" rel="noopener">参考&lt;/a>）．&lt;/p>
+&lt;br>
+&lt;p>また，以下のように，コマンドライン上でサービスを活用する方法も用意されています．&lt;/p>
+&lt;pre>&lt;code class="language-bash"># サーバを呼び出す
+$ rosservice call &amp;lt;ServiceName&amp;gt; &amp;lt;Arguments&amp;gt;
+# 存在するサービスの一覧を表示
+$ rosservice list
+# サービスのメッセージ型を表示
+$ rosservice type &amp;lt;ServiceName&amp;gt;
+&lt;/code>&lt;/pre>
+&lt;h3 id="actionlib">actionlib&lt;/h3>
+&lt;p>ここまで，トピック通信を使うことで相手を仮定しない非同期通信を，サービスを使った通信を行うことで相手のレスポンスを待つ同期的な通信を実現できることを見てきました．&lt;/p>
+&lt;p>サービスによる通信では，クライアントはサーバからのレスポンスを待つため，サーバで長い時間がかかるような処理を行う（計算量が大きい，または，移動に時間がかかるなど）場合には，クライアントの処理が長い間停止してしまうという問題があります．&lt;/p>
+&lt;p>そのため，処理の呼び出し側のプログラムをブロックせずに，かつ，処理の結果（や途中経過）を知れるような非同期通信が欲しくなります．
+この要求を満たすのが，ROSのアクション(actionlib)です．&lt;/p>
+&lt;p>actionlibは，実はトピック通信の組み合わせとして構成されており，&lt;code>goal&lt;/code>（命令），&lt;code>result&lt;/code>（処理の結果），&lt;code>feedback&lt;/code>（途中経過），&lt;code>status&lt;/code>（サーバの状態），&lt;code>cancel&lt;/code>（命令の取り消し）の5つのトピックからなります．
+このあたりの仕様は，&lt;a href="https://qiita.com/srs/items/a39dcd24aaeb03216026#%E6%A6%82%E8%A6%81" target="_blank" rel="noopener">qiitaのROS講座&lt;/a>が詳しいので参照してください．&lt;/p>
+&lt;p>pythonでは，actionlibのサーバやクライアントも，&lt;/p>
+&lt;pre>&lt;code class="language-python">import actionlib
+&lt;/code>&lt;/pre>
+&lt;p>したのちに，他の通信方式と同様に&lt;code>actionlib.SimpleActionServer&lt;/code>として，簡単に作成できます（&lt;a href="http://wiki.ros.org/ja/actionlib_tutorials/Tutorials/Writing%20a%20Simple%20Action%20Server%20using%20the%20Execute%20Callback%20%28Python%29" target="_blank" rel="noopener">ドキュメント&lt;/a>）．&lt;/p>
+&lt;p>今回の演習では，簡単のためaction serverの作成は行いません．
+変わりに，移動のためのactionとして，&lt;code>move_base&lt;/code>パッケージの中で定義されている&lt;code>move_base&lt;/code>というactionを使うことにしましょう．&lt;/p>
+&lt;!-- service serverやservice clientも作成してないが...? -->
+&lt;p>実はこのパッケージは&lt;/p>
+&lt;pre>&lt;code class="language-bash">roslaunch navigation_tutorial navigation.launch
+&lt;/code>&lt;/pre>
+&lt;p>を実行して&lt;code>move_base&lt;/code>ノードを起動した際に既に利用されていました．&lt;/p>
+&lt;!--（これまでは，そのパッケージの中でサブスクライバとして定義された`move_base_simple/goal`というトピックにpublishすることで移動をしていました）-->
+&lt;p>&lt;code>move_base&lt;/code>パッケージの詳細は&lt;a href="http://wiki.ros.org/move_base" target="_blank" rel="noopener">ドキュメント&lt;/a>を参照してください．&lt;/p>
+&lt;p>同様に，action clientも&lt;code>actionlib.SimpleActionClient&lt;/code>を利用することで簡単に作成できます．&lt;/p>
+&lt;p>例えば，&lt;code>move_base&lt;/code>のaction clientを実装する際には，&lt;/p>
+&lt;pre>&lt;code class="language-python">import actionlib
+import tf
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from geometry_msgs.msg import Quaternion
+action_client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
+action_client.wait_for_server() # action serverの準備ができるまで待つ
+goal = MoveBaseGoal() # goalのメッセージの定義
+goal.target_pose.header.frame_id = 'map' # マップ座標系でのゴールとして設定
+goal.target_pose.header.stamp = rospy.Time.now() # 現在時刻
+# ゴールの姿勢を指定
+goal.target_pose.pose.position.x = X
+goal.target_pose.pose.position.y = Y
+q = tf.transformations.quaternion_from_euler(0, 0, YAW) # 回転はquartanionで記述するので変換
+goal.target_pose.pose.orientation = Quaternion(q[0], q[1], q[2], q[3])
+action_client.send_goal(goal) # サーバにゴールを送信
+&lt;/code>&lt;/pre>
+&lt;p>のようにクライアントの&lt;code>send_goal&lt;/code>メソッドでゴールを指定できます．&lt;/p>
+&lt;p>その後，&lt;/p>
+&lt;pre>&lt;code class="language-python">action_client.wait_for_result(rospy.Duration(30))
+&lt;/code>&lt;/pre>
+&lt;p>とすると，結果が返ってくるまで（この場合30秒間）クライアントの処理をブロックすることができ，&lt;/p>
+&lt;pre>&lt;code class="language-python">result = action_client.wait_for_result(rospy.Duration(30))
+&lt;/code>&lt;/pre>
+&lt;p>とすることで，&lt;code>result&lt;/code>変数に処理の結果を格納できます．&lt;/p>
+&lt;h2 id="演習">演習&lt;/h2>
+&lt;details class="spoiler " id="spoiler-0">
+&lt;summary>【jetson・開発マシン】起動準備&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-shell">cd roomba_hack
+git fetch
+git checkout feature/integrate
+(jetson) ./RUN-DOCKER-CONTAINER.sh
+(開発マシン) ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-1">
+&lt;summary>【開発マシン】scriptベースのnavigationを実行してみる&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-shell">(開発マシン)(docker) roslaunch navigation_tutorial navigation.launch
+(開発マシン)(docker) rosrun navigation_tutorial topic_goal.py
+(開発マシン)(docker) rosrun navigation_tutorial action_goal.py
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-2">
+&lt;summary>【開発マシン】RealSenseで検出した障害物をコストマップに追加してみよう&lt;/summary>
+&lt;p>&lt;pre>&lt;code class="language-shell">(開発マシン)(docker) roslaunch three-dimensions_tutorial detection_pc.launch
+&lt;/code>&lt;/pre>
+&lt;/p>
+&lt;/details>
+&lt;details class="spoiler " id="spoiler-3">
+&lt;summary>（総合課題）障害物を避けながらnavigationする&lt;/summary>
+&lt;p>&lt;p>Lidarに映らない物体も画像ベースで検出しコストマップに追加することでナビゲーション時にぶつからないようにしましょう。&lt;/p>
+&lt;p>ヒント&lt;/p>
+&lt;ul>
+&lt;li>物体検出結果に基づいて物体部分以外をマスクしたデプス画像をpublishする&lt;/li>
+&lt;li>depth2pc.launchでそれをsubscribeし、point(cloud)に変換する&lt;/li>
+&lt;li>変換されたpointからmap座標系での位置を取得する&lt;/li>
+&lt;li>costmapに反映する&lt;/li>
+&lt;li>&lt;code>move_base&lt;/code>アクションを使ってナビゲーションを実装しよう．
+&lt;ul>
+&lt;li>するとactionがタイムアウトした場合や，&lt;code>KeyboardInterrupt&lt;/code>された場合に&lt;code>cancel_goal&lt;/code>メソッドを使うことでactionをキャンセルできるように拡張できるはずです．&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>さらに，PyTorchを使用した自作の分類器やネット上の分類器をシステムに組み込んで（例えばセグメンテーションモデルなど），よりよく動作するように改良してみましょう．&lt;/p>
+&lt;/p>
+&lt;/details></description></item><item><title>ロボットシステムにおけるセンシング・アクチュエーション・通信②</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/</link><pubDate>Thu, 22 Jun 2023 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap3/sensing2/</guid><description>&lt;p>複数のセンサを組み合わせてよりかしこくロボットを動かしてみよう&lt;/p>
 &lt;h2 id="learn">Learn&lt;/h2>
 &lt;p>前回使用した&lt;a href="https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/navigation_tutorial/scripts/simple_control.py" target="_blank" rel="noopener">simple_control.py&lt;/a>
 では，速度，角速度，時間を指定し，
@@ -1004,114 +1117,7 @@ TODO:
 - sshに必要な設定を説明する
 - VNCに必要な設定を説明する
 - VNC viewerの使い方を説明する
---></description></item><item><title>serviceとactionlib</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap6/service-actionlib/</link><pubDate>Sat, 22 Jan 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap6/service-actionlib/</guid><description>&lt;h2 id="learn">Learn&lt;/h2>
-&lt;p>ここまでトピックを使った通信を使ってロボットシステムを構築してきました．
-トピック通信は，メッセージを出版(publish，配信とも訳される)・購読（subscribe）することで通信する，相手を仮定しない非同期な通信方法でした．&lt;/p>
-&lt;p>しかし，もっと複雑なシステムを組む場合には，「相手の処理の結果を呼び出し側で受け取って知りたい」など様々な場合が考えられます．&lt;/p>
-&lt;p>このようなより複雑な通信を実現するための通信方式として，ROSにはサービス（service）とアクション（actionlib）が用意されています．&lt;/p>
-&lt;h3 id="service">service&lt;/h3>
-&lt;p>これまで利用してきたトピック通信は，通信の相手を仮定しない（相手がいようといまいと関係ない）ため，ロボットシステムに特有な非同期通信・処理を実現するために簡単な方法でした．&lt;/p>
-&lt;p>一方で，他のノードに対して「特定の処理の依頼をして，その結果を待ちたい」場合など，同期的・双方向な通信が必要になることがあります．
-例えば，あるノードの設定を変更をして，それが成功したかどうかを知りたい場合などに使えます．
-サービスを使った通信は，「クライアント・サーバ」型の通信（クライアントサーバモデル, client-server model）となり，クライアントがサーバにリクエストを送ると，サーバがレスポンスを返すような仕組みになっています．&lt;/p>
-&lt;p>pythonでは&lt;code>rospy.service&lt;/code>を使ってサーバを，&lt;code>rospy.service_proxy&lt;/code>を使ってクライアントを簡単に実装できます（&lt;a href="http://wiki.ros.org/ja/ROS/Tutorials/WritingServiceClient%28python%29" target="_blank" rel="noopener">参考URL&lt;/a>）．&lt;/p>
-&lt;p>また，コマンドラインからは&lt;/p>
-&lt;pre>&lt;code class="language-bash">rosservice call [service] [args]
-&lt;/code>&lt;/pre>
-&lt;p>として，簡単にクライアントを作成できますし，システム上に存在するサービスの一覧は&lt;/p>
-&lt;pre>&lt;code class="language-bash">rosservice list
-&lt;/code>&lt;/pre>
-&lt;p>とすることで表示できます．あるサービスのメッセージがどのように定義されているかは，&lt;/p>
-&lt;pre>&lt;code class="language-bash">rosservice type [service]
-&lt;/code>&lt;/pre>
-&lt;p>で調べられます．&lt;/p>
-&lt;h3 id="actionlib">actionlib&lt;/h3>
-&lt;p>ここまで，トピック通信を使うことで相手を仮定しない非同期通信を，サービスを使った通信を行うことで相手のレスポンスを待つ同期的な通信を実現できることを見てきました．&lt;/p>
-&lt;p>サービスによる通信では，クライアントはサーバからのレスポンスを待つため，サーバで長い時間がかかるような処理を行う（計算量が大きい，または，移動に時間がかかるなど）場合には，クライアントの処理が長い間停止してしまうという問題があります．&lt;/p>
-&lt;p>そのため，処理の呼び出し側のプログラムをブロックせずに，かつ，処理の結果（や途中経過）を知れるような非同期通信が欲しくなります．
-この要求を満たすのが，ROSのアクション(actionlib)です．&lt;/p>
-&lt;p>actionlibは，実はトピック通信の組み合わせとして構成されており，&lt;code>goal&lt;/code>（命令），&lt;code>result&lt;/code>（処理の結果），&lt;code>feedback&lt;/code>（途中経過），&lt;code>status&lt;/code>（サーバの状態），&lt;code>cancel&lt;/code>（命令の取り消し）の5つのトピックからなります．
-このあたりの仕様は，&lt;a href="https://qiita.com/srs/items/a39dcd24aaeb03216026#%E6%A6%82%E8%A6%81" target="_blank" rel="noopener">qiitaのROS講座&lt;/a>が詳しいので参照してください．&lt;/p>
-&lt;p>pythonでは，actionlibのサーバやクライアントも，&lt;/p>
-&lt;pre>&lt;code class="language-python">import actionlib
-&lt;/code>&lt;/pre>
-&lt;p>したのちに，他の通信方式と同様に&lt;code>actionlib.SimpleActionServer&lt;/code>として，簡単に作成できます（&lt;a href="http://wiki.ros.org/ja/actionlib_tutorials/Tutorials/Writing%20a%20Simple%20Action%20Server%20using%20the%20Execute%20Callback%20%28Python%29" target="_blank" rel="noopener">ドキュメント&lt;/a>）．&lt;/p>
-&lt;p>今回の演習では，簡単のためaction serverの作成は行いません．
-変わりに，移動のためのactionとして，&lt;code>move_base&lt;/code>パッケージの中で定義されている&lt;code>move_base&lt;/code>というactionを使うことにしましょう．&lt;/p>
-&lt;p>実はこのパッケージは&lt;/p>
-&lt;pre>&lt;code class="language-bash">roslaunch navigation_tutorial navigation.launch
-&lt;/code>&lt;/pre>
-&lt;p>して&lt;code>move_base&lt;/code>ノードを起動した際に既に利用されていました（これまでは，そのパッケージの中でサブスクライバとして定義された&lt;code>move_base_simple/goal&lt;/code>というトピックにpublishすることで移動をしていました）．&lt;/p>
-&lt;p>&lt;code>move_base&lt;/code>のパッケージの詳細は&lt;a href="http://wiki.ros.org/move_base" target="_blank" rel="noopener">ドキュメント&lt;/a>を見て確認してみてください．&lt;/p>
-&lt;p>同様に，action clientも&lt;code>actionlib.SimpleActionClient&lt;/code>を利用することで簡単に作成できます．&lt;/p>
-&lt;p>例えば，&lt;code>move_base&lt;/code>のaction clientの実装する際には，&lt;/p>
-&lt;pre>&lt;code class="language-python">import actionlib
-import tf
-from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
-from geometry_msgs.msg import Quaternion
-action_client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
-action_client.wait_for_server() # action serverの準備ができるまで待つ
-goal = MoveBaseGoal() # goalのメッセージの定義
-goal.target_pose.header.frame_id = 'map' # マップ座標系でのゴールとして設定
-goal.target_pose.header.stamp = rospy.Time.now() # 現在時刻
-# ゴールの姿勢を指定
-goal.target_pose.pose.position.x = X
-goal.target_pose.pose.position.y = Y
-q = uaternion_from_euler(0, 0, YAW) # 回転はquartanionで記述するので変換
-goal.target_pose.pose.orientation = Quaternion(q[0], q[1], q[2], q[3])
-action_client.send_goal(goal) # ゴールを命令
-&lt;/code>&lt;/pre>
-&lt;p>のようにクライアントの&lt;code>send_goal&lt;/code>メソッドでゴールを指定できます．&lt;/p>
-&lt;p>その後，&lt;/p>
-&lt;pre>&lt;code class="language-python">action_client.wait_for_result(rospy.Duration(30))
-&lt;/code>&lt;/pre>
-&lt;p>とすると，結果が返ってくるまで（この場合30秒間），クライアントの処理をブロックできますし，&lt;/p>
-&lt;pre>&lt;code class="language-python">result = action_client.wait_for_result(rospy.Duration(30))
-&lt;/code>&lt;/pre>
-&lt;p>とすることで，&lt;code>result&lt;/code>変数に処理の結果が格納され，確認できます．&lt;/p>
-&lt;h2 id="演習">演習&lt;/h2>
-&lt;details class="spoiler " id="spoiler-0">
-&lt;summary>【jetson・開発マシン】起動準備&lt;/summary>
-&lt;p>&lt;pre>&lt;code class="language-shell">cd roomba_hack
-git fetch
-git checkout feature/integrate
-(jetson) ./RUN-DOCKER-CONTAINER.sh
-(開発マシン) ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
-&lt;/code>&lt;/pre>
-&lt;/p>
-&lt;/details>
-&lt;details class="spoiler " id="spoiler-1">
-&lt;summary>【開発マシン】scriptベースのnavigationを実行してみる&lt;/summary>
-&lt;p>&lt;pre>&lt;code class="language-shell">(開発マシン)(docker) roslaunch navigation_tutorial navigation.launch
-(開発マシン)(docker) rosrun navigation_tutorial topic_goal.py
-(開発マシン)(docker) rosrun navigation_tutorial action_goal.py
-&lt;/code>&lt;/pre>
-&lt;/p>
-&lt;/details>
-&lt;details class="spoiler " id="spoiler-2">
-&lt;summary>【開発マシン】RealSenseで検出した障害物をコストマップに追加してみよう&lt;/summary>
-&lt;p>&lt;pre>&lt;code class="language-shell">(開発マシン)(docker) roslaunch three-dimensions_tutorial detection_pc.launch
-&lt;/code>&lt;/pre>
-&lt;/p>
-&lt;/details>
-&lt;details class="spoiler " id="spoiler-3">
-&lt;summary>（総合課題）障害物を避けながらnavigationする&lt;/summary>
-&lt;p>&lt;p>Lidarに映らない物体も画像ベースで検出しコストマップに追加することでナビゲーション時にぶつからないようにしましょう。&lt;/p>
-&lt;p>ヒント&lt;/p>
-&lt;ul>
-&lt;li>物体検出結果に基づいて物体部分以外をマスクしたデプス画像をpublishする&lt;/li>
-&lt;li>depth2pc.launchでそれをsubscribeし、point(cloud)に変換する&lt;/li>
-&lt;li>変換されたpointからmap座標系での位置を取得する&lt;/li>
-&lt;li>costmapに反映する&lt;/li>
-&lt;li>&lt;code>move_base&lt;/code>アクションを使ってナビゲーションを実装しよう．
-&lt;ul>
-&lt;li>するとactionがタイムアウトした場合や，&lt;code>KeyboardInterrupt&lt;/code>された場合に&lt;code>cancel_goal&lt;/code>メソッドを使うことでactionをキャンセルできるように拡張できるはずです．&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;p>さらに，PyTorchを使用した自作の分類器やネット上の分類器をシステムに組み込んで（例えばセグメンテーションモデルなど），よりよく動作するように改良してみましょう．&lt;/p>
-&lt;/p>
-&lt;/details></description></item><item><title>三次元画像処理</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap5/three-dimensions/</link><pubDate>Sat, 22 Jan 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap5/three-dimensions/</guid><description>&lt;h2 id="learn">Learn&lt;/h2>
+--></description></item><item><title>三次元画像処理</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap5/three-dimensions/</link><pubDate>Sat, 22 Jan 2022 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap5/three-dimensions/</guid><description>&lt;h2 id="learn">Learn&lt;/h2>
 &lt;!--今回はRealSenseD435というRGBDカメラを用いて三次元画像処理を行っていきましょう。-->
 &lt;p>RGBDカメラを用いて三次元画像処理を行いましょう。&lt;/p>
 &lt;h3 id="rgbdカメラについて">RGBDカメラについて&lt;/h3>
