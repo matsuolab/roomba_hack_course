@@ -1,6 +1,6 @@
 ---
 title: serviceとactionlib
-date: '2022-01-22'
+date: '2023-07-26'
 type: book
 weight: 20
 ---
@@ -10,34 +10,40 @@ weight: 20
 ## Learn
 
 ここまでトピックを使った通信を使ってロボットシステムを構築してきました．
-トピック通信は，メッセージを出版(publish，配信とも訳される)・購読（subscribe）することで通信する，相手を仮定しない非同期な通信方法でした．
+トピック通信は，メッセージをpublish・subscribeすることで通信する，相手を仮定しない非同期な通信方法でした．
 
-しかし，もっと複雑なシステムを組む場合には，「相手の処理の結果を呼び出し側で受け取って知りたい」など様々な場合が考えられます．
+しかし，システムを構築する場合には，「相手ノードの処理の結果を呼び出し側のノードで受け取って活用したい」
+といった場合もあります．
 
-このようなより複雑な通信を実現するための通信方式として，ROSにはサービス（service）とアクション（actionlib）が用意されています．
+このような比較的複雑な通信を実現するための通信方式として，ROSではサービス（service）とアクション（actionlib）が用意されています．
 
 ### service
-これまで利用してきたトピック通信は，通信の相手を仮定しない（相手がいようといまいと関係ない）ため，ロボットシステムに特有な非同期通信・処理を実現するために簡単な方法でした．
+これまで利用してきたトピック通信は，通信の相手を仮定しない（相手がいようといまいと関係ない）ため，
+ロボットシステムに特有な非同期通信・処理を簡単に実現することができました．
 
 一方で，他のノードに対して「特定の処理の依頼をして，その結果を待ちたい」場合など，同期的・双方向な通信が必要になることがあります．
 例えば，あるノードの設定を変更をして，それが成功したかどうかを知りたい場合などに使えます．
-サービスを使った通信は，「クライアント・サーバ」型の通信（クライアントサーバモデル, client-server model）となり，クライアントがサーバにリクエストを送ると，サーバがレスポンスを返すような仕組みになっています．
+サービスを使った通信は，「クライアント・サーバ」型の通信（クライアントサーバモデル, client-server model）となり，
+クライアントがサーバにリクエストを送ると，サーバ側で処理を行い，クライアントにレスポンスを返します．
 
-pythonでは`rospy.service`を使ってサーバを，`rospy.service_proxy`を使ってクライアントを簡単に実装できます（[参考URL](http://wiki.ros.org/ja/ROS/Tutorials/WritingServiceClient%28python%29)）．
+pythonでは，rospyモジュールの`rospy.Service()`や
+`rospy.ServiceProxy()`を使用することで，サーバ・クライアント
+を簡単に実装することができます（[参考](http://wiki.ros.org/ja/ROS/Tutorials/WritingServiceClient%28python%29)）．
 
-また，コマンドラインからは
+<br>
+
+また，以下のように，コマンドライン上でサービスを活用する方法も用意されています．
 ```bash
-rosservice call [service] [args]
+# サーバを呼び出す
+$ rosservice call <ServiceName> <Arguments>
+
+# 存在するサービスの一覧を表示
+$ rosservice list
+
+# サービスのメッセージ型を表示
+$ rosservice type <ServiceName>
 ```
-として，簡単にクライアントを作成できますし，システム上に存在するサービスの一覧は
-```bash
-rosservice list
-```
-とすることで表示できます．あるサービスのメッセージがどのように定義されているかは，
-```bash
-rosservice type [service]
-```
-で調べられます．
+
 
 ### actionlib
 ここまで，トピック通信を使うことで相手を仮定しない非同期通信を，サービスを使った通信を行うことで相手のレスポンスを待つ同期的な通信を実現できることを見てきました．
@@ -58,18 +64,20 @@ import actionlib
 
 今回の演習では，簡単のためaction serverの作成は行いません．
 変わりに，移動のためのactionとして，`move_base`パッケージの中で定義されている`move_base`というactionを使うことにしましょう．
+<!-- service serverやservice clientも作成してないが...? -->
 
 実はこのパッケージは
 ```bash
 roslaunch navigation_tutorial navigation.launch
 ```
-して`move_base`ノードを起動した際に既に利用されていました（これまでは，そのパッケージの中でサブスクライバとして定義された`move_base_simple/goal`というトピックにpublishすることで移動をしていました）．
+を実行して`move_base`ノードを起動した際に既に利用されていました．
+<!--（これまでは，そのパッケージの中でサブスクライバとして定義された`move_base_simple/goal`というトピックにpublishすることで移動をしていました）-->
 
-`move_base`のパッケージの詳細は[ドキュメント](http://wiki.ros.org/move_base)を見て確認してみてください．
+`move_base`パッケージの詳細は[ドキュメント](http://wiki.ros.org/move_base)を参照してください．
 
 同様に，action clientも`actionlib.SimpleActionClient`を利用することで簡単に作成できます．
 
-例えば，`move_base`のaction clientの実装する際には，
+例えば，`move_base`のaction clientを実装する際には，
 ```python
 import actionlib
 import tf
@@ -85,10 +93,10 @@ goal.target_pose.header.stamp = rospy.Time.now()  # 現在時刻
 # ゴールの姿勢を指定
 goal.target_pose.pose.position.x = X
 goal.target_pose.pose.position.y = Y
-q = uaternion_from_euler(0, 0, YAW)  # 回転はquartanionで記述するので変換
+q = tf.transformations.quaternion_from_euler(0, 0, YAW)  # 回転はquartanionで記述するので変換
 goal.target_pose.pose.orientation = Quaternion(q[0], q[1], q[2], q[3])
 
-action_client.send_goal(goal)  # ゴールを命令
+action_client.send_goal(goal)  # サーバにゴールを送信
 ```
 のようにクライアントの`send_goal`メソッドでゴールを指定できます．
 
@@ -96,11 +104,11 @@ action_client.send_goal(goal)  # ゴールを命令
 ```python
 action_client.wait_for_result(rospy.Duration(30))
 ```
-とすると，結果が返ってくるまで（この場合30秒間），クライアントの処理をブロックできますし，
+とすると，結果が返ってくるまで（この場合30秒間）クライアントの処理をブロックすることができ，
 ```python
 result = action_client.wait_for_result(rospy.Duration(30))
 ```
-とすることで，`result`変数に処理の結果が格納され，確認できます．
+とすることで，`result`変数に処理の結果を格納できます．
 
 
 ## 演習
