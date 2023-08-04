@@ -53,7 +53,7 @@ math: true
 diagram: true
 privacy_pack: false
 edit_page:
-  repo_url: 'https://github.com/matsuolab/roomba_hack'
+  repo_url: 'https://github.com/matsuolab/roomba_hack_course'
   content_dir: 'content'
   repo_branch: 'master'
   editable:
