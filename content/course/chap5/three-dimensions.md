@@ -12,7 +12,6 @@ weight: 20
 <!--今回はRealSenseD435というRGBDカメラを用いて三次元画像処理を行っていきましょう。-->
 RGBDカメラを用いて三次元画像処理を行いましょう。
 
-
 ### RGBDカメラについて
 
 RGBDカメラとは、色(RGB)に加え、深度(Depth)情報を取得できるカメラのことです。
@@ -26,8 +25,9 @@ RGBDカメラとは、色(RGB)に加え、深度(Depth)情報を取得できる�
 ROSで用いる際には[標準のラッパー](https://github.com/IntelRealSense/realsense-ros)を使用します。
 
 ```
-$ roslaunch realsense2_camera rs_camera.launch
+roslaunch realsense2_camera rs_camera.launch
 ```
+
 を実行すると、2種類のトピック
 
 `/camera/color/image_raw` (RGB画像)  
@@ -37,21 +37,22 @@ $ roslaunch realsense2_camera rs_camera.launch
 これらのトピックはいずれも`sensor_msgs/Image`型です。
 
 RealSenseはRGB画像モジュールとデプス画像モジュールが物理的に離れています。
-このため、これら2つのトピックはいずれも画像データではあるものの、ピクセルの位置関係が対応しておらず、そのまま画像処理に利用することはできません。 
+このため、これら2つのトピックはいずれも画像データではあるものの、ピクセルの位置関係が対応しておらず、そのまま画像処理に利用することはできません。
 
 RealSenseを使用するためのlaunchファイル([rs_camera.launch]())を起動する際に
 "align_depth"パラメータを"true"に指定することで、デプス画像をRGB画像のピクセルに対応するように変換した
 `/camera/aligned_depth_to_color/image_raw`トピックが使用できるようになります。
 
 ただし、roomba_bringupパッケージのbringup.launchファイルの
+
 ```
     <include file="$(find realsense2_camera)/launch/rs_camera.launch" if="$(arg realsense)">
         <arg name="align_depth" value="true"/>
     </include>
 ```
+
 の箇所がこの操作に対応していため、今回は特別な操作をせずとも
 `/camera/aligned_depth_to_color/image_raw`トピックを使用できます。
-
 
 ### 物体検出
 
@@ -63,24 +64,25 @@ RealSenseを使用するためのlaunchファイル([rs_camera.launch]())を起�
 です。
 
 1. `/camera/color/image_raw`をsubscribeし、
-1. 物体検出アルゴリズムであるYOLOv3に入力し、
+1. 物体検出アルゴリズムであるYOLOv8に入力し、
 1. 物体検出の結果をbounding boxとして描画し、
 1. `/detection_result`としてpublish
 
 の処理を行っています。
 
-
-```
+```py
 #!/usr/bin/env python3
 
-import rospy
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge
-from pytorchyolo import detect, models
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import cv2
 import copy
+from typing import List
+
+import cv2
+import rospy
+from cv_bridge import CvBridge
+from sensor_msgs.msg import Image
+from ultralytics import YOLO
+from ultralytics.engine.results import Results
+
 
 class ObjectDetection:
     def __init__(self):
@@ -90,44 +92,38 @@ class ObjectDetection:
         self.detection_result_pub = rospy.Publisher('/detection_result', Image, queue_size=10)
 
         # Subscriber
-        rgb_sub = rospy.Subscriber('/camera/color/image_raw', Image, self.callback_rgb)
+        rospy.Subscriber('/camera/color/image_raw', Image, self.callback_rgb)
 
         self.bridge = CvBridge()
         self.rgb_image = None
 
+        self.model = YOLO('yolov8n.pt')
+
     def callback_rgb(self, data):
         cv_array = self.bridge.imgmsg_to_cv2(data, 'bgr8')
-        cv_array = cv2.cvtColor(cv_array, cv2.COLOR_BGR2RGB)
         self.rgb_image = cv_array
 
     def process(self):
-        path = "/root/roomba_hack/catkin_ws/src/three-dimensions_tutorial/yolov3/"
-
-        # load category
-        with open(path+"data/coco.names") as f:
-            category = f.read().splitlines()
-
-        # prepare model
-        model = models.load_model(path+"config/yolov3.cfg", path+"weights/yolov3.weights")
-
         while not rospy.is_shutdown():
             if self.rgb_image is None:
                 continue
 
-            # inference
-            tmp_image = copy.copy(self.rgb_image)
-            boxes = detect.detect_image(model, tmp_image)
-            # [[x1, y1, x2, y2, confidence, class]]
+            results: List[Results] = self.model.predict(self.rgb_image)
 
-            # plot bouding box
-            for box in boxes:
-                x1, y1, x2, y2 = map(int, box[:4])
-                cls_pred = int(box[5])
-                tmp_image = cv2.rectangle(tmp_image, (x1, y1), (x2, y2), (0, 255, 0), 3)
-                tmp_image = cv2.putText(tmp_image, category[cls_pred], (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
+            # plot bounding box
+            tmp_image = copy.deepcopy(self.rgb_image)
+            for result in results:
+                boxes = result.boxes.cpu().numpy()
+                names = result.names
+                for xyxy, conf, cls in zip(boxes.xyxy, boxes.conf, boxes.cls):
+                    if conf < 0.5:
+                        continue
+                    x1, y1, x2, y2 = map(int, xyxy[:4])
+                    cls_pred = cls
+                    tmp_image = cv2.rectangle(tmp_image, (x1, y1), (x2, y2), (0, 255, 0), 3)
+                    tmp_image = cv2.putText(tmp_image, names[cls_pred], (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
 
             # publish image
-            tmp_image = cv2.cvtColor(tmp_image, cv2.COLOR_RGB2BGR)
             detection_result = self.bridge.cv2_to_imgmsg(tmp_image, "bgr8")
             self.detection_result_pub.publish(detection_result)
 
@@ -142,10 +138,11 @@ if __name__ == '__main__':
 
 画像データを物体検出モデルに入力として渡すためには、その画像データの型がnp.ndarray型である必要があります。
 そのため、コールバック関数で、受け取った`sensor_msgs/Image`型の画像データをnp.ndarray型に変換しています。
-```
+
+```py
 cv_array = self.bridge.imgmsg_to_cv2(data, 'bgr8')
-cv_array = cv2.cvtColor(cv_array, cv2.COLOR_BGR2RGB)
 ```
+
 の部分がこの処理に対応します。  
 subscriberを宣言するときにコールバック関数を指定して、
 subscribeしたデータをこの関数に渡すという基本的な処理の流れは、
@@ -172,47 +169,18 @@ subscribeしたデータをこの関数に渡すという基本的な処理の�
 画像の時刻同期には[message_filters](http://wiki.ros.org/message_filters)がよく使われます。
 
 message_filters.ApproximateTimeSynchronizerを使い、以下のようにSubscriberを作成します。
+
 ```python
-import message_filters
-
-# 中略
-
-rgb_sub = message_filters.Subscriber('/camera/color/image_raw', Image)
-depth_sub = message_filters.Subscriber('/camera/aligned_depth_to_color/image_raw', Image)
-message_filters.ApproximateTimeSynchronizer([rgb_sub, depth_sub], 10, 1.0).registerCallback(callback_rgbd)
-
-def callback_rgbd(data1, data2):
-    bridge = CvBridge()
-    cv_array = bridge.imgmsg_to_cv2(data1, 'bgr8')
-    cv_array = cv2.cvtColor(cv_array, cv2.COLOR_BGR2RGB)
-    self.rgb_image = cv_array
-
-    cv_array = bridge.imgmsg_to_cv2(data2, 'passthrough')
-    self.depth_image = cv_array
-```
-この例では、  
-`/camera/color/image_raw`と  
-`/camera/aligned_depth_to_color/image_raw`の  
-トピックを同時(1.0秒までのずれを許容する)に受け取った場合のみ、
-2つの画像データをコールバック関数callback_rgbdに渡します。
-
-それでは、[three-dementions_tutorial](https://github.com/matsuolab/roomba_hack/tree/master/catkin_ws/src/three-dimensions_tutorial)
-パッケージの[detection_distance.py](https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/three-dimensions_tutorial/scripts/detection_distance.py)
-を見てみましょう。  
-物体を検出し、その物体までの距離を測定するスクリプトです。
-
-```
 #!/usr/bin/env python3
 
-import rospy
-import message_filters
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge
-from pytorchyolo import detect, models
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-import cv2
 import copy
+from typing import List
+
+import cv2
+import message_filters
+import rospy
+from cv_bridge import CvBridge
+from sensor_msgs.msg import Image
 
 class DetectionDistance:
     def __init__(self):
@@ -236,35 +204,83 @@ class DetectionDistance:
 
         cv_array = self.bridge.imgmsg_to_cv2(data2, 'passthrough')
         self.depth_image = cv_array
+# 後略
+```
+
+この例では、  
+`/camera/color/image_raw`と  
+`/camera/aligned_depth_to_color/image_raw`の  
+トピックを同時(1.0秒までのずれを許容する)に受け取った場合のみ、
+2つの画像データをコールバック関数callback_rgbdに渡します。
+
+それでは、[three-dementions_tutorial](https://github.com/matsuolab/roomba_hack/tree/master/catkin_ws/src/three-dimensions_tutorial)
+パッケージの[detection_distance.py](https://github.com/matsuolab/roomba_hack/blob/master/catkin_ws/src/three-dimensions_tutorial/scripts/detection_distance.py)
+を見てみましょう。  
+物体を検出し、その物体までの距離を測定するスクリプトです。
+
+```py
+#!/usr/bin/env python3
+
+import copy
+from typing import List
+
+import cv2
+import message_filters
+import rospy
+from cv_bridge import CvBridge
+from sensor_msgs.msg import Image
+from ultralytics import YOLO
+from ultralytics.engine.results import Results
+
+
+class DetectionDistance:
+    def __init__(self):
+        rospy.init_node('detection_distance', anonymous=True)
+
+        # Publisher
+        self.detection_result_pub = rospy.Publisher('/detection_result', Image, queue_size=10)
+
+        # Subscriber
+        rgb_sub = message_filters.Subscriber('/camera/color/image_raw', Image)
+        depth_sub = message_filters.Subscriber('/camera/aligned_depth_to_color/image_raw', Image)
+        message_filters.ApproximateTimeSynchronizer([rgb_sub, depth_sub], 10, 1.0).registerCallback(self.callback_rgbd)
+
+        self.bridge = CvBridge()
+        self.rgb_image, self.depth_image = None, None
+
+        self.model = YOLO('yolov8n.pt')
+
+    def callback_rgbd(self, data1, data2):
+        cv_array = self.bridge.imgmsg_to_cv2(data1, 'bgr8')
+        cv_array = cv2.cvtColor(cv_array, cv2.COLOR_BGR2RGB)
+        self.rgb_image = cv_array
+
+        cv_array = self.bridge.imgmsg_to_cv2(data2, 'passthrough')
+        self.depth_image = cv_array
 
     def process(self):
-        path = "/root/roomba_hack/catkin_ws/src/three-dimensions_tutorial/yolov3/"
-
-        # load category
-        with open(path+"data/coco.names") as f:
-            category = f.read().splitlines()
-
-        # prepare model
-        model = models.load_model(path+"config/yolov3.cfg", path+"weights/yolov3.weights")
-
         while not rospy.is_shutdown():
             if self.rgb_image is None:
                 continue
 
             # inference
             tmp_image = copy.copy(self.rgb_image)
-            boxes = detect.detect_image(model, tmp_image)
-            # [[x1, y1, x2, y2, confidence, class]]
+
+            results: List[Results] = self.model.predict(self.rgb_image, verbose=False)
 
             # plot bouding box
-            for box in boxes:
-                x1, y1, x2, y2 = map(int, box[:4])
-                cls_pred = int(box[5])
+            for result in results:
+                boxes = result.boxes.cpu().numpy()
+                names = result.names
+                if len(boxes.xyxy) == 0:
+                    continue
+                x1, y1, x2, y2 = map(int, boxes.xyxy[0][:4])
+                cls_pred = boxes.cls[0]
                 tmp_image = cv2.rectangle(tmp_image, (x1, y1), (x2, y2), (0, 255, 0), 3)
-                tmp_image = cv2.putText(tmp_image, category[cls_pred], (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
+                tmp_image = cv2.putText(tmp_image, names[cls_pred], (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
                 cx, cy = (x1+x2)//2, (y1+y2)//2
-                print(category[cls_pred], self.depth_image[cy][cx]/1000, "m")
-            
+                print(names[cls_pred], self.depth_image[cy][cx]/1000, "m")
+
             # publish image
             tmp_image = cv2.cvtColor(tmp_image, cv2.COLOR_RGB2BGR)
             detection_result = self.bridge.cv2_to_imgmsg(tmp_image, "bgr8")
@@ -276,17 +292,19 @@ if __name__ == '__main__':
     try:
         dd.process()
     except rospy.ROSInitException:
+        pass
 ```
 
 基本的には物体検出のスクリプトと同じですが、
-```
+
+```py
 cx, cy = (x1+x2)//2, (y1+y2)//2
-print(category[cls_pred], self.depth_image[cy][cx]/1000, "m")
+print(names[cls_pred], self.depth_image[cy][cx]/1000, "m")
 ```
+
 でbounding boxの中心座標を変換し、対応する距離をメートル単位で表示しています。
 
 整列されたデプス画像を用いているため、RGB画像に基づき算出した座標をそのまま指定できます。
-
 
 ### 点群の作成
 
@@ -309,7 +327,7 @@ print(category[cls_pred], self.depth_image[cy][cx]/1000, "m")
 
 depth_image_procのwikiを参考に以下のようなlaunchファイルを作成しました。
 
-```
+```xml
 <?xml version="1.0"?>
 <launch>
   <node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager" />
@@ -322,6 +340,7 @@ depth_image_procのwikiを参考に以下のようなlaunchファイルを作成
   </node>
 </launch>
 ```
+
 このlaunchファイルを実行すると  
 `/camera/color/camera_info`と  
 `/camera/aligned_depth_to_color/image_raw`を  
@@ -330,61 +349,68 @@ subscribeし、
 
 `/camera/color/camera_info`は
 [sensor_msgs/CameraInfo](http://docs.ros.org/en/melodic/api/sensor_msgs/html/msg/CameraInfo.html)型のトピックです。
-カメラパラメータやフレームid、タイムスタンプなどの情報を保持しており、点群の変換に利用されます。 
+カメラパラメータやフレームid、タイムスタンプなどの情報を保持しており、点群の変換に利用されます。
 
-`/camera/aligned_depth_to_color/image_raw`はRGB画像に合わせて整列されたDepth画像であるため、    
+`/camera/aligned_depth_to_color/image_raw`はRGB画像に合わせて整列されたDepth画像であるため、
 `/camera/{{< hl >}}depth{{</ hl >}}/camera_info`ではなく  
 `/camera/{{< hl >}}color{{</ hl >}}/camera_info`を指定しています。  
 
+```bash
+(開発PC)(docker)# roslaunch three-dimensions_tutorial depth2pc.launch
 ```
-$ roslaunch three-dimensions_tutorial depth2pc.launch
-```
+
 を実行し、`/camera/depth/points`トピックをrvizで可視化をすると三次元空間に点群データが表示されているのが確認できます。
 
 ## 演習
 
 {{< spoiler text="(開発PC, jetson)起動準備" >}}
 
-```
+```bash
 (jetson)$ ./RUN-DOCKER-CONTAINER.sh
 (jetson)(docker)# roslaunch roomba_bringup bringup.launch
 (開発PC)$ ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
 ```
+
 {{< /spoiler >}}
 
 {{< spoiler text="(開発PC)RealSenseのトピックの可視化" >}}
+
+```bash
+(開発PC)(docker)# rviz
 ```
-(開発PC)(docker) rviz
-```
+
 rviz上で
 
-- `/camera/color/image_raw` 
+- `/camera/color/image_raw`
 - `/camera/depth/image_raw`
 - `/camera/aligned_depth_to_color/image_raw`  
 
 を可視化して違いを確認してみましょう。
 {{< /spoiler >}}
 
-
 {{< spoiler text="(開発PC)物体検出を行う" >}}
+
+```bash
+(開発PC)(docker)# cd catkin_ws; catkin_make; source devel/setup.bash
+(開発PC)(docker)# roscd three-dimensions_tutorial; cd yolov3/weights; ./download_weights.sh
+(開発PC)(docker)# rosrun three-dimensions_tutorial object_detection.py
+# rvizで`/detection_result`を表示し結果を確認してみよう。
+(開発PC)(docker)# rosrun three-dimensions_tutorial detection_distance.py
 ```
-(開発PC)(docker) cd catkin_ws; catkin_make; source devel/setup.bash
-(開発PC)(docker) roscd three-dimensions_tutorial; cd yolov3/weights; ./download_weights.sh
-(開発PC)(docker) rosrun three-dimensions_tutorial object_detection.py
-rvizで`/detection_result`を表示し結果を確認してみよう。
-(開発PC)(docker) rosrun three-dimensions_tutorial detection_distance.py
-```
+
 {{< /spoiler >}}
 
 {{< spoiler text="(開発PC)外部パッケージを使用" >}}
+
+```bash
+(開発PC)(docker)# cd ~/external_catkin_ws/src 
+(開発PC)(docker)# git clone https://github.com/ros-perception/image_pipeline
+(開発PC)(docker)# cd ../; catkin build; source devel/setup.bash
+(開発PC)(docker)# cd ~/roomba_hack/catkin_ws; source devel/setup.bash
+(開発PC)(docker)# roslaunch three-dimensions_tutorial depth2pc.launch
+(開発PC)(docker)# roslaunch navigation_tutorial navigation.launch
 ```
-(開発PC)(docker) cd ~/external_catkin_ws/src 
-(開発PC)(docker) git clone https://github.com/ros-perception/image_pipeline
-(開発PC)(docker) cd ../; catkin build; source devel/setup.bash
-(開発PC)(docker) cd ~/roomba_hack/catkin_ws; source devel/setup.bash
-(開発PC)(docker) roslaunch three-dimensions_tutorial depth2pc.launch
-(開発PC)(docker) roslaunch navigation_tutorial navigation.launch
-```
+
 rvizで`/camera/depth/points`トピックを追加して確認してみましょう。
 {{< /spoiler >}}
 
@@ -392,6 +418,7 @@ rvizで`/camera/depth/points`トピックを追加して確認してみましょ
 物体を検出し、特定の物体の手前まで移動するスクリプトを作ってみましょう。
 
 ヒント
+
 - 物体検出結果に基づいて物体部分以外をマスクしたデプス画像をpublishする
 - depth2pc.launchでそれをsubscribeし、point(cloud)に変換する
 - 変換されたpointからmap座標系での位置を取得する
