@@ -1,5 +1,10 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Chapter 8 | ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap8/</link><atom:link href="https://matsuolab.github.io/roomba_hack_course/course/chap8/index.xml" rel="self" type="application/rss+xml"/><description>Chapter 8</description><generator>Wowchemy (https://wowchemy.com)</generator><language>ja</language><copyright>© 2023 Tokyo Robot And Intelligence Lab (TRAIL)</copyright><lastBuildDate>Sun, 09 Sep 2018 00:00:00 +0000</lastBuildDate><image><url>https://matsuolab.github.io/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png</url><title>Chapter 8</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap8/</link></image><item><title>最終プロジェクト</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap8/final_project/</link><pubDate>Thu, 22 Jun 2023 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap8/final_project/</guid><description>&lt;h2 id="最終課題について">最終課題について&lt;/h2>
-&lt;p>最終課題発表会の日程は&lt;mark>未定&lt;/mark>です(2023-06-22現在)。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Chapter 8 | ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap8/</link><atom:link href="https://matsuolab.github.io/roomba_hack_course/course/chap8/index.xml" rel="self" type="application/rss+xml"/><description>Chapter 8</description><generator>Wowchemy (https://wowchemy.com)</generator><language>ja</language><copyright>© 2023 Tokyo Robot And Intelligence Lab (TRAIL)</copyright><lastBuildDate>Sun, 09 Sep 2018 00:00:00 +0000</lastBuildDate><image><url>https://matsuolab.github.io/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png</url><title>Chapter 8</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap8/</link></image><item><title>最終プロジェクト</title><link>https://matsuolab.github.io/roomba_hack_course/course/chap8/final_project/</link><pubDate>Thu, 22 Jun 2023 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/chap8/final_project/</guid><description>&lt;div class="alert alert-note">
+&lt;div>
+これは 2023 年度の情報です。今後変更の可能性があります。
+&lt;/div>
+&lt;/div>
+&lt;h2 id="最終課題について">最終課題について&lt;/h2>
+&lt;p>最終課題発表会の日程は&lt;mark>8/30&lt;/mark>です。&lt;/p>
 &lt;p>それまでに各チームで以下のタスクを行うコードを準備してください。
 また、チームでGitHubにリポジトリを作成し、準備したコードをアップロードしてください。&lt;/p>
 &lt;p>すべてのタスクを完璧に実装しようとすると少し大変なので、まずは、ヒントを参考に「はじめの一歩」を実装するのを目指しましょう。&lt;/p>
@@ -16,7 +21,7 @@
 &lt;/figcaption>&lt;/figure>
 &lt;p>それぞれのTaskのStaring Pointではルンバの自己位置を合わせることはできますが、一度ルンバが動き始めたら人が介入することができないことに注意してください。(リスタートを除く)&lt;/p>
 &lt;h4 id="task1">Task1&lt;/h4>
-&lt;details class="spoiler " id="spoiler-2">
+&lt;details class="spoiler " id="spoiler-3">
 &lt;summary>ルール&lt;/summary>
 &lt;p>&lt;p>Task1では、3分の制限時間の間で、Room1のStarting Pointからルンバを自律移動させ、Area1内に落ちている5つの物体を避けながらRoom2へと移動することが目標になります。&lt;/p>
 &lt;p>途中でロボットが停止した場合などは再びStarting Pointからリスタートすることができます。&lt;/p>
@@ -44,7 +49,7 @@ Task1で出現する物体
 &lt;p>実際に使用する物体は角川に置いてあります。&lt;/p>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-3">
+&lt;details class="spoiler " id="spoiler-4">
 &lt;summary>採点基準&lt;/summary>
 &lt;p>&lt;p>ゴール得点と物体検出得点それぞれ100点満点です。また、ゴール得点と物体検出得点それぞれの得点が負になることはありません。&lt;/p>
 &lt;p>ゴール得点内訳(100点満点)&lt;/p>
@@ -53,7 +58,7 @@ Task1で出現する物体
 &lt;p>検出結果の分類結果が正しければ物体ごとに+20点、間違っていたら-20点&lt;/p>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-4">
+&lt;details class="spoiler " id="spoiler-5">
 &lt;summary>ヒント&lt;/summary>
 &lt;p>&lt;p>はじめの一歩&lt;/p>
 &lt;ul>
@@ -82,14 +87,14 @@ Task1で出現する物体
 &lt;/p>
 &lt;/details>
 &lt;h4 id="task2">Task2&lt;/h4>
-&lt;details class="spoiler " id="spoiler-5">
+&lt;details class="spoiler " id="spoiler-6">
 &lt;summary>ルール&lt;/summary>
 &lt;p>&lt;p>Task2では、3分の制限時間の間で、Room2のStarting Pointからルンバを自律移動させ、Area2にいる2人の人のうち、手を振っている人の前で停止することが目標になります。&lt;/p>
 &lt;p>また、2人の人がArea2にある2つの椅子に座っており、そのうち一方のみが手を振っていることが保証されています。&lt;/p>
 &lt;p>途中でロボットが停止した場合などは再びStarting Pointからリスタートすることができます。&lt;/p>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-6">
+&lt;details class="spoiler " id="spoiler-7">
 &lt;summary>採点基準&lt;/summary>
 &lt;p>&lt;p>Task2全体で150点満点です、また、Task2の得点が負になることはありません。&lt;/p>
 &lt;p>時間以内にいずれかの人の前に移動が成功し、その場で停止する(人の50cm以内に到達する)+70点&lt;/p>
@@ -97,7 +102,7 @@ Task1で出現する物体
 &lt;p>加えて、ロボットをStarting Pointからリスタートする度に-10点&lt;/p>
 &lt;/p>
 &lt;/details>
-&lt;details class="spoiler " id="spoiler-7">
+&lt;details class="spoiler " id="spoiler-8">
 &lt;summary>ヒント&lt;/summary>
 &lt;p>&lt;p>はじめの一歩&lt;/p>
 &lt;ul>
