@@ -392,7 +392,6 @@ rviz上で
 
 ```bash
 (開発PC)(docker)# cd catkin_ws; catkin_make; source devel/setup.bash
-(開発PC)(docker)# roscd three-dimensions_tutorial; cd yolov3/weights; ./download_weights.sh
 (開発PC)(docker)# rosrun three-dimensions_tutorial object_detection.py
 # rvizで`/detection_result`を表示し結果を確認してみよう。
 (開発PC)(docker)# rosrun three-dimensions_tutorial detection_distance.py
