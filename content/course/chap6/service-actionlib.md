@@ -9,30 +9,42 @@ weight: 20
 
 ## Learn
 
-ここまでトピックを使った通信を使ってロボットシステムを構築してきました．
-トピック通信は，メッセージをpublish・subscribeすることで通信する，相手を仮定しない非同期な通信方法でした．
+これまでは，トピックを使った通信によりロボットシステムを構築してきました．
+トピック通信には，
+- 通信の相手を仮定しない ... subscriberがいなくてもpublishできる  
+- 非同期通信・処理ができる ... publisherはメッセージをpublishしたらすぐに次の処理を始める（=subscriberの処理が終わるのを待たない）  
 
-しかし，システムを構築する場合には，「相手ノードの処理の結果を呼び出し側のノードで受け取って活用したい」
-といった場合もあります．
+などの特徴があり、シンプルにノード間の通信を実現できました．  
+しかし，逆に言えば，
+- 通信の相手を仮定する ... 呼び出し側のノードが，処理を実行するノードの処理結果によって振るまいを変える
+- 同期通信・処理 ... 呼び出し側のノードが，処理を実行するノードで処理が完了するまで待つ
 
-このような比較的複雑な通信を実現するための通信方式として，ROSではサービス（service）とアクション（actionlib）が用意されています．
+のような処理（クライアント・サーバ型の通信と呼ばれることが多い）を
+トピックによって実現することは大変です．
+
+このような比較的複雑な通信を実現するための通信方式として，
+ROSはサービス（service）とアクション（actionlib）を用意しています．
 
 ### service
-これまで利用してきたトピック通信は，通信の相手を仮定しない（相手がいようといまいと関係ない）ため，
-ロボットシステムに特有な非同期通信・処理を簡単に実現することができました．
+#### serviceとは
+service通信は，クライアント・サーバ型の通信を実現する最も基本的な方法です。
 
-一方で，他のノードに対して「特定の処理の依頼をして，その結果を待ちたい」場合など，同期的・双方向な通信が必要になることがあります．
-例えば，あるノードの設定を変更をして，それが成功したかどうかを知りたい場合などに使えます．
-サービスを使った通信は，「クライアント・サーバ」型の通信（クライアントサーバモデル, client-server model）となり，
-クライアントがサーバにリクエストを送ると，サーバ側で処理を行い，クライアントにレスポンスを返します．
+サービスを提供するノード(service server)と，サービスを呼び出すノード(service client)の間の通信を可能にします．  
+以下のような流れで使用します．
+
+1. clientがserverに引数を渡す(処理をリクエストする)
+1. 引数を受け取ったserverが何らかの処理を実行する
+1. serverが処理結果を返り値としてclientに返す
+1. clientは受け取った値に基づいて処理を続行する
+
+{{< figure src="../ros_service.png">}}
 
 pythonでは，rospyモジュールの`rospy.Service()`や
 `rospy.ServiceProxy()`を使用することで，サーバ・クライアント
-を簡単に実装することができます（[参考](http://wiki.ros.org/ja/ROS/Tutorials/WritingServiceClient%28python%29)）．
+を簡単に実装することができます
+（[参考](http://wiki.ros.org/ja/ROS/Tutorials/WritingServiceClient%28python%29)）．
 
-<br>
-
-また，以下のように，コマンドライン上でサービスを活用する方法も用意されています．
+以下のように，コマンドラインからサービスを利用することもできます．
 ```bash
 # サーバを呼び出す
 $ rosservice call <ServiceName> <Arguments>
@@ -44,17 +56,28 @@ $ rosservice list
 $ rosservice type <ServiceName>
 ```
 
+#### serviceのデータ型
+サービスにおいて使用されるデータの型は.srvファイルに記述されています．
+トピックにおいて使用されるデータの型は.msgファイルに記述されていましたが，
+サービスの場合は引数と返り値の二つの形式を定義する必要がある点が異なります．  
+例としてstd_srvs/SetBoolを示します．引数と返り値の間に`---`を入れて定義します．
+```
+bool data
+---
+bool success
+string message
+```
 
 ### actionlib
-ここまで，トピック通信を使うことで相手を仮定しない非同期通信を，サービスを使った通信を行うことで相手のレスポンスを待つ同期的な通信を実現できることを見てきました．
+サービス通信では，クライアントはサーバ側の処理が終わるまで処理を停止するため，
+サーバで長い時間がかかるような処理を行う（計算量が大きい，または，移動に時間がかかるなど）場合には，
+クライアントの処理が長い間停止してしまうという問題があります．
 
-サービスによる通信では，クライアントはサーバからのレスポンスを待つため，サーバで長い時間がかかるような処理を行う（計算量が大きい，または，移動に時間がかかるなど）場合には，クライアントの処理が長い間停止してしまうという問題があります．
+処理の呼び出し側のプログラムを停止させずに，かつ，
+処理の結果や途中経過を受け取って利用できるようにしたものがアクション(actionlib)通信です．
 
-そのため，処理の呼び出し側のプログラムをブロックせずに，かつ，処理の結果（や途中経過）を知れるような非同期通信が欲しくなります．
-この要求を満たすのが，ROSのアクション(actionlib)です．
-
-actionlibは，実はトピック通信の組み合わせとして構成されており，`goal`（命令），`result`（処理の結果），`feedback`（途中経過），`status`（サーバの状態），`cancel`（命令の取り消し）の5つのトピックからなります．
-このあたりの仕様は，[qiitaのROS講座](https://qiita.com/srs/items/a39dcd24aaeb03216026#%E6%A6%82%E8%A6%81)が詳しいので参照してください．
+actionlibは5つのトピック通信を組み合わせることで実現されています．
+詳しい説明は[qiitaのROS講座](https://qiita.com/srs/items/a39dcd24aaeb03216026#%E6%A6%82%E8%A6%81)を参照してください．
 
 pythonでは，actionlibのサーバやクライアントも，
 ```python
@@ -75,8 +98,7 @@ roslaunch navigation_tutorial navigation.launch
 
 `move_base`パッケージの詳細は[ドキュメント](http://wiki.ros.org/move_base)を参照してください．
 
-同様に，action clientも`actionlib.SimpleActionClient`を利用することで簡単に作成できます．
-
+同様に，action clientも`actionlib.SimpleActionClient`を利用することで簡単に作成できます．  
 例えば，`move_base`のaction clientを実装する際には，
 ```python
 import actionlib
@@ -87,7 +109,7 @@ from geometry_msgs.msg import Quaternion
 action_client = actionlib.SimpleActionClient('move_base', MoveBaseAction)
 action_client.wait_for_server()  # action serverの準備ができるまで待つ
 
-goal = MoveBaseGoal()  # goalのメッセージの定義
+goal = MoveBaseGoal()  # goalのメッセージを作成
 goal.target_pose.header.frame_id = 'map'  # マップ座標系でのゴールとして設定
 goal.target_pose.header.stamp = rospy.Time.now()  # 現在時刻
 # ゴールの姿勢を指定
