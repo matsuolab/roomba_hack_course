@@ -81,3 +81,10 @@ $ docker exec -it roomba_hack bash
 を実行しても同じことができます。
 
 その後、`rosrun`コマンドや`roslaunch`コマンドで、実行したいプログラムを実行してください。
+<br>
+<br>
+<br>
+補足  
+`$ ./RUN-DOCKER-CONTAINER.sh`や  
+`$ roslaunch roomba_bringup bringup.launch`のより詳細な動作が知りたい場合は、
+ファイルの中身を読んで確認してください。
