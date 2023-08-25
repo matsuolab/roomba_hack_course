@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Appendix | ロボットシステム入門</title><link>https://matsuolab.github.io/roomba_hack_course/course/appendix/</link><atom:link href="https://matsuolab.github.io/roomba_hack_course/course/appendix/index.xml" rel="self" type="application/rss+xml"/><description>Appendix</description><generator>Wowchemy (https://wowchemy.com)</generator><language>ja</language><copyright>© 2023 Tokyo Robot And Intelligence Lab (TRAIL)</copyright><lastBuildDate>Thu, 17 Aug 2023 00:00:00 +0000</lastBuildDate><image><url>https://matsuolab.github.io/roomba_hack_course/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_2.png</url><title>Appendix</title><link>https://matsuolab.github.io/roomba_hack_course/course/appendix/</link></image><item><title>システムの構成</title><link>https://matsuolab.github.io/roomba_hack_course/course/appendix/system_structure/</link><pubDate>Fri, 25 Aug 2023 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/appendix/system_structure/</guid><description>&lt;p>Roomba Hackにおける
+計算機やDockerコンテナのシステム構成について説明します。&lt;br>
+各回の演習でRoombaのセットアップ時に実行するコマンドの意味（目的）を大まかに理解し、
+プログラムを実行したい時にどのDockerコンテナに入るべきかがわかるようになる
+ことを目指します。&lt;/p>
+&lt;h2 id="lecture">Lecture&lt;/h2>
+&lt;p>はじめにシステム構成を説明した後、
+node同士の通信を可能にするros masterの機能について説明し、
+最後に各回の講義で実行するコマンドの意味を説明します。&lt;/p>
+&lt;h3 id="システム構成">システム構成&lt;/h3>
+&lt;p>以下の図が、システムの完成形を表しています。&lt;/p>
+&lt;figure >
+&lt;div class="d-flex justify-content-center">
+&lt;div class="w-100" >&lt;img src="../system_structure.png" alt="" loading="lazy" data-zoomable />&lt;/div>
+&lt;/div>&lt;/figure>
+&lt;p>Roombaに載っているJetsonと開発PCのそれぞれで、Dockerコンテナが１つづつ起動しています。
+便宜的にコンテナ1、コンテナ2と呼びます。&lt;/p>
+&lt;p>Jetson側では、Roombaのセンサやアクチュエータ（モータなど、
+動力を生み出すもの）を制御するためのノードが動作します。
+比較的低レイヤーの動作を担っています。&lt;/p>
+&lt;p>開発PC側で動作するノードは、Jetson側のノードと比べて高レイヤーの機能を担っています。
+開発PCはJetsonと比べスペックが高く、計算量の大きい処理も行うことができます。
+各回の演習で編集するソースコードは、開発PC側のDockerコンテナ内で動作するものです。&lt;/p>
+&lt;h3 id="ros-masterとros_master_uriの役割">ros masterとROS_MASTER_URIの役割&lt;/h3>
+&lt;p>&lt;a href="https://qiita.com/srs/items/7d4aeb5e44138f97c770" target="_blank" rel="noopener">ROS講座20 複数のPCでROS接続1&lt;/a>を参照してください。&lt;/p>
+&lt;h3 id="コマンドの意味">コマンドの意味&lt;/h3>
+&lt;p>コンテナ1内のノードとコンテナ2内のノードがデータをやり取りするためには、
+同じros masterに問い合わせを行う必要があります。&lt;/p>
+&lt;h4 id="jetson側で実行するコマンド">Jetson側で実行するコマンド&lt;/h4>
+&lt;p>各回の演習では、
+初めにJetsonにssh接続して&lt;/p>
+&lt;pre>&lt;code>~/group_x/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
+&lt;/code>&lt;/pre>
+&lt;p>を実行することでコンテナ1を起動し、
+そのままコンテナ1内で&lt;/p>
+&lt;pre>&lt;code>~/group_x/roomba_hack$ roslaunch roomba_bringup bringup.launch
+&lt;/code>&lt;/pre>
+&lt;p>を実行した時点で、すでにros masterが起動しています。&lt;/p>
+&lt;h4 id="開発pc側で実行するコマンド">開発PC側で実行するコマンド&lt;/h4>
+&lt;p>つぎに、開発PCで&lt;/p>
+&lt;pre>&lt;code>$ ./RUN-DOCKER-CONTAINER.sh 192.168.10.7x
+&lt;/code>&lt;/pre>
+&lt;p>とすることで、コンテナ2を起動しています。
+この時、引数にJetsonのIPアドレスを指定することで、
+コンテナ1と同じros masterに問い合わせを行っています。&lt;/p>
+&lt;p>ここまでで、必要な準備は完了しています。&lt;br>
+他のプログラムを新たに実行したい場合には、すでに存在しているコンテナ2内で実行してください。
+具体的には、開発PCで新しいターミナルを開き、&lt;/p>
+&lt;pre>&lt;code>~/group_x/roomba_hack$ ./RUN-DOCKER-CONTAINER.sh
+&lt;/code>&lt;/pre>
+&lt;p>(すでに開発PC上でコンテナが起動している場合には引数はいらない)
+を実行することでコンテナ2内に入ることができます。&lt;/p>
+&lt;p>あるいは、新しいターミナルで&lt;/p>
+&lt;pre>&lt;code>$ docker exec -it roomba_hack bash
+&lt;/code>&lt;/pre>
+&lt;p>を実行しても同じことができます。&lt;/p>
+&lt;p>その後、&lt;code>rosrun&lt;/code>コマンドや&lt;code>roslaunch&lt;/code>コマンドで、実行したいプログラムを実行してください。
+&lt;br>
+&lt;br>
+&lt;br>
+補足&lt;br>
+&lt;code>$ ./RUN-DOCKER-CONTAINER.sh&lt;/code>や&lt;br>
+&lt;code>$ roslaunch roomba_bringup bringup.launch&lt;/code>のより詳細な動作が知りたい場合は、
+ファイルの中身を読んで確認してください。&lt;/p></description></item></channel></rss>
