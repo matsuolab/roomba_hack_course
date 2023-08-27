@@ -48,7 +48,7 @@ class TaskManager:
         else:
           rospy.loginfo("move failed!")
         
-        result = self.move(0.0, 1.0)
+        result = self.move(0.0, 90.0)
         if result:
           rospy.loginfo("turn success!")
         else:
@@ -182,7 +182,7 @@ $ rosrun navigation_tutorial move_robot.py
 ```
 $ rosrun navigation_tutorial task_manager.py
 ```
-を実行すると、ロボットが直進してから右に回転します。
+を実行すると、ロボットが直進してから左に回転します。
 
 ## 補足
 ファイルがうまく実行できない場合、ファイルに実行権限があたえられていない可能性があります。
