@@ -85,13 +85,16 @@ class RobotController:
         # Subscriber
         odom_sub = rospy.Subscriber('/odom', Odometry, self.callback_odom)
 
+        # Service Server
+        rospy.Service('/move_robot', MoveTrigger, self.callback_move_robot)
+
         self.x = None
         self.y = None
         self.yaw = None
         while self.x is None:
             rospy.sleep(0.1)
 
-    def call_back_move_robot(self, req):
+    def callback_move_robot(self, req):
         res = MoveTriggerResponse()
         try:
             self.go_straight(req.straight)
