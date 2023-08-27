@@ -18,7 +18,7 @@ task_manager.py
 ```
 #!/usr/bin/env python3
 import rospy
-from navigation_tutorial.srv import MoveTrigger
+from navigation_tutorial.srv import MoveTrigger, MoveTriggerRequest
 
 class TaskManager:
     def __init__(self):
