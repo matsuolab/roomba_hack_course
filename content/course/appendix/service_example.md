@@ -101,7 +101,7 @@ class RobotController:
             if req.turn >= 0:
                 self.turn_left(req.turn)
             else:
-                self.turn_right(req.turn)
+                self.turn_right(-req.turn)
             res.success = True
             return res
         except rospy.ROSInterruptException:
