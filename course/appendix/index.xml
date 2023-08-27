@@ -61,4 +61,154 @@ node同士の通信を可能にするros masterの機能について説明し、
 補足&lt;br>
 &lt;code>$ ./RUN-DOCKER-CONTAINER.sh&lt;/code>や&lt;br>
 &lt;code>$ roslaunch roomba_bringup bringup.launch&lt;/code>のより詳細な動作が知りたい場合は、
-ファイルの中身を読んで確認してください。&lt;/p></description></item></channel></rss>
+ファイルの中身を読んで確認してください。&lt;/p></description></item><item><title>サービス通信の例(仮)</title><link>https://matsuolab.github.io/roomba_hack_course/course/appendix/service_example/</link><pubDate>Sun, 27 Aug 2023 00:00:00 +0000</pubDate><guid>https://matsuolab.github.io/roomba_hack_course/course/appendix/service_example/</guid><description>&lt;p>serviceを用いたnode間通信の例を挙げます。&lt;/p>
+&lt;p>task_manager.pyで起動したノードから、
+serviceを用いてmove_robot.pyで起動したノードの機能を使用する例です。&lt;/p>
+&lt;h2 id="pythonファイルの用意">pythonファイルの用意&lt;/h2>
+&lt;p>navigation_tutorial/scripts/に以下の2つのファイルを作成してください
+(コピペで構いません)。&lt;/p>
+&lt;p>task_manager.py&lt;/p>
+&lt;pre>&lt;code>#!/usr/bin/env python3
+import rospy
+from navigation_tutorial.srv import MoveTrigger, MoveTriggerRequest
+class TaskManager:
+def __init__(self):
+rospy.init_node('task_manager')
+# service client
+self.move_robot = rospy.ServiceProxy('/move_robot', MoveTrigger)
+self.move_robot.wait_for_service()
+rospy.loginfo(&amp;quot;Service /move_robot is ready!&amp;quot;)
+def move(self, straight, turn):
+command = MoveTriggerRequest()
+command.straight = straight
+command.turn = turn
+rospy.loginfo(f&amp;quot;request: straight={straight}, turn={turn}&amp;quot;)
+response = self.move_robot(command) # service call
+return response.success
+def main(self):
+&amp;quot;&amp;quot;&amp;quot;
+タスクの流れを手続的に記述する
+&amp;quot;&amp;quot;&amp;quot;
+result = self.move(1.0, 0.0)
+if result:
+rospy.loginfo(&amp;quot;move success!&amp;quot;)
+else:
+rospy.loginfo(&amp;quot;move failed!&amp;quot;)
+result = self.move(0.0, 90.0)
+if result:
+rospy.loginfo(&amp;quot;turn success!&amp;quot;)
+else:
+rospy.loginfo(&amp;quot;turn failed!&amp;quot;)
+rospy.loginfo(&amp;quot;task completed!&amp;quot;)
+if __name__ == '__main__':
+task_manager = TaskManager()
+task_manager.main()
+&lt;/code>&lt;/pre>
+&lt;br>
+&lt;br>
+&lt;p>move_robot.py&lt;/p>
+&lt;pre>&lt;code>#!/usr/bin/env python3
+import numpy as np
+import rospy
+import tf
+from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
+from navigation_tutorial.srv import MoveTrigger, MoveTriggerResponse
+class RobotController:
+def __init__(self):
+rospy.init_node('robot_controller', anonymous=True)
+# Publisher
+self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+# Subscriber
+odom_sub = rospy.Subscriber('/odom', Odometry, self.callback_odom)
+# Service Server
+rospy.Service('/move_robot', MoveTrigger, self.callback_move_robot)
+self.x = None
+self.y = None
+self.yaw = None
+while self.x is None:
+rospy.sleep(0.1)
+def callback_move_robot(self, req):
+res = MoveTriggerResponse()
+try:
+self.go_straight(req.straight)
+if req.turn &amp;gt;= 0:
+self.turn_left(req.turn)
+else:
+self.turn_right(-req.turn)
+res.success = True
+return res
+except rospy.ROSInterruptException:
+res.success = False
+return res
+def callback_odom(self, data):
+self.x = data.pose.pose.position.x
+self.y = data.pose.pose.position.y
+self.yaw = self.get_yaw_from_quaternion(data.pose.pose.orientation)
+def go_straight(self, dis, velocity=0.3):
+vel = Twist()
+x0 = self.x
+y0 = self.y
+while(np.sqrt((self.x-x0)**2+(self.y-y0)**2)&amp;lt;dis):
+vel.linear.x = velocity
+vel.angular.z = 0.0
+self.cmd_vel_pub.publish(vel)
+rospy.sleep(0.1)
+self.stop()
+def turn_right(self, yaw, yawrate=-0.5):
+vel = Twist()
+yaw0 = self.yaw
+while(abs(self.yaw-yaw0)&amp;lt;np.deg2rad(yaw)):
+vel.linear.x = 0.0
+vel.angular.z = yawrate
+self.cmd_vel_pub.publish(vel)
+rospy.sleep(0.1)
+self.stop()
+def turn_left(self, yaw, yawrate=0.5):
+vel = Twist()
+yaw0 = self.yaw
+while(abs(self.yaw-yaw0)&amp;lt;np.deg2rad(yaw)):
+vel.linear.x = 0.0
+vel.angular.z = yawrate
+self.cmd_vel_pub.publish(vel)
+rospy.sleep(0.1)
+self.stop()
+def stop(self):
+vel = Twist()
+vel.linear.x = 0.0
+vel.angular.z = 0.0
+self.cmd_vel_pub.publish(vel)
+def get_yaw_from_quaternion(self, quaternion):
+e = tf.transformations.euler_from_quaternion(
+(quaternion.x, quaternion.y, quaternion.z, quaternion.w))
+return e[2]
+if __name__=='__main__':
+simple_controller = SimpleController()
+rospy.spin()
+&lt;/code>&lt;/pre>
+&lt;p>move_robot.pyはsimple_control2.pyを少し修正した程度です。
+simple_control2.pyについては、&lt;a href="../../chap3/sensing2">chapter3&lt;/a>で詳しく解説しています。&lt;/p>
+&lt;h2 id="srvファイルの用意">srvファイルの用意&lt;/h2>
+&lt;p>また、&lt;a href="https://note.com/npaka/n/n3e90d24bd38b" target="_blank" rel="noopener">このページ&lt;/a>を参考にして、
+navigation_tutorialパッケージ内に
+navigation_tutorilal/srv/MoveTrigger.srvファイルを作成してください。&lt;/p>
+&lt;p>とくに、navigation_tutorial/CMakeLists.txtを編集する箇所を抜かさないように気をつけてください
+（&lt;a href="[https://note.com/npaka/n/n3e90d24bd38b]%28https://note.com/npaka/n/n3e90d24bd38b#:~:text=%282%29%20%E3%80%8CCMAkeLists.txt%E3%80%8D%E3%82%92%E4%BB%A5%E4%B8%8B%E3%81%AE%E3%82%88%E3%81%86%E3%81%AB%E7%B7%A8%E9%9B%86%E3%80%82%29">対応する説明&lt;/a>）。&lt;/p>
+&lt;p>MoveTrigger.srv&lt;/p>
+&lt;pre>&lt;code>float32 straight
+float32 turn
+---
+bool success
+&lt;/code>&lt;/pre>
+&lt;h2 id="実行方法">実行方法&lt;/h2>
+&lt;p>ターミナルで以下のコマンドを実行した後、&lt;/p>
+&lt;pre>&lt;code>$ rosrun navigation_tutorial move_robot.py
+&lt;/code>&lt;/pre>
+&lt;p>別のターミナルで&lt;/p>
+&lt;pre>&lt;code>$ rosrun navigation_tutorial task_manager.py
+&lt;/code>&lt;/pre>
+&lt;p>を実行すると、ロボットが直進して左に回転します。&lt;/p>
+&lt;h2 id="補足">補足&lt;/h2>
+&lt;p>ファイルがうまく実行できない場合、ファイルに実行権限があたえられていない可能性があります。
+&lt;a href="https://qiita.com/shisama/items/5f4c4fa768642aad9e06" target="_blank" rel="noopener">このページ&lt;/a>を参考にして解決してみてください。&lt;/p>
+&lt;p>それでも解決しない場合はslackで気軽に質問してください。&lt;/p></description></item></channel></rss>
