@@ -6,14 +6,14 @@ weight: 2
 ---
 serviceを用いたnode間通信の例を挙げます。
 
-navigation_tutorial/scripts/に以下の2つのファイルを作成してください
-(コピペで構いません)。
-
 task_manager.pyで起動したノードから、
 serviceを用いてmove_robot.pyで起動したノードの機能を使用する例です。
 
 
 ## pythonファイルの用意
+navigation_tutorial/scripts/に以下の2つのファイルを作成してください
+(コピペで構いません)。
+
 task_manager.py
 ```
 #!/usr/bin/env python3
