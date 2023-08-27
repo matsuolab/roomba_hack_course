@@ -169,7 +169,7 @@ navigation_tutorialパッケージ内に
 navigation_tutorilal/srv/MoveTrigger.srvファイルを作成してください。
 
 とくに、navigation_tutorial/CMakeLists.txtを編集する箇所を抜かさないように気をつけてください
-（[対応する説明]([https://note.com/npaka/n/n3e90d24bd38b](https://note.com/npaka/n/n3e90d24bd38b#:~:text=(2)%20%E3%80%8CCMAkeLists.txt%E3%80%8D%E3%82%92%E4%BB%A5%E4%B8%8B%E3%81%AE%E3%82%88%E3%81%86%E3%81%AB%E7%B7%A8%E9%9B%86%E3%80%82))）。
+（[対応する説明](https://note.com/npaka/n/n3e90d24bd38b#:~:text=(2)%20%E3%80%8CCMAkeLists.txt%E3%80%8D%E3%82%92%E4%BB%A5%E4%B8%8B%E3%81%AE%E3%82%88%E3%81%86%E3%81%AB%E7%B7%A8%E9%9B%86%E3%80%82)）。
 
 MoveTrigger.srv
 ```
