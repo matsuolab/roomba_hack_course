@@ -121,4 +121,39 @@ Task1で出現する物体
 &lt;li>学習済みのKeypoint R-CNNを用いることで人間の手や腕の位置などのキーポイントを推定することができます。&lt;/li>
 &lt;/ul>
 &lt;/p>
-&lt;/details></description></item></channel></rss>
+&lt;/details>
+&lt;h2 id="技術プレゼンについて">技術プレゼンについて&lt;/h2>
+&lt;p>最終競技会のために開発した技術について、発表会でプレゼンを行います。
+プレゼンの評価方法は &lt;a href="https://github.com/RoboCupAtHome/RuleBook/releases/download/2023.2/rulebook.pdf" target="_blank" rel="noopener">RoboCup@Home のルール&lt;/a> に基づいています（7.2 Evaluating Juries for Final Demonstrations 参照）。
+評価項目は、&lt;code>internal jury&lt;/code> と &lt;code>external jury&lt;/code> で異なっています。&lt;/p>
+&lt;ul>
+&lt;li>internal jury（大会参加者による相互評価）
+&lt;ul>
+&lt;li>Efficacy/elegance of the solution
+&lt;ul>
+&lt;li>タスクの解決策の効果の高さ / エレガンスさ&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Difficulty of the overall demonstration
+&lt;ul>
+&lt;li>全体的な技術的難易度の高さ&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>external jury（大会運営者による外部評価）
+&lt;ul>
+&lt;li>Originality and presentation (story-telling is to be rewarded)
+&lt;ul>
+&lt;li>オリジナリティ、プレゼンの完成度&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>Elegance/success of overall demonstration
+&lt;ul>
+&lt;li>全体的なエレガンスさ、達成度&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;p>各項目 10 点満点で評価し、internal, external それぞれの平均値の合計を得点とします。&lt;/p></description></item></channel></rss>
