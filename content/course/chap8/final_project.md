@@ -146,3 +146,21 @@ Task2全体で150点満点です、また、Task2の得点が負になること�
 
 {{< /spoiler >}}
 
+## 技術プレゼンについて
+
+最終競技会のために開発した技術について、発表会でプレゼンを行います。
+プレゼンの評価方法は [RoboCup@Home のルール](https://github.com/RoboCupAtHome/RuleBook/releases/download/2023.2/rulebook.pdf) に基づいています（7.2 Evaluating Juries for Final Demonstrations 参照）。
+評価項目は、`internal jury`  と `external jury` で異なっています。
+
+- internal jury（大会参加者による相互評価）
+  - Efficacy/elegance of the solution
+    - タスクの解決策の効果の高さ / エレガンスさ
+  - Difficulty of the overall demonstration
+    - 全体的な技術的難易度の高さ
+- external jury（大会運営者による外部評価）
+  - Originality and presentation (story-telling is to be rewarded)
+    - オリジナリティ、プレゼンの完成度
+  - Elegance/success of overall demonstration
+    - 全体的なエレガンスさ、達成度
+
+各項目 10 点満点で評価し、internal, external それぞれの平均値の合計を得点とします。
