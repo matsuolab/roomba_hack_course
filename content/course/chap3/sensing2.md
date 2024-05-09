@@ -602,7 +602,7 @@ jetsonでdockerコンテナを起動
 {{< spoiler text="オドメトリを使ったフィードバック制御" >}}
 
 
-`simple_control2.py`を実行してみよう．
+それではコントローラを開発PCに接続して，`simple_control2.py`を実行してみよう．
 
 開発PCでteleopのコードを実行しましょう
 ```shell
